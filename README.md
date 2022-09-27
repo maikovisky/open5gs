@@ -2,9 +2,36 @@
 
 # Terraform para GKE
 
+```
+$env:GOOGLE_PROJECT=maiko-359801
+$env:KUBE_CONFIG_PATH=~/.kube/config 
+gcloud container clusters get-credentials gke-slice --region us-central1 --project maiko-359801
+```
+
 # Docker
 
 ```
-$ cd docker
-$ docker build -t maikovisky/openg5s .
-``` 
+cd docker
+docker build -t maikovisky/openg5s .
+```
+
+## Multiplataform
+
+Install QEMU  
+
+```
+sudo apt install -y qemu-user-static binfmt-support
+```
+
+Create image
+
+```
+docker buildx build --platform linux/amd64,linux/arm64,linux/arm/v6,linux/arm/v7  -o type=docker -t maikovisky/open5gs .
+```
+
+
+# Links
+- https://brito.com.br/posts/build-docker-arm64/
+- https://bitbucket.org/infinitydon/workspace/projects/PROJ
+- https://bitbucket.org/infinitydon/opensource-5g-core-service-mesh/src/main/
+- https://medium.com/@googler_ram/100-opensource-5g-projects-that-you-can-get-your-hands-dirty-with-127a50967692
