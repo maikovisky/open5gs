@@ -1,0 +1,46 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: open5gs-amf-config
+  namespace: open5gs
+  labels:
+    epc-mode: amf
+data:
+  amf.yaml: |
+    logger:
+        file: /var/log/open5gs/amf.log
+
+    smf:
+      sbi:
+        - addr: 0.0.0.0
+          port: 7777
+      pfcp:
+        - addr: 127.0.0.4
+        - addr: ::1
+      gtpc:
+        - addr: 127.0.0.4
+        - addr: ::1
+      gtpu:
+        - addr: 127.0.0.4
+        - addr: ::1
+      subnet:
+        - addr: 10.45.0.1/16
+        - addr: 2001:db8:cafe::1/48
+      dns:
+        - 8.8.8.8
+        - 8.8.4.4
+        - 2001:4860:4860::8888
+        - 2001:4860:4860::8844
+      mtu: 1400
+      ctf:
+        enabled: auto
+        freeDiameter: /etc/freeDiameter/smf.conf
+    nrf:
+        sbi:
+          - addr: open5gs-nrf 
+    upf:
+        pfcp:
+          - addr: open5gs-upf
+    metrics:
+        addr: open5gs-mme
+        port: 9090

@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: open5gs-bsf-config
+  namespace: open5gs
+  labels:
+    epc-mode: bsf
+data:
+  bsf.yaml: |
+    db_uri: mongodb://open5gs-mongodb-svc/open5gs
+    logger:
+        file: /var/log/open5gs/bsf.log
+
+    bsf:
+        sbi:
+          addr: 0.0.0.0
+          advertise: open5gs-bsf
+    nrf:
+        sbi:
+          name: open5gs-nrf

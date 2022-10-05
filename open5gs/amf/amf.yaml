@@ -1,0 +1,58 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: open5gs-amf
+  namespace: open5gs
+  labels:
+    epc-mode: amf
+spec:
+  selector:
+    epc-mode: amf
+  ports:
+    - protocol: TCP
+      port: 7777   
+---    
+apiVersion: apps/v1 
+kind: Deployment
+metadata:
+  name: open5gs-amf
+  namespace: open5gs
+  labels:
+    epc-mode: amf
+spec:
+  replicas: 1
+  nodeSelector:
+        agentpool: with-protocol-sctp
+  selector:
+    matchLabels:
+      epc-mode: amf
+  template:
+    metadata:
+      labels:
+        epc-mode: amf
+    spec:   
+      containers:
+        - name: amf
+          image: maikovisky/open5gs:latest      
+          securityContext:
+            privileged: true
+            capabilities:
+              add: ["NET_ADMIN", "SYS_MODULE"]
+          volumeMounts:
+            - name: open5gs-amf-config
+              mountPath: /open5gs/config-map/amf.yaml
+              subPath: "amf.yaml"
+            #- mountPath: /dev/net/tun
+            #  name: dev-net-tun
+            - name: "dev-net-tun"
+              mountPath: "/dev/net/tun" # Needed for VPN
+          #command: ["open5gs-amfd", "-d","-c", "/open5gs/config-map/amf.yaml"]
+          command: ["open5gs-amfd", "-t", "-d","-c", "/open5gs/config-map/amf.yaml"]
+      volumes:
+        - name: open5gs-amf-config
+          configMap:
+            name: open5gs-amf-config
+        - name: dev-net-tun
+          hostPath:
+            path: /dev/net/tun
+
