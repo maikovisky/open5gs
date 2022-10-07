@@ -230,13 +230,13 @@ data:
     #  4 - full    - display the complete information on a single long line
     #  8 - tree    - display the complete information in an easier to read format spanning several lines.
 
-    LoadExtension = "/lib/x86_64-linux-gnu/freeDiameter/dbg_msg_dumps.fdx" : "0x8888";
-    LoadExtension = "/lib/x86_64-linux-gnu/freeDiameter/dict_rfc5777.fdx";
-    LoadExtension = "/lib/x86_64-linux-gnu/freeDiameter/dict_mip6i.fdx";
-    LoadExtension = "/lib/x86_64-linux-gnu/freeDiameter/dict_nasreq.fdx";
-    LoadExtension = "/lib/x86_64-linux-gnu/freeDiameter/dict_nas_mipv6.fdx";
-    #LoadExtension = "/lib/x86_64-linux-gnu/freeDiameter/dict_dcca.fdx";
-    LoadExtension = "/lib/x86_64-linux-gnu/freeDiameter/dict_dcca_3gpp.fdx";
+    LoadExtension = "/lib/freeDiameter/dbg_msg_dumps.fdx" : "0x8888";
+    LoadExtension = "/lib/freeDiameter/dict_rfc5777.fdx";
+    LoadExtension = "/lib/freeDiameter/dict_mip6i.fdx";
+    LoadExtension = "/lib/freeDiameter/dict_nasreq.fdx";
+    LoadExtension = "/lib/freeDiameter/dict_nas_mipv6.fdx";
+    LoadExtension = "/lib/freeDiameter/dict_dcca.fdx";
+    LoadExtension = "/lib/freeDiameter/dict_dcca_3gpp.fdx";
 
     ##############################################################
     ##  Peers configuration
@@ -268,6 +268,3 @@ data:
     #ConnectPeer = "aaa.wide.ad.jp";
     #ConnectPeer = "old.diameter.serv" { TcTimer = 60; TLS_old_method; No_SCTP; Port=3868; } ;
     ConnectPeer = "hss.localdomain" { ConnectTo = "10.0.0.1"; No_TLS; };
-
-    ##############################################################
-    

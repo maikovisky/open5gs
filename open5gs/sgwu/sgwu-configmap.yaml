@@ -11,8 +11,11 @@ data:
         file: /var/log/open5gs/sgwu.log
 
     sgwu:
-        gtpc:
-          - addr: 127.0.0.6
+        gtpu:
+          - addr: 0.0.0.0
         pfcp:
-          - addr: 127.0.0.6
+          - addr: 0.0.0.0
+
     sgwc:
+      pfcp:
+        addr: open5gs-sgwc

@@ -12,9 +12,9 @@ data:
 
     sgwc:
         gtpc:
-          - addr: 127.0.0.3
+          - addr: 0.0.0.0
         pfcp:
-          - addr: 127.0.0.3
+          - addr: 0.0.0.0
     sgwu:
         pfcp:
-          - addr: 127.0.0.6
+          - addr: open5gs-sgwu

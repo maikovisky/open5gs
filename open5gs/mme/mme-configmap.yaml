@@ -254,9 +254,9 @@ data:
       mme:
           freeDiameter: /etc/freeDiameter/mme.conf
           s1ap:
-            - addr: 127.0.0.2
+            - addr: 0.0.0.0
           gtpc:
-            - addr: 127.0.0.2
+            - addr: 0.0.0.0
           gummei:
             plmn_id:
               mcc: 999
@@ -333,7 +333,7 @@ data:
       #
       sgwc:
           gtpc:
-            - addr: 127.0.0.3
+            - addr: open5gs-sgwc
 
       #
       # smf:
@@ -375,7 +375,7 @@ data:
       smf:
           gtpc:
             - addr:
-              - 127.0.0.4
+              - open5gs-smf
               - ::1
 
       #
@@ -442,5 +442,5 @@ data:
       #      port: 9090
       #
       metrics:
-          addr: 127.0.0.2
+          addr: 0.0.0.0
           port: 9090

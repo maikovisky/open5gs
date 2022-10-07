@@ -55,7 +55,7 @@ spec:
               subPath: "mme.key.pem"
             - name: "dev-net-tun"
               mountPath: "/dev/net/tun" # Needed for VPN
-          command: ["open5gs-mmed", "-t", "-d", "-c", "/open5gs/config-map/mme.yaml"]
+          command: ["open5gs-mmed", "-d", "-c", "/open5gs/config-map/mme.yaml"]
       volumes:
         - name: open5gs-mme-config
           configMap:

@@ -46,7 +46,7 @@ spec:
               subPath: "sgwu.yaml"
             - name: "dev-net-tun"
               mountPath: "/dev/net/tun" # Needed for VPN
-          command: ["open5gs-sgwud", "-c", "/open5gs/config-map/sgwu.yaml"]
+          command: ["open5gs-sgwud", "-d","-c", "/open5gs/config-map/sgwu.yaml"]
       volumes:
         - name: open5gs-sgwu-config
           configMap:

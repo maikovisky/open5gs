@@ -1,13 +1,13 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: open5gs-bsf
+  name: open5gs-upf
   namespace: open5gs
   labels:
-    epc-mode: bsf
+    epc-mode: upf
 spec:
   selector:
-    epc-mode: bsf
+    epc-mode: upf
   ports:
     - protocol: TCP
       port: 80
@@ -16,24 +16,24 @@ spec:
 apiVersion: apps/v1 # for versions before 1.9.0 use apps/v1beta2
 kind: Deployment
 metadata:
-  name: open5gs-bsf
+  name: open5gs-upf
   namespace: open5gs
   labels:
-    epc-mode: bsf
+    epc-mode: upf
 spec:
   replicas: 1
   selector:
     matchLabels:
-      epc-mode: bsf
+      epc-mode: upf
   template:
     metadata:
 #      annotations:
 #        "helm.sh/hook": pre-install    
       labels:
-        epc-mode: bsf
+        epc-mode: upf
     spec:  
       containers:
-        - name: bsf
+        - name: upf
           image: maikovisky/open5gs:latest  
           securityContext:
             privileged: true
@@ -41,16 +41,16 @@ spec:
               add: ["NET_ADMIN", "SYS_MODULE"]
           #imagePullPolicy: {{ .Values.open5gs.image.pullPolicy }}
           volumeMounts:
-            - name: open5gs-bsf-config
-              mountPath: /open5gs/config-map/bsf.yaml
-              subPath: "bsf.yaml"
+            - name: open5gs-upf-config
+              mountPath: /open5gs/config-map/upf.yaml
+              subPath: "upf.yaml"
             - name: "dev-net-tun"
               mountPath: "/dev/net/tun" # Needed for VPN
-          command: ["open5gs-bsfd", "-t", "-d", "-c", "/open5gs/config-map/bsf.yaml"]
+          command: ["open5gs-upfd", "-c", "/open5gs/config-map/upf.yaml"]
       volumes:
-        - name: open5gs-bsf-config
+        - name: open5gs-upf-config
           configMap:
-            name: open5gs-bsf-config
+            name: open5gs-upf-config
         - name: dev-net-tun
           hostPath:
             path: /dev/net/tun

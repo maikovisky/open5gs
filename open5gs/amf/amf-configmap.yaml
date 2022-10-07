@@ -14,7 +14,7 @@ data:
           - addr: 0.0.0.0
             advertise: open5gs-amf
         ngap: 
-          - addr: 127.0.0.5
+          - addr: 0.0.0.0
         guami:
           - plmn_id:
               mcc: 208
@@ -42,6 +42,11 @@ data:
         amf_name: open5gs-amf0
 
     nrf:
-     sbi:
-       name: open5gs-nrf
+      sbi:
+        name: open5gs-nrf
+        
     usrsctp:
+
+    metrics:
+      addr: open5gs-mme
+      port: 9090

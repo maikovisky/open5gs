@@ -1,0 +1,33 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: open5gs-upf-config
+  namespace: open5gs
+  labels:
+    epc-mode: upf
+data:
+  upf.yaml: |
+    logger:
+        file: /var/log/open5gs/upf.log
+    
+    #  <PFCP Server>
+    upf:
+      pfcp:
+        - addr: 0.0.0.0
+      gtpu:
+        - addr: 0.0.0.0
+      subnet:
+        - addr: 10.45.0.1/16
+        - addr: 2001:db8:cafe::1/48
+
+    #
+    # smf:
+    #
+    #  <PFCP Client>>
+    #
+    #  o PFCP Client(127.0.0.4:8805)
+    #
+    #    pfcp:
+    #      addr: 127.0.0.4
+    #
+    smf:

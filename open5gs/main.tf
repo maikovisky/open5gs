@@ -1,9 +1,9 @@
 # Criando namesapce open5gs
-resource "kubernetes_namespace" "open5gs" {
-   metadata {
-     name = "open5gs"
-   }
-}
+# resource "kubernetes_namespace" "open5gs" {
+#    metadata {
+#      name = "open5gs"
+#    }
+# }
 
 
 # MongoDB
@@ -160,3 +160,90 @@ resource "kubectl_manifest" "pcf" {
       data.kubectl_path_documents.nrf_manifests
     ]
 }
+
+
+# sgwc
+data "kubectl_path_documents" "sgwc_manifests" {
+    pattern = "./sgwc/*.yaml"
+}
+
+resource "kubectl_manifest" "sgwc" {
+    count     = length(data.kubectl_path_documents.sgwc_manifests.documents)
+    yaml_body = element(data.kubectl_path_documents.sgwc_manifests.documents, count.index)
+
+    depends_on = [
+      data.kubectl_path_documents.nrf_manifests
+    ]
+}
+
+# smf
+data "kubectl_path_documents" "smf_manifests" {
+    pattern = "./smf/*.yaml"
+}
+
+resource "kubectl_manifest" "smf" {
+    count     = length(data.kubectl_path_documents.smf_manifests.documents)
+    yaml_body = element(data.kubectl_path_documents.smf_manifests.documents, count.index)
+
+    depends_on = [
+      data.kubectl_path_documents.nrf_manifests
+    ]
+}
+
+# udm
+data "kubectl_path_documents" "udm_manifests" {
+    pattern = "./udm/*.yaml"
+}
+
+resource "kubectl_manifest" "udm" {
+    count     = length(data.kubectl_path_documents.udm_manifests.documents)
+    yaml_body = element(data.kubectl_path_documents.udm_manifests.documents, count.index)
+
+    depends_on = [
+      data.kubectl_path_documents.nrf_manifests
+    ]
+}
+
+# sgwu
+data "kubectl_path_documents" "sgwu_manifests" {
+    pattern = "./sgwu/*.yaml"
+}
+
+resource "kubectl_manifest" "sgwu" {
+    count     = length(data.kubectl_path_documents.sgwu_manifests.documents)
+    yaml_body = element(data.kubectl_path_documents.sgwu_manifests.documents, count.index)
+
+    depends_on = [
+      data.kubectl_path_documents.nrf_manifests
+    ]
+}
+
+# UDR
+data "kubectl_path_documents" "udr_manifests" {
+    pattern = "./udr/*.yaml"
+}
+
+resource "kubectl_manifest" "udr" {
+    count     = length(data.kubectl_path_documents.udr_manifests.documents)
+    yaml_body = element(data.kubectl_path_documents.udr_manifests.documents, count.index)
+
+    depends_on = [
+      data.kubectl_path_documents.nrf_manifests
+    ]
+}
+
+# UPF
+data "kubectl_path_documents" "upf_manifests" {
+    pattern = "./upf/*.yaml"
+}
+
+resource "kubectl_manifest" "upf" {
+    count     = length(data.kubectl_path_documents.upf_manifests.documents)
+    yaml_body = element(data.kubectl_path_documents.upf_manifests.documents, count.index)
+
+    depends_on = [
+      data.kubectl_path_documents.nrf_manifests
+    ]
+}
+
+
