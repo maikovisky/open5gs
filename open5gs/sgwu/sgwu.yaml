@@ -32,6 +32,8 @@ spec:
       labels:
         epc-mode: sgwu
     spec:  
+      nodeSelector:
+        kubernetes.io/arch: amd64
       containers:
         - name: sgwu
           image: maikovisky/open5gs:latest  

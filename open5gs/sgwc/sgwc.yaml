@@ -22,6 +22,8 @@ metadata:
     epc-mode: sgwc
 spec:
   replicas: 1
+  nodeSelector:
+    kubernetes.io/arch: amd64
   selector:
     matchLabels:
       epc-mode: sgwc
@@ -32,6 +34,8 @@ spec:
       labels:
         epc-mode: sgwc
     spec:  
+      nodeSelector:
+        kubernetes.io/arch: amd64
       containers:
         - name: sgwc
           image: maikovisky/open5gs:latest  
