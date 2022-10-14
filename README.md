@@ -41,3 +41,6 @@ docker buildx build --platform linux/amd64,linux/arm64,linux/arm/v6,linux/arm/v7
 - https://bitbucket.org/infinitydon/opensource-5g-core-service-mesh/src/main/
 - https://medium.com/@googler_ram/100-opensource-5g-projects-that-you-can-get-your-hands-dirty-with-127a50967692
 - https://open5gs.org/open5gs/docs/platform/08-alpine/
+- https://github.com/my5G/my5G-RANTester
+- https://github.com/PORVIR-5G-Project/my5G-RANTester
+- https://github.com/aligungr/UERANSIM

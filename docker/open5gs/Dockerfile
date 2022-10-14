@@ -12,14 +12,12 @@ RUN apk update && \
        lksctp-tools \
        libmicrohttpd \
        libidn \
-       libstdc++ \
        mongo-c-driver 
     
 
 FROM base as builder
 RUN apk add --no-cache \
         alpine-sdk \
-        cmake \
         bison \
         flex \
         git \
@@ -39,9 +37,7 @@ RUN apk add --no-cache \
         talloc-dev \
         iproute2 && \
     git clone --recursive https://github.com/open5gs/open5gs && \
-    cd open5gs && meson build --prefix=/ && ninja -C build && cd build && DESTDIR=/open5gs/install ninja install && \
-    git clone --recursive https://github.com/aligungr/UERANSIM && \
-    cd UERANSIM && make && chmod a+x build/nr-binder 
+    cd open5gs && meson build --prefix=/ && ninja -C build && cd build && DESTDIR=/open5gs/install ninja install 
 
 WORKDIR /
 
@@ -56,12 +52,6 @@ COPY --from=builder /open5gs/build/configs/open5gs /etc/open5gs
 COPY --from=builder /open5gs/build/configs/freeDiameter /etc/freeDiameter 
 COPY --from=builder /open5gs/build/configs/*.yaml /etc/
 COPY --from=builder /open5gs/misc/netconf.sh /bin/ 
-COPY --from=builder /UERANSIM/build/nr-gnb /bin
-COPY --from=builder /UERANSIM/build/nr-ue /bin
-COPY --from=builder /UERANSIM/build/nr-cli /bin
-COPY --from=builder /UERANSIM/build/nr-binder /bin
-COPY --from=builder /UERANSIM/build/libdevbnd.so /lib
-COPY --from=builder /UERANSIM/config /etc/ueransim
 
 
 
