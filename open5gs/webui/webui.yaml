@@ -1,58 +1,60 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: open5gs-upf
+  name: open5gs-webui
   namespace: open5gs
   labels:
-    epc-mode: upf
+    epc-mode: webui
 spec:
   selector:
-    epc-mode: upf
+    epc-mode: webui
   ports:
-    - protocol: TCP
+    - name: open5gs-webui-tcp-80
+      protocol: TCP
       port: 80
-      targetPort: 80
+    - name: open5gs-webui-tcp-3000
+      protocol: TCP
+      port: 3000
 ---    
 apiVersion: apps/v1 # for versions before 1.9.0 use apps/v1beta2
 kind: Deployment
 metadata:
-  name: open5gs-upf
+  name: open5gs-webui
   namespace: open5gs
   labels:
-    epc-mode: upf
+    epc-mode: webui
 spec:
   replicas: 1
   selector:
     matchLabels:
-      epc-mode: upf
+      epc-mode: webui
   template:
     metadata:
 #      annotations:
 #        "helm.sh/hook": pre-install    
       labels:
-        epc-mode: upf
+        epc-mode: webui
     spec:  
       nodeSelector:
         kubernetes.io/arch: amd64
       containers:
-        - name: upf
-          image: maikovisky/open5gs:latest  
+        - name: webui
+          image: maikovisky/open5gs-webui:latest  
           securityContext:
             privileged: true
             capabilities:
               add: ["NET_ADMIN", "SYS_MODULE"]
           #imagePullPolicy: {{ .Values.open5gs.image.pullPolicy }}
           volumeMounts:
-            - name: open5gs-upf-config
-              mountPath: /open5gs/config-map/upf.yaml
-              subPath: "upf.yaml"
             - name: "dev-net-tun"
               mountPath: "/dev/net/tun" # Needed for VPN
-          command: ["open5gs-upfd", "-c", "/open5gs/config-map/upf.yaml"]
+          env:
+            - name: DB_URI 
+              value: mongodb://open5gs-mongodb-svc:27017
+            - name: HOSTNAME
+              value: 0.0.0.0
+          command: ["npm", "run", "dev"]
       volumes:
-        - name: open5gs-upf-config
-          configMap:
-            name: open5gs-upf-config
         - name: dev-net-tun
           hostPath:
             path: /dev/net/tun

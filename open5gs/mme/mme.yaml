@@ -9,9 +9,22 @@ spec:
   selector:
     epc-mode: mme
   ports:
-    - protocol: TCP
-      port: 80
-      targetPort: 80
+    - name: open5gs-mme-tcp-s1ap
+      protocol: TCP
+      port: 36412
+    - name: open5gs-mme-tcp-gtpc
+      protocol: TCP
+      port: 2123
+    - name: open5gs-mme-tcp-sgsap
+      protocol: TCP
+      port: 29119
+    - name: open5gs-mme-tcp-usrstcp
+      protocol: TCP
+      port: 9899
+    - name: open5gs-mme-tcp-metrics
+      protocol: TCP
+      port: 9090
+
 ---    
 apiVersion: apps/v1 # for versions before 1.9.0 use apps/v1beta2
 kind: Deployment

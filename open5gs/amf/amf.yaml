@@ -9,8 +9,18 @@ spec:
   selector:
     epc-mode: amf
   ports:
-    - protocol: TCP
-      port: 7777   
+    - name: open5gs-amf-tcp-80
+      protocol: TCP
+      port: 80 
+    - name: open5gs-amf-tcp-7777
+      protocol: TCP
+      port: 7777  
+    - name: open5gs-amf-tcp-9090
+      protocol: TCP
+      port: 9090 
+    - name: open5gs-amf-sctp-38412
+      protocol: SCTP
+      port: 38412
 ---    
 apiVersion: apps/v1 
 kind: Deployment
@@ -31,9 +41,10 @@ spec:
     spec:   
       nodeSelector:
         kubernetes.io/arch: amd64
+        kubernetes.io/hostname: molejo
       containers:
         - name: amf
-          image: maikovisky/open5gs:latest      
+          image: maikovisky/open5gs-all:latest      
           securityContext:
             privileged: true
             capabilities:
@@ -47,7 +58,7 @@ spec:
             - name: "dev-net-tun"
               mountPath: "/dev/net/tun" # Needed for VPN
           #command: ["open5gs-amfd", "-d","-c", "/open5gs/config-map/amf.yaml"]
-          command: ["open5gs-amfd", "-t", "-d","-c", "/open5gs/config-map/amf.yaml"]
+          command: ["open5gs-amfd", "-c", "/open5gs/config-map/amf.yaml"]
       volumes:
         - name: open5gs-amf-config
           configMap:

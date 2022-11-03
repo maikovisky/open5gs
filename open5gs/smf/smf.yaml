@@ -32,6 +32,8 @@ spec:
       labels:
         epc-mode: smf
     spec:  
+      nodeSelector:
+        kubernetes.io/arch: amd64
       containers:
         - name: smf
           image: maikovisky/open5gs:latest  
@@ -61,6 +63,7 @@ spec:
               mountPath: "/dev/net/tun" # Needed for VPN
               
           command: ["open5gs-smfd", "-c", "/open5gs/config-map/smf.yaml"]
+          #command: ["top"]
       volumes:
         - name: open5gs-smf-config
           configMap:

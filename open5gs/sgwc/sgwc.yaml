@@ -10,8 +10,7 @@ spec:
     epc-mode: sgwc
   ports:
     - protocol: TCP
-      port: 80
-      targetPort: 80
+      port: 8805
 ---    
 apiVersion: apps/v1 # for versions before 1.9.0 use apps/v1beta2
 kind: Deployment
@@ -48,7 +47,8 @@ spec:
               subPath: "sgwc.yaml"
             - name: "dev-net-tun"
               mountPath: "/dev/net/tun" # Needed for VPN
-          command: ["open5gs-sgwcd", "-c", "/open5gs/config-map/sgwc.yaml"]
+          #command: ["open5gs-sgwcd", "-c", "/open5gs/config-map/sgwc.yaml"]
+          command: ["top"]
       volumes:
         - name: open5gs-sgwc-config
           configMap:

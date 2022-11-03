@@ -246,4 +246,47 @@ resource "kubectl_manifest" "upf" {
     ]
 }
 
+# webui
+data "kubectl_path_documents" "webui_manifests" {
+    pattern = "./webui/*.yaml"
+}
+
+resource "kubectl_manifest" "webui" {
+    count     = length(data.kubectl_path_documents.webui_manifests.documents)
+    yaml_body = element(data.kubectl_path_documents.webui_manifests.documents, count.index)
+
+    depends_on = [
+      data.kubectl_path_documents.nrf_manifests
+    ]
+}
+
+# POD for teste
+data "kubectl_path_documents" "test_manifests" {
+    pattern = "./test/*.yaml"
+}
+
+resource "kubectl_manifest" "test" {
+    count     = length(data.kubectl_path_documents.test_manifests.documents)
+    yaml_body = element(data.kubectl_path_documents.test_manifests.documents, count.index)
+
+    depends_on = [
+      data.kubectl_path_documents.nrf_manifests
+    ]
+}
+
+# POD for ueransim
+data "kubectl_path_documents" "ueransim_manifests" {
+    pattern = "./ueransim/*.yaml"
+}
+
+resource "kubectl_manifest" "ueransim" {
+    count     = length(data.kubectl_path_documents.ueransim_manifests.documents)
+    yaml_body = element(data.kubectl_path_documents.ueransim_manifests.documents, count.index)
+
+    depends_on = [
+      data.kubectl_path_documents.nrf_manifests
+    ]
+}
+
+
 

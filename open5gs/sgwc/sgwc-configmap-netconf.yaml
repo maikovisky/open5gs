@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: open5gs-sgwc-netconf
+  namespace: open5gs
+  labels:
+    epc-mode: sgwc
+data:
+  netconf.sh: |
+    apk add iproute2
+    ip tuntap add name ogstun mode tun
+    ip link show
+    ip addr add 10.45.0.1/16 dev ogstun
+    ip addr add 2001:db8:cafe::1/48 dev ogstun
+    sudo ip link set ogstun up
+    ip link show

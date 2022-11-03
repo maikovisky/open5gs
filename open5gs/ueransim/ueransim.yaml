@@ -1,58 +1,57 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: open5gs-upf
+  name: open5gs-ueransim
   namespace: open5gs
   labels:
-    epc-mode: upf
+    epc-mode: ueransim
 spec:
   selector:
-    epc-mode: upf
+    epc-mode: ueransim
   ports:
-    - protocol: TCP
+    - name: open5gs-ueransim-tcp-80
+      protocol: TCP
       port: 80
-      targetPort: 80
+    - name: open5gs-ueransim-tcp-3000
+      protocol: TCP
+      port: 3000
 ---    
 apiVersion: apps/v1 # for versions before 1.9.0 use apps/v1beta2
 kind: Deployment
 metadata:
-  name: open5gs-upf
+  name: open5gs-ueransim
   namespace: open5gs
   labels:
-    epc-mode: upf
+    epc-mode: ueransim
 spec:
   replicas: 1
   selector:
     matchLabels:
-      epc-mode: upf
+      epc-mode: ueransim
   template:
     metadata:
 #      annotations:
 #        "helm.sh/hook": pre-install    
       labels:
-        epc-mode: upf
+        epc-mode: ueransim
     spec:  
       nodeSelector:
         kubernetes.io/arch: amd64
+        kubernetes.io/hostname: molejo
       containers:
-        - name: upf
-          image: maikovisky/open5gs:latest  
+        - name: ueransim
+          image: maikovisky/ueransim:latest  
           securityContext:
             privileged: true
             capabilities:
               add: ["NET_ADMIN", "SYS_MODULE"]
           #imagePullPolicy: {{ .Values.open5gs.image.pullPolicy }}
           volumeMounts:
-            - name: open5gs-upf-config
-              mountPath: /open5gs/config-map/upf.yaml
-              subPath: "upf.yaml"
             - name: "dev-net-tun"
               mountPath: "/dev/net/tun" # Needed for VPN
-          command: ["open5gs-upfd", "-c", "/open5gs/config-map/upf.yaml"]
+          command: ["sed", "-i", ""]
+          command: ["top"]
       volumes:
-        - name: open5gs-upf-config
-          configMap:
-            name: open5gs-upf-config
         - name: dev-net-tun
           hostPath:
             path: /dev/net/tun

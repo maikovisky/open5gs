@@ -17,5 +17,5 @@ data:
           - addr: 0.0.0.0
 
     sgwc:
-      pfcp:
-        addr: open5gs-sgwc
+      #pfcp:
+      #  addr: open5gs-sgwc
