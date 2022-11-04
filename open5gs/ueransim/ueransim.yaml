@@ -47,11 +47,23 @@ spec:
               add: ["NET_ADMIN", "SYS_MODULE"]
           #imagePullPolicy: {{ .Values.open5gs.image.pullPolicy }}
           volumeMounts:
+            - name: open5gs-ueransim-gnb-config
+              mountPath: /etc/ueransim/open5gs-gnb.yaml
+              subPath: "open5gs-gnb.yaml"
+            - name: open5gs-ueransim-ue-config
+              mountPath: /etc/ueransim/open5gs-ue.yaml
+              subPath: "open5gs-ue.yaml"
             - name: "dev-net-tun"
               mountPath: "/dev/net/tun" # Needed for VPN
           command: ["sed", "-i", ""]
           command: ["top"]
       volumes:
+        - name: open5gs-ueransim-gnb-config
+          configMap:
+            name: open5gs-ueransim-gnb-config
+        - name: open5gs-ueransim-ue-config
+          configMap:
+            name: open5gs-ueransim-ue-config
         - name: dev-net-tun
           hostPath:
             path: /dev/net/tun
