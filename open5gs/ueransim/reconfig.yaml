@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: open5gs-ueransim-reconfig
+  namespace: open5gs
+  labels:
+    epc-mode: ueransim
+data:
+  reconfig: |
+    #!/bin/bash
+    sed "s/HOSTNAME/$HOSTNAME/g" /etc/ueransim/open5gs-gnb-base.yaml > /etc/ueransim/open5gs-gnb-01.yaml
+    sed "s/HOSTNAME/$HOSTNAME/g" /etc/ueransim/open5gs-ue-base.yaml > /etc/ueransim/open5gs-ue-01.yaml
+    nr-gnb -c /etc/ueransim/open5gs-gnb-01.yaml
+    #top

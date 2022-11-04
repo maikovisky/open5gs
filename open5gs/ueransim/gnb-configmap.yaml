@@ -6,7 +6,7 @@ metadata:
   labels:
     epc-mode: ueransim
 data:
-  open5gs-gnb.yaml: |
+  open5gs-gnb-base.yaml: |
     mcc: '208'          # Mobile Country Code value
     mnc: '93'           # Mobile Network Code value (2 or 3 digits)
 

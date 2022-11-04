@@ -6,7 +6,7 @@ metadata:
   labels:
     epc-mode: ueransim
 data:
-  open5gs-ue.yaml: |
+  open5gs-ue-base.yaml: |
     # IMSI number of the UE. IMSI = [MCC|MNC|MSISDN] (In total 15 digits)
     supi: 'imsi-208930000000001'
     # Mobile Country Code value of HPLMN
@@ -29,10 +29,12 @@ data:
 
     # List of gNB IP addresses for Radio Link Simulation
     gnbSearchList:
-      - 127.0.0.1
-
+      - HOSTNAME
+      
     # UAC Access Identities Configuration
-    mcs: false
+    uacAic:
+      mps: false
+      mcs: false
 
     # UAC Access Control Class
     uacAcc:
@@ -49,3 +51,30 @@ data:
         apn: 'internet'
         slice:
           sst: 1
+    
+    # Configured NSSAI for this UE by HPLMN
+    configured-nssai:
+      - sst: 1
+
+    # Default Configured NSSAI for this UE
+    default-nssai:
+      - sst: 1
+        sd: 1
+
+    # Supported integrity algorithms by this UE
+    integrity:
+      IA1: true
+      IA2: true
+      IA3: true
+
+    # Supported encryption algorithms by this UE
+    ciphering:
+      EA1: true
+      EA2: true
+      EA3: true
+
+    # Integrity protection maximum data rate for user plane
+    integrityMaxRate:
+      uplink: 'full'
+      downlink: 'full'
+

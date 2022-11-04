@@ -40,24 +40,33 @@ spec:
         kubernetes.io/hostname: molejo
       containers:
         - name: ueransim
-          image: maikovisky/ueransim:latest  
+          image: maikovisky/ueransim:1.1  
           securityContext:
             privileged: true
             capabilities:
               add: ["NET_ADMIN", "SYS_MODULE"]
           #imagePullPolicy: {{ .Values.open5gs.image.pullPolicy }}
           volumeMounts:
+            - name: open5gs-ueransim-reconfig
+              mountPath: /bin/reconfig
+              subPath: "reconfig"
             - name: open5gs-ueransim-gnb-config
-              mountPath: /etc/ueransim/open5gs-gnb.yaml
-              subPath: "open5gs-gnb.yaml"
+              mountPath: /etc/ueransim/open5gs-gnb-base.yaml
+              subPath: "open5gs-gnb-base.yaml"
             - name: open5gs-ueransim-ue-config
-              mountPath: /etc/ueransim/open5gs-ue.yaml
-              subPath: "open5gs-ue.yaml"
+              mountPath: /etc/ueransim/open5gs-ue-base.yaml
+              subPath: "open5gs-ue-base.yaml"
             - name: "dev-net-tun"
               mountPath: "/dev/net/tun" # Needed for VPN
-          command: ["sed", "-i", ""]
-          command: ["top"]
+          #command: ["sed", "-i", ""]
+          #command: ["top"]
+          command: ["/bin/reconfig"]
+          #command: ["/bin/reconfig", "&&", "nr-gnb", "-c", "/etc/uesinran/open5g-gnb-01.yaml"]
       volumes:
+        - name: open5gs-ueransim-reconfig
+          configMap:
+            name: open5gs-ueransim-reconfig
+            defaultMode: 0777
         - name: open5gs-ueransim-gnb-config
           configMap:
             name: open5gs-ueransim-gnb-config

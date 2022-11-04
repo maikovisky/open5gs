@@ -50,7 +50,7 @@ spec:
               mountPath: "/dev/net/tun" # Needed for VPN
           env:
             - name: DB_URI 
-              value: mongodb://open5gs-mongodb-svc:27017
+              value: mongodb://open5gs-mongodb-svc/open5gs
             - name: HOSTNAME
               value: 0.0.0.0
           command: ["npm", "run", "dev"]
