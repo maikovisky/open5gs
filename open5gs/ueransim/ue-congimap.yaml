@@ -59,7 +59,7 @@ data:
     # Default Configured NSSAI for this UE
     default-nssai:
       - sst: 1
-        sd: 1
+
 
     # Supported integrity algorithms by this UE
     integrity:
@@ -77,4 +77,5 @@ data:
     integrityMaxRate:
       uplink: 'full'
       downlink: 'full'
+      
 

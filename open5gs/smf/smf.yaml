@@ -8,10 +8,20 @@ metadata:
 spec:
   selector:
     epc-mode: smf
+  #type: ClusterIP
   ports:
-    - protocol: TCP
+    - name: open5gs-smf-tcp-80
+      protocol: TCP
       port: 80
       targetPort: 80
+    - name: open5gs-smf-udp-2152
+      protocol: UDP
+      port: 2152
+      targetPort: 2152
+    - name: open5gs-smf-udp-8805
+      protocol: UDP
+      port: 8805
+      targetPort: 8805
 ---    
 apiVersion: apps/v1 # for versions before 1.9.0 use apps/v1beta2
 kind: Deployment
@@ -62,7 +72,7 @@ spec:
             - name: "dev-net-tun"
               mountPath: "/dev/net/tun" # Needed for VPN
               
-          command: ["open5gs-smfd", "-c", "/open5gs/config-map/smf.yaml"]
+          command: ["open5gs-smfd", "-d", "-c", "/open5gs/config-map/smf.yaml"]
           #command: ["top"]
       volumes:
         - name: open5gs-smf-config

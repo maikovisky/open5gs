@@ -48,7 +48,7 @@ spec:
               subPath: "bsf.yaml"
             - name: "dev-net-tun"
               mountPath: "/dev/net/tun" # Needed for VPN
-          command: ["open5gs-bsfd", "-t", "-d", "-c", "/open5gs/config-map/bsf.yaml"]
+          command: ["open5gs-bsfd", "-c", "/open5gs/config-map/bsf.yaml"]
       volumes:
         - name: open5gs-bsf-config
           configMap:

@@ -32,6 +32,8 @@ spec:
       labels:
         epc-mode: pcf
     spec:  
+      nodeSelector:
+        kubernetes.io/arch: amd64
       containers:
         - name: pcf
           image: maikovisky/open5gs:latest  

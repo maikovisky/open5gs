@@ -15,7 +15,6 @@ data:
           addr: 0.0.0.0
         nsi:
           - addr: 0.0.0.0
-            port: 7777
             s_nssai:
               sst: 1
     nrf:

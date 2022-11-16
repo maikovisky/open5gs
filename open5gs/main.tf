@@ -147,6 +147,20 @@ resource "kubectl_manifest" "nssf" {
     ]
 }
 
+# PCRF Database
+# data "kubectl_path_documents" "pcrf_manifests" {
+#     pattern = "./pcrf/*.yaml"
+# }
+
+# resource "kubectl_manifest" "pcrf" {
+#     count     = length(data.kubectl_path_documents.pcrf_manifests.documents)
+#     yaml_body = element(data.kubectl_path_documents.pcrf_manifests.documents, count.index)
+
+#     depends_on = [
+#       data.kubectl_path_documents.nrf_manifests
+#     ]
+# }
+
 # PCF Database
 data "kubectl_path_documents" "pcf_manifests" {
     pattern = "./pcf/*.yaml"

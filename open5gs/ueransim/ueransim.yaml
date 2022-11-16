@@ -46,6 +46,23 @@ spec:
             capabilities:
               add: ["NET_ADMIN", "SYS_MODULE"]
           #imagePullPolicy: {{ .Values.open5gs.image.pullPolicy }}
+          env:
+            - name: MY_POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+            - name: linkIp
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+            - name: ngapIp
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+            - name: gtpIp
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
           volumeMounts:
             - name: open5gs-ueransim-reconfig
               mountPath: /bin/reconfig
@@ -58,10 +75,9 @@ spec:
               subPath: "open5gs-ue-base.yaml"
             - name: "dev-net-tun"
               mountPath: "/dev/net/tun" # Needed for VPN
-          #command: ["sed", "-i", ""]
-          #command: ["top"]
           command: ["/bin/reconfig"]
-          #command: ["/bin/reconfig", "&&", "nr-gnb", "-c", "/etc/uesinran/open5g-gnb-01.yaml"]
+          #command: ["sleep", "1d"]
+          #command: ["nr-gnb", "-c", "/etc/ueransim/open5g-gnb.yaml"]
       volumes:
         - name: open5gs-ueransim-reconfig
           configMap:

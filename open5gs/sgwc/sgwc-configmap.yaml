@@ -12,9 +12,12 @@ data:
 
     sgwc:
         gtpc:
-          - addr: 0.0.0.0
+          - addr: HOSTNAME
         pfcp:
-          - addr: 0.0.0.0
+          - addr: HOSTNAME
     sgwu:
         pfcp:
           - addr: open5gs-sgwu
+    
+    # End of file
+    

@@ -13,15 +13,15 @@ data:
     smf:
       sbi:
         - addr: 0.0.0.0
-          port: 7777
+          port: 80
       pfcp:
-        - addr: 0.0.0.0
+        - dev: eth0
         - addr: ::1
       gtpc:
-        - addr: 0.0.0.0
+        - dev: eth0
         - addr: ::1
       gtpu:
-        - addr: 0.0.0.0
+        - dev: eth0
         - addr: ::1
       subnet:
         - addr: 10.45.0.1/16
@@ -45,5 +45,5 @@ data:
     #      - addr: open5gs-upf
 
     metrics:
-        addr: open5gs-mme
+        addr: 0.0.0.0
         port: 9090

@@ -9,9 +9,18 @@ spec:
   selector:
     epc-mode: upf
   ports:
-    - protocol: TCP
+    - name: open5gs-upf-tcp-80
+      protocol: TCP
       port: 80
       targetPort: 80
+    - name: open5gs-upf-udp-2152
+      protocol: UDP
+      port: 2152
+      targetPort: 2152
+    - name: open5gs-upf-udp-8805
+      protocol: UDP
+      port: 8805
+      targetPort: 8805
 ---    
 apiVersion: apps/v1 # for versions before 1.9.0 use apps/v1beta2
 kind: Deployment

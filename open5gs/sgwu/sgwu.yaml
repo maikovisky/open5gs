@@ -37,6 +37,7 @@ spec:
     spec:  
       nodeSelector:
         kubernetes.io/arch: amd64
+        kubernetes.io/hostname: molejo
       containers:
         - name: sgwu
           image: maikovisky/open5gs:latest  
@@ -48,14 +49,22 @@ spec:
           volumeMounts:
             - name: open5gs-sgwu-config
               mountPath: /open5gs/config-map/sgwu.yaml
-              subPath: "sgwu.yaml"            
+              subPath: "sgwu.yaml"   
+            - name: open5gs-sgwu-reconfig
+              mountPath: /bin/reconfig.sh
+              subPath: "reconfig.sh"            
             - name: "dev-net-tun"
               mountPath: "/dev/net/tun" # Needed for VPN
-          command: ["open5gs-sgwud", "-d","-c", "/open5gs/config-map/sgwu.yaml"]
+          #command: ["open5gs-sgwud", "-d","-c", "/open5gs/config-map/sgwu.yaml"]
+          command: ["sleep", "1d"]
       volumes:
         - name: open5gs-sgwu-config
           configMap:
             name: open5gs-sgwu-config
+        - name: open5gs-sgwu-reconfig
+          configMap:
+            name: open5gs-sgwu-reconfig
+            defaultMode: 0777
         - name: open5gs-sgwu-netconf
           configMap:
             name: open5gs-sgwu-netconf

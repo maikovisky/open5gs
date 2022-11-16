@@ -32,6 +32,9 @@ spec:
       labels:
         epc-mode: udm
     spec:  
+      nodeSelector:
+        kubernetes.io/arch: amd64
+        kubernetes.io/hostname: molejo
       containers:
         - name: udm
           image: maikovisky/open5gs:latest  
@@ -46,7 +49,7 @@ spec:
               subPath: "udm.yaml"
             - name: "dev-net-tun"
               mountPath: "/dev/net/tun" # Needed for VPN
-          command: ["open5gs-udmd", "-c", "/open5gs/config-map/udm.yaml"]
+          command: ["open5gs-udmd",  "-t", "-d", "-c", "/open5gs/config-map/udm.yaml"]
       volumes:
         - name: open5gs-udm-config
           configMap:
