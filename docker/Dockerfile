@@ -40,7 +40,7 @@ RUN apk add --no-cache \
         iproute2 && \
     git clone --recursive https://github.com/open5gs/open5gs && \
     cd open5gs && meson build --prefix=/ && ninja -C build && cd build && DESTDIR=/open5gs/install ninja install && \
-    git clone --recursive https://github.com/aligungr/UERANSIM && \
+    cd / && git clone --recursive https://github.com/aligungr/UERANSIM && \
     cd UERANSIM && make && chmod a+x build/nr-binder 
 
 WORKDIR /

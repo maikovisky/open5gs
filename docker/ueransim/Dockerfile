@@ -26,7 +26,15 @@ WORKDIR /
 
 
 FROM base as final
-RUN mkdir -p /var/log/ueransim
+RUN mkdir -p /var/log/ueransim && \
+    apk add --no-cache \
+       bash \
+       libstdc++ \
+       iproute2 \
+       curl \
+       lksctp-tools \
+       net-tools  
+	
 WORKDIR /
 COPY --from=builder /UERANSIM/build/nr-gnb /bin
 COPY --from=builder /UERANSIM/build/nr-ue /bin
