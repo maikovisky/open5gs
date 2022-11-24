@@ -6,7 +6,7 @@ metadata:
   labels:
     freeDiameter: smf
 data:
-  smf.conf: |
+  smf.conf: |-
       # This is a sample configuration file for freeDiameter daemon.
 
       # Most of the options can be omitted, as they default to reasonable values.
@@ -88,7 +88,7 @@ data:
       #ListenOn = "202.249.37.5";
       #ListenOn = "2001:200:903:2::202:1";
       #ListenOn = "fe80::21c:5ff:fe98:7d62%eth0";
-      ListenOn = "0.0.0.0";
+      #ListenOn = "0.0.0.0";
 
 
       ##############################################################
@@ -270,8 +270,9 @@ data:
       # Examples:
       #ConnectPeer = "aaa.wide.ad.jp";
       #ConnectPeer = "old.diameter.serv" { TcTimer = 60; TLS_old_method; No_SCTP; Port=3868; } ;
-      ConnectPeer = "pcrf.localdomain" { ConnectTo = "127.0.0.9"; No_TLS; };
-
-
+      #ConnectPeer = "pcrf.localdomain" { ConnectTo = "127.0.0.9"; No_TLS; };
       ##############################################################
+
+      ListenOn = "0.0.0.0";
+      
           

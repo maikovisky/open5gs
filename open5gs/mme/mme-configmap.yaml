@@ -254,19 +254,19 @@ data:
       mme:
           freeDiameter: /etc/freeDiameter/mme.conf
           s1ap:
-            - addr: 0.0.0.0
+            - dev: eth0
           gtpc:
-            - addr: 0.0.0.0
+            - dev: eth0
           gummei:
             plmn_id:
-              mcc: 999
-              mnc: 70
+              mcc: 208
+              mnc: 93
             mme_gid: 2
             mme_code: 1
           tai:
             plmn_id:
-              mcc: 999
-              mnc: 70
+              mcc: 208
+              mnc: 93
             tac: 1
           security:
               integrity_order : [ EIA2, EIA1, EIA0 ]

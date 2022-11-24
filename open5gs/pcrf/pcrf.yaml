@@ -1,13 +1,13 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: open5gs-pcfr
+  name: open5gs-pcrf
   namespace: open5gs
   labels:
-    epc-mode: pcfr
+    epc-mode: pcrf
 spec:
   selector:
-    epc-mode: pcfr
+    epc-mode: pcrf
   ports:
     - protocol: TCP
       port: 80
@@ -16,24 +16,24 @@ spec:
 apiVersion: apps/v1 # for versions before 1.9.0 use apps/v1beta2
 kind: Deployment
 metadata:
-  name: open5gs-pcfr
+  name: open5gs-pcrf
   namespace: open5gs
   labels:
-    epc-mode: pcfr
+    epc-mode: pcrf
 spec:
   replicas: 1
   selector:
     matchLabels:
-      epc-mode: pcfr
+      epc-mode: pcrf
   template:
-    metadata:
-#      annotations:
-#        "helm.sh/hook": pre-install    
+    metadata:  
       labels:
-        epc-mode: pcfr
+        epc-mode: pcrf
     spec:  
+      nodeSelector:
+        kubernetes.io/arch: amd64
       containers:
-        - name: pcfr
+        - name: pcrf
           image: maikovisky/open5gs:latest  
           securityContext:
             privileged: true
@@ -41,22 +41,23 @@ spec:
               add: ["NET_ADMIN", "SYS_MODULE"]
           #imagePullPolicy: {{ .Values.open5gs.image.pullPolicy }}
           volumeMounts:
-            - name: open5gs-pcfr-config
-              mountPath: /open5gs/config-map/pcfr.yaml
-              subPath: "pcfr.yaml"
-            - name: freediameter-pcfr-config
-              mountPath: /etc/freeDiameter/pcfr.conf
-              subPath: "pcfr.conf"
+            - name: open5gs-pcrf-config
+              mountPath: /open5gs/config-map/pcrf.yaml
+              subPath: "pcrf.yaml"
+            - name: freediameter-pcrf-config
+              mountPath: /etc/freeDiameter/pcrf.conf
+              subPath: "pcrf.conf"
             - name: "dev-net-tun"
               mountPath: "/dev/net/tun" # Needed for VPN
-          command: ["open5gs-pcfrd", "-c", "/open5gs/config-map/pcfr.yaml"]
+          command: ["open5gs-pcrfd", "-c", "/open5gs/config-map/pcrf.yaml"]
+          #command: ["sleep", "1d"]
       volumes:
-        - name: open5gs-pcfr-config
+        - name: open5gs-pcrf-config
           configMap:
-            name: open5gs-pcfr-config
-        - name: freediameter-pcfr-config
+            name: open5gs-pcrf-config
+        - name: freediameter-pcrf-config
           configMap:
-            name: freediameter-pcfr-config
+            name: freediameter-pcrf-config
         - name: dev-net-tun
           hostPath:
             path: /dev/net/tun

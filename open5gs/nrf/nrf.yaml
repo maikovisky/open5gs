@@ -32,6 +32,9 @@ spec:
       labels:
         epc-mode: nrf
     spec:  
+      nodeSelector:
+        kubernetes.io/arch: amd64
+        kubernetes.io/hostname: molejo
       containers:
         - name: nrf
           image: maikovisky/open5gs:latest  
@@ -46,7 +49,7 @@ spec:
               subPath: "nrf.yaml"
             - name: "dev-net-tun"
               mountPath: "/dev/net/tun" # Needed for VPN
-          command: ["open5gs-nrfd", "-c", "/open5gs/config-map/nrf.yaml"]
+          command: ["open5gs-nrfd", "-d", "-c", "/open5gs/config-map/nrf.yaml"]
       volumes:
         - name: open5gs-nrf-config
           configMap:

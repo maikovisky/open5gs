@@ -6,20 +6,22 @@ metadata:
   labels:
     epc-mode: upf
 data:
-  upf.yaml: |
+  upf.yaml: |-
     logger:
         file: /var/log/open5gs/upf.log
     
     #  <PFCP Server>
     upf:
       pfcp:
-        - addr: 0.0.0.0
+        - dev eth0
       gtpu:
-        - addr: 0.0.0.0
+        - dev eth0
       subnet:
         - addr: 10.45.0.1/16
+          dev: ogstun
+          dnn: internet
         - addr: 2001:db8:cafe::1/48
-
+       
     #
     # smf:
     #
@@ -30,5 +32,7 @@ data:
     #    pfcp:
     #      addr: 127.0.0.4
     #
-    smf:
-      name: openg5s-smf
+    #smf:
+    #    pfcp:
+    #      name: openg5s-smf
+    #

@@ -12,10 +12,11 @@ data:
 
     sgwu:
         gtpu:
-          - addr: 0.0.0.0
+          - dev: eth0
         pfcp:
-          - addr: 0.0.0.0
+          - dev: eth0
 
     sgwc:
-      #pfcp:
-      #  addr: open5gs-sgwc
+      pfcp:
+        - name: open5gs-sgwc
+      

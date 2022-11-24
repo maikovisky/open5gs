@@ -26,9 +26,7 @@ spec:
     matchLabels:
       epc-mode: udr
   template:
-    metadata:
-#      annotations:
-#        "helm.sh/hook": pre-install    
+    metadata:   
       labels:
         epc-mode: udr
     spec:  

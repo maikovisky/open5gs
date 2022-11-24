@@ -8,10 +8,32 @@ metadata:
 spec:
   selector:
     epc-mode: smf
+  #type: ClusterIP
   ports:
-    - protocol: TCP
+    - name: open5gs-smf-tcp-80
+      protocol: TCP
       port: 80
       targetPort: 80
+    - name: open5gs-smf-udp-2152
+      protocol: UDP
+      port: 2152
+      targetPort: 2152
+    - name: open5gs-smf-udp-2123
+      protocol: UDP
+      port: 2123
+      targetPort: 2123
+    - name: open5gs-smf-udp-8805
+      protocol: UDP
+      port: 8805
+      targetPort: 8805
+    - name: open5gs-smf-sctp-3868
+      protocol: SCTP
+      port: 3868
+      targetPort: 3868
+    - name: open5gs-smf-tcp-metric
+      protocol: TCP
+      port: 9090
+      targetPort: 9090
 ---    
 apiVersion: apps/v1 # for versions before 1.9.0 use apps/v1beta2
 kind: Deployment
@@ -59,11 +81,15 @@ spec:
               mountPath: /etc/freeDiameter/smf.key.pem
               subPath: "smf.key.pem"
 
+            - name: freediameter-cacert-config
+              mountPath: /etc/freeDiameter/cacert.pem
+              subPath: "cacert.pem"            
+
             - name: "dev-net-tun"
               mountPath: "/dev/net/tun" # Needed for VPN
               
-          command: ["open5gs-smfd", "-c", "/open5gs/config-map/smf.yaml"]
-          #command: ["top"]
+          #command: ["open5gs-smfd", "-c", "/open5gs/config-map/smf.yaml"]
+          command: ["sleep", "1d"]
       volumes:
         - name: open5gs-smf-config
           configMap:
@@ -80,6 +106,10 @@ spec:
         - name: freediameter-smf-key-config
           configMap:
             name: freediameter-smf-key-config
+        
+        - name: freediameter-cacert-config
+          configMap:
+            name: freediameter-cacert-config
 
         - name: dev-net-tun
           hostPath:
