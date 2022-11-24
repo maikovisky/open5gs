@@ -42,14 +42,14 @@ spec:
             privileged: true
             capabilities:
               add: ["NET_ADMIN", "SYS_MODULE"]
-          #imagePullPolicy: {{ .Values.open5gs.image.pullPolicy }}
+
           volumeMounts:
             - name: open5gs-udm-config
               mountPath: /open5gs/config-map/udm.yaml
               subPath: "udm.yaml"
             - name: "dev-net-tun"
               mountPath: "/dev/net/tun" # Needed for VPN
-          command: ["open5gs-udmd",  "-t", "-d", "-c", "/open5gs/config-map/udm.yaml"]
+          command: ["open5gs-udmd",  "-c", "/open5gs/config-map/udm.yaml"]
       volumes:
         - name: open5gs-udm-config
           configMap:

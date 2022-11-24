@@ -50,13 +50,13 @@ spec:
             - name: open5gs-sgwu-config
               mountPath: /open5gs/config-map/sgwu.yaml
               subPath: "sgwu.yaml"   
-            - name: open5gs-sgwu-reconfig
-              mountPath: /bin/reconfig.sh
-              subPath: "reconfig.sh"            
+            # - name: open5gs-sgwu-reconfig
+            #   mountPath: /bin/reconfig.sh
+            #   subPath: "reconfig.sh"            
             - name: "dev-net-tun"
               mountPath: "/dev/net/tun" # Needed for VPN
-          #command: ["open5gs-sgwud", "-d","-c", "/open5gs/config-map/sgwu.yaml"]
-          command: ["sleep", "1d"]
+          command: ["open5gs-sgwud", "-c", "/open5gs/config-map/sgwu.yaml"]
+          #command: ["sleep", "1d"]
       volumes:
         - name: open5gs-sgwu-config
           configMap:

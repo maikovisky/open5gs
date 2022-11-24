@@ -45,6 +45,8 @@ spec:
       labels:
         epc-mode: mme
     spec:  
+      nodeSelector:
+        kubernetes.io/arch: amd64
       containers:
         - name: mme
           image: maikovisky/open5gs:latest  

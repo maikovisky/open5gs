@@ -12,12 +12,13 @@ data:
 
     sgwc:
         gtpc:
-          - addr: HOSTNAME
+          - dev: eth0
         pfcp:
-          - addr: HOSTNAME
+          - dev: eth0
     sgwu:
         pfcp:
-          - addr: open5gs-sgwu
+          - name: open5gs-sgwu
+    #       apn: ["internet"]
     
     # End of file
     

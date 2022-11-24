@@ -11,20 +11,19 @@ data:
         file: /var/log/open5gs/smf.log
 
     smf:
+      freeDiameter: /etc/freeDiameter/smf.conf
       sbi:
         - addr: 0.0.0.0
           port: 80
       pfcp:
         - dev: eth0
-        - addr: ::1
       gtpc:
         - dev: eth0
-        - addr: ::1
       gtpu:
         - dev: eth0
-        - addr: ::1
       subnet:
         - addr: 10.45.0.1/16
+          dnn: internet
         - addr: 2001:db8:cafe::1/48
       dns:
         - 8.8.8.8
@@ -34,15 +33,14 @@ data:
       mtu: 1400
       ctf:
         enabled: auto
-        freeDiameter: /etc/freeDiameter/smf.conf
         
     nrf:
       sbi:
         name: open5gs-nrf
 
     upf:
-    #    pfcp:
-    #      - addr: open5gs-upf
+      pfcp:
+        - addr: open5gs-upf
 
     metrics:
         addr: 0.0.0.0

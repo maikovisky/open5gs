@@ -51,8 +51,8 @@ spec:
               subPath: "reconfig.sh"
             - name: "dev-net-tun"
               mountPath: "/dev/net/tun" # Needed for VPN
-          #command: ["open5gs-sgwcd", "-c", "/open5gs/config-map/sgwc.yaml"]
-          command: ["sleep", "1d"]
+          command: ["open5gs-sgwcd", "-c", "/open5gs/config-map/sgwc.yaml"]
+          #command: ["sleep", "1d"]
       volumes:
         - name: open5gs-sgwc-config
           configMap:
