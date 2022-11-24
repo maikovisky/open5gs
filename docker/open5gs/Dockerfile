@@ -11,6 +11,7 @@ RUN apk update && \
        yaml \
        lksctp-tools \
        libmicrohttpd \
+       gdb \
        libidn \
        mongo-c-driver 
     
@@ -21,6 +22,7 @@ RUN apk add --no-cache \
         bison \
         flex \
         git \
+        cmake \
         meson \
         bash \
         linux-headers \
@@ -36,8 +38,14 @@ RUN apk add --no-cache \
         nghttp2-dev \
         talloc-dev \
         iproute2 && \
-    git clone --recursive https://github.com/open5gs/open5gs && \
-    cd open5gs && meson build --prefix=/ && ninja -C build && cd build && DESTDIR=/open5gs/install ninja install 
+        git clone --recursive https://github.com/open5gs/open5gs && \
+        cd open5gs && \
+	git checkout v2.5.6 && \
+        meson build --prefix=/ && \
+	meson configure -Dmetrics_impl=prometheus build && \
+        ninja -C build && \
+        cd build && \
+        DESTDIR=/open5gs/install ninja install 
 
 WORKDIR /
 
@@ -48,6 +56,7 @@ WORKDIR /
 COPY --from=builder /open5gs/install/bin  /bin 
 COPY --from=builder /open5gs/install/bin  /bin 
 COPY --from=builder /open5gs/install/lib  /lib
+COPY --from=builder /open5gs/install/usr/lib /lib
 COPY --from=builder /open5gs/build/configs/open5gs /etc/open5gs 
 COPY --from=builder /open5gs/build/configs/freeDiameter /etc/freeDiameter 
 COPY --from=builder /open5gs/build/configs/*.yaml /etc/
