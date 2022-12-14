@@ -45,7 +45,7 @@ docker buildx build --platform linux/amd64 --push -t maikovisky/open5gs:2.5.5 -t
 
 ## Install
 
-Need [insall krew](https://docs.eupraxia.io/docs/how-to-guides/kubernetes-plugin-ksniff/) and after plugin sniff 
+Need [insall krew](https://krew.sigs.k8s.io/docs/) and after plugin sniff 
 
 ```
 krew install krew
