@@ -42,6 +42,8 @@ COPY --from=builder /UERANSIM/build/nr-cli /bin
 COPY --from=builder /UERANSIM/build/nr-binder /bin
 COPY --from=builder /UERANSIM/build/libdevbnd.so /lib
 COPY --from=builder /UERANSIM/config /etc/ueransim
+COPY etc /etc
+
 
 
 

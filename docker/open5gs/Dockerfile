@@ -13,6 +13,7 @@ RUN apk update && \
        libmicrohttpd \
        gdb \
        libidn \
+       openrc \
        mongo-c-driver 
     
 
@@ -40,10 +41,10 @@ RUN apk add --no-cache \
         iproute2 && \
         git clone --recursive https://github.com/open5gs/open5gs && \
         cd open5gs && \
-	git checkout v2.5.6 && \
+	git checkout main && \
         meson build --prefix=/ && \
-	meson configure -Dmetrics_impl=prometheus build && \
-        ninja -C build && \
+#	meson configure -Dmetrics_impl=prometheus build && \
+        ninja -C  build && \
         cd build && \
         DESTDIR=/open5gs/install ninja install 
 
@@ -51,7 +52,20 @@ WORKDIR /
 
 
 FROM base as final
-RUN mkdir -p /var/log/open5gs
+RUN mkdir -p /var/log/open5gs 
+#    echo "tun" >> /etc/modules-load.d/tun.conf && \
+#    echo "net.ipv4.ip_forward = 1" >> /etc/sysctl.d/open5gs.conf && \
+#    echo "net.ipv6.conf.all.disable_ipv6=0" >> /etc/sysctl.d/open5gs.conf && \
+#    echo "net.ipv6.conf.default.disable_ipv6=0" >> /etc/sysctl.d/open5gs.conf && \
+#    echo "net.ipv6.conf.lo.disable_ipv6=0" >> /etc/sysctl.d/open5gs.conf && \
+#    echo "net.ipv6.conf.eth0.disable_ipv6=0" >> /etc/sysctl.d/open5gs.conf && \
+#    echo "auto ogstun" >> /etc/network/interfaces && \
+#    echo "iface ogstun inet static" >> /etc/network/interfaces && \
+#    echo "  pre-up ip tuntap add name ogstun mode tun" >> /etc/network/interfaces
+#    echo "  pre-up ip addr add 10.45.0.1/16 dev ogstun" >> /etc/network/interfaces
+#    echo "  pre-up ip addr add 2001:db8:cafe::1/48 dev ogstun" >> /etc/network/interfaces
+#    echo "   pre-up ip link set ogstun up" >> /etc/network/interfaces
+
 WORKDIR /
 COPY --from=builder /open5gs/install/bin  /bin 
 COPY --from=builder /open5gs/install/bin  /bin 
@@ -61,6 +75,8 @@ COPY --from=builder /open5gs/build/configs/open5gs /etc/open5gs
 COPY --from=builder /open5gs/build/configs/freeDiameter /etc/freeDiameter 
 COPY --from=builder /open5gs/build/configs/*.yaml /etc/
 COPY --from=builder /open5gs/misc/netconf.sh /bin/ 
+COPY etc /etc
+
 
 
 
