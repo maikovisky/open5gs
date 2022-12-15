@@ -88,8 +88,8 @@ spec:
             - name: "dev-net-tun"
               mountPath: "/dev/net/tun" # Needed for VPN
               
-          #command: ["open5gs-smfd", "-c", "/open5gs/config-map/smf.yaml"]
-          command: ["sleep", "1d"]
+          command: ["open5gs-smfd", "-c", "/open5gs/config-map/smf.yaml"]
+          #command: ["sleep", "1d"]
       volumes:
         - name: open5gs-smf-config
           configMap:

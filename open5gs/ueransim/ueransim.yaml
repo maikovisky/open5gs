@@ -40,7 +40,7 @@ spec:
         kubernetes.io/hostname: molejo
       containers:
         - name: ueransim
-          image: maikovisky/ueransim:1.1  
+          image: maikovisky/ueransim:latest  
           securityContext:
             privileged: true
             capabilities:

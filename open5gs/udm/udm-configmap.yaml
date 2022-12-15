@@ -12,8 +12,10 @@ data:
 
     udm:
         sbi:
-          addr: 0.0.0.0
-          port: 80
+          - addr: 0.0.0.0
+            port: 80
+            advertise: open5gs-udm
+            
         discovery:
           option:
             no_service_names: true

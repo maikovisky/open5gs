@@ -5,6 +5,26 @@
 #    }
 # }
 
+# Metrics to Prometheus
+
+data "kubectl_path_documents" "open5gs_prometheus_manifests" {
+    pattern = "./service-monitor.yaml"
+}
+resource "kubectl_manifest" "open5gs_prometheus" {
+    count     = length(data.kubectl_path_documents.open5gs_prometheus_manifests.documents)
+    yaml_body = element(data.kubectl_path_documents.open5gs_prometheus_manifests.documents, count.index)
+}
+
+
+# LogFile
+data "kubectl_path_documents" "logfile_manifests" {
+    pattern = "./persistent-log.yaml"
+}
+
+resource "kubectl_manifest" "logfile" {
+    count     = length(data.kubectl_path_documents.logfile_manifests.documents)
+    yaml_body = element(data.kubectl_path_documents.logfile_manifests.documents, count.index)
+}
 
 # MongoDB
 data "kubectl_path_documents" "mongodb_manifests" {
@@ -38,7 +58,8 @@ resource "kubectl_manifest" "nrf" {
     yaml_body = element(data.kubectl_path_documents.nrf_manifests.documents, count.index)
 
     depends_on = [
-      data.kubectl_path_documents.mongodb_manifests
+      data.kubectl_path_documents.mongodb_manifests,
+      data.kubectl_path_documents.logfile_manifests
     ]
 }
 
@@ -58,6 +79,20 @@ resource "kubectl_manifest" "scp" {
     ]
 }
 
+# ALL Open5gs Functions
+# data "kubectl_path_documents" "all_manifests" {
+#     pattern = "./all/*.yaml"
+# }
+
+# resource "kubectl_manifest" "all" {
+#     count     = length(data.kubectl_path_documents.all_manifests.documents)
+#     yaml_body = element(data.kubectl_path_documents.all_manifests.documents, count.index)
+
+#     depends_on = [
+#       data.kubectl_path_documents.nrf_manifests
+#     ]
+# }
+
 # AMF Database
 data "kubectl_path_documents" "amf_manifests" {
     pattern = "./amf/*.yaml"
@@ -68,7 +103,8 @@ resource "kubectl_manifest" "amf" {
     yaml_body = element(data.kubectl_path_documents.amf_manifests.documents, count.index)
 
     depends_on = [
-      data.kubectl_path_documents.scp_manifests
+      data.kubectl_path_documents.nrf_manifests,
+      data.kubectl_path_documents.logfile_manifests
     ]
 }
 
@@ -200,7 +236,8 @@ resource "kubectl_manifest" "smf" {
     yaml_body = element(data.kubectl_path_documents.smf_manifests.documents, count.index)
 
     depends_on = [
-      data.kubectl_path_documents.nrf_manifests
+      data.kubectl_path_documents.nrf_manifests,
+      data.kubectl_path_documents.amf_manifests
     ]
 }
 
@@ -214,7 +251,8 @@ resource "kubectl_manifest" "udm" {
     yaml_body = element(data.kubectl_path_documents.udm_manifests.documents, count.index)
 
     depends_on = [
-      data.kubectl_path_documents.nrf_manifests
+      data.kubectl_path_documents.nrf_manifests,
+      data.kubectl_path_documents.amf_manifests
     ]
 }
 
@@ -256,7 +294,8 @@ resource "kubectl_manifest" "upf" {
     yaml_body = element(data.kubectl_path_documents.upf_manifests.documents, count.index)
 
     depends_on = [
-      data.kubectl_path_documents.nrf_manifests
+      data.kubectl_path_documents.nrf_manifests,
+      data.kubectl_path_documents.amf_manifests
     ]
 }
 
@@ -298,7 +337,9 @@ resource "kubectl_manifest" "ueransim" {
     yaml_body = element(data.kubectl_path_documents.ueransim_manifests.documents, count.index)
 
     depends_on = [
-      data.kubectl_path_documents.nrf_manifests
+      data.kubectl_path_documents.nrf_manifests,
+      data.kubectl_path_documents.amf_manifests,
+      data.kubectl_path_documents.smf_manifests
     ]
 }
 

@@ -44,7 +44,7 @@ spec:
         kubernetes.io/hostname: molejo
       containers:
         - name: amf
-          image: maikovisky/open5gs-all:latest      
+          image: maikovisky/open5gs:latest      
           securityContext:
             privileged: true
             capabilities:
@@ -53,12 +53,17 @@ spec:
             - name: open5gs-amf-config
               mountPath: /open5gs/config-map/amf.yaml
               subPath: "amf.yaml"
-            #- mountPath: /dev/net/tun
-            #  name: dev-net-tun
+
+            - name: logfile-persistent-storage
+              mountPath: /var/log/open5gs
+
             - name: "dev-net-tun"
               mountPath: "/dev/net/tun" # Needed for VPN
+
           #command: ["open5gs-amfd", "-d","-c", "/open5gs/config-map/amf.yaml"]
           command: ["open5gs-amfd",  "-c", "/open5gs/config-map/amf.yaml"]
+          #command: ["sleep", "1d"]
+          
       volumes:
         - name: open5gs-amf-config
           configMap:
@@ -66,4 +71,7 @@ spec:
         - name: dev-net-tun
           hostPath:
             path: /dev/net/tun
+        - name: logfile-persistent-storage
+          persistentVolumeClaim:
+            claimName: open5gs-logfile-pv-claim
 

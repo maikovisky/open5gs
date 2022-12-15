@@ -13,9 +13,12 @@ data:
     db_uri: mongodb://open5gs-mongodb-svc/open5gs
 
     pcf:
-        sbi:
-          addr: 0.0.0.0
+      sbi:
+        - addr: 0.0.0.0
           advertise: open5gs-pcf
+      metrics:
+        - addr: 0.0.0.0
+          port: 9090
     nrf:
-        sbi:
-          name: open5gs-nrf
+      sbi:
+        name: open5gs-nrf

@@ -13,8 +13,10 @@ data:
 
     bsf:
         sbi:
-          addr: 0.0.0.0
-          advertise: open5gs-bsf
+          - addr: 0.0.0.0
+            advertise: open5gs-bsf
+
+          
     nrf:
         sbi:
           name: open5gs-nrf
