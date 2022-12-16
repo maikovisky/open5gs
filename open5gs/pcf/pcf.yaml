@@ -5,13 +5,19 @@ metadata:
   namespace: open5gs
   labels:
     epc-mode: pcf
+    promotheus: open5gs-monitor
 spec:
   selector:
     epc-mode: pcf
   ports:
-    - protocol: TCP
+    - name: open5gs-pcf-tcp-80
+      protocol: TCP
       port: 80
       targetPort: 80
+    - name: open5gs-pcf-tcp-9090
+      protocol: TCP
+      port: 9090
+      targetPort: 9090
 ---    
 apiVersion: apps/v1 # for versions before 1.9.0 use apps/v1beta2
 kind: Deployment
@@ -20,6 +26,7 @@ metadata:
   namespace: open5gs
   labels:
     epc-mode: pcf
+    promotheus: open5gs-monitor
 spec:
   replicas: 1
   selector:

@@ -5,6 +5,7 @@ metadata:
   namespace: open5gs
   labels:
     epc-mode: upf
+    promotheus: open5gs-monitor
 spec:
   selector:
     epc-mode: upf
@@ -13,6 +14,10 @@ spec:
       protocol: TCP
       port: 80
       targetPort: 80
+    - name: open5gs-upf-tcp-9090
+      protocol: TCP
+      port: 9090
+      targetPort: 9090
     - name: open5gs-upf-udp-2152
       protocol: UDP
       port: 2152
@@ -29,6 +34,7 @@ metadata:
   namespace: open5gs
   labels:
     epc-mode: upf
+    promotheus: open5gs-monitor
 spec:
   replicas: 1
   selector:
