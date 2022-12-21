@@ -56,8 +56,8 @@ spec:
               mountPath: /open5gs/config-map/amf.yaml
               subPath: "amf.yaml"
 
-            - name: logfile-persistent-storage
-              mountPath: /var/log/open5gs
+            # - name: logfile-persistent-storage
+            #   mountPath: /var/log/open5gs
 
             - name: "dev-net-tun"
               mountPath: "/dev/net/tun" # Needed for VPN
@@ -73,7 +73,7 @@ spec:
         - name: dev-net-tun
           hostPath:
             path: /dev/net/tun
-        - name: logfile-persistent-storage
-          persistentVolumeClaim:
-            claimName: open5gs-logfile-pv-claim
+        # - name: logfile-persistent-storage
+        #   persistentVolumeClaim:
+        #     claimName: open5gs-logfile-pv-claim
 
