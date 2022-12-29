@@ -4,6 +4,7 @@ RUN apk update && \
     apk add --no-cache \
        bash \
        iproute2 \
+       curl \
        talloc \
        ca-certificates \
        nghttp2-libs \
@@ -14,6 +15,7 @@ RUN apk update && \
        gdb \
        libidn \
        openrc \
+       prometheus-node-exporter \
        mongo-c-driver 
     
 
@@ -41,7 +43,7 @@ RUN apk add --no-cache \
         iproute2 && \
         git clone --recursive https://github.com/open5gs/open5gs && \
         cd open5gs && \
-	git checkout main && \
+	git checkout main  && \
         meson build --prefix=/ && \
 #	meson configure -Dmetrics_impl=prometheus build && \
         ninja -C  build && \
@@ -52,7 +54,8 @@ WORKDIR /
 
 
 FROM base as final
-RUN mkdir -p /var/log/open5gs 
+RUN mkdir -p /var/log/open5gs \
+    rc-update add node-exporter default
 #    echo "tun" >> /etc/modules-load.d/tun.conf && \
 #    echo "net.ipv4.ip_forward = 1" >> /etc/sysctl.d/open5gs.conf && \
 #    echo "net.ipv6.conf.all.disable_ipv6=0" >> /etc/sysctl.d/open5gs.conf && \
@@ -76,7 +79,6 @@ COPY --from=builder /open5gs/build/configs/freeDiameter /etc/freeDiameter
 COPY --from=builder /open5gs/build/configs/*.yaml /etc/
 COPY --from=builder /open5gs/misc/netconf.sh /bin/ 
 COPY etc /etc
-
 
 
 

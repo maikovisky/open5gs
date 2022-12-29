@@ -1,6 +1,6 @@
 #!/sbin/openrc-run
 
-command="/bin/${RC_SVCNAMAE}d"
+command="/bin/${RC_SVCNAME}d"
 command_arg="-D"
 command_background=true
 pidfile="/var/run/${RC_SVCNAME}.pid"
