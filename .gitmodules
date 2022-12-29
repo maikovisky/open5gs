@@ -1,4 +1,4 @@
 [submodule "my5grantester"]
 	path = my5grantester
-	url = git@github.com:maikovisky/my5grantester.git
+	url = https://github.com/maikovisky/my5grantester.git
 	branch = main
