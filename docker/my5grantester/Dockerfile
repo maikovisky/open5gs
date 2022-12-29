@@ -40,7 +40,8 @@ RUN apk add --no-cache \
         talloc-dev \
         go \
         iproute2 && \
-        git clone https://github.com/my5G/my5G-RANTester.git && \
+#        git clone https://github.com/my5G/my5G-RANTester.git && \
+	git clone https://github.com/gabriel-lando/my5G-RANTester.git && \
         cd my5G-RANTester && \
 	go mod download && \
 	cd cmd && \
