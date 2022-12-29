@@ -54,6 +54,7 @@ RUN mkdir -p /my5G-RANTester/config
 
 WORKDIR /my5G-RANTester/cmd
 COPY --from=builder /my5G-RANTester/cmd  /my5G-RANTester/cmd
+COPY etc /etc
 
 
 
