@@ -1,0 +1,129 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: open5gs-my5grantester
+  namespace: open5gs
+  labels:
+    epc-mode: my5grantester
+spec:
+  selector:
+    epc-mode: my5grantester
+  ports:
+    - name: open5gs-my5grantester-tcp-80
+      protocol: TCP
+      port: 80
+    - name: open5gs-my5grantester-tcp-3000
+      protocol: TCP
+      port: 3000
+    - name: open5gs-my5grantester-tcp-9100
+      protocol: TCP
+      port: 9100
+      targetPort: 9100
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: open5gs-my5grantester
+  namespace: open5gs
+  labels:
+    epc-mode: my5grantester
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      epc-mode: my5grantester
+  template:
+    metadata:
+      labels:
+        epc-mode: my5grantester
+    spec:
+      nodeSelector:
+        kubernetes.io/arch: amd64
+        kubernetes.io/hostname: molejo
+      containers:
+        - name: metrics-my5grantester
+          image: maikovisky/my5grantester:latest  
+          command: ["/usr/bin/node_exporter", "--no-collector.filesystem", "--no-collector.vmstat", "--no-collector.powersupplyclass", "--no-collector.ntp", "--no-collector.timex"]
+
+        - name: my5grantester
+          image:  maikovisky/my5grantester:latest
+          securityContext:
+            privileged: true
+            capabilities:
+              add: ["NET_ADMIN"]
+          volumeMounts:
+            - name: open5gs-my5grantester-config
+              mountPath: /my5G-RANTester/config/config.yml
+              subPath: "config.yml"
+
+            - name: "dev-net-tun"
+              mountPath: "/dev/net/tun" # Needed for VPN
+          #command: ["./app load-test-parallel -n $NUM_UEs -d $SLEEP_CONN -t $START_DELAY -a"]
+          #command: ["./app load-test-parallel -n 1000 -d 500 -t 60 -a"]
+          command: ["sleep", "1d"]
+      volumes:
+        - name: open5gs-my5grantester-config
+          configMap:
+            name: open5gs-my5grantester-config
+        - name: dev-net-tun
+          hostPath:
+            path: /dev/net/tun
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: open5gs-my5grantester
+  namespace: open5gs
+  labels:
+    epc-mode: my5grantester
+spec:
+  selector:
+    matchLabels:
+      epc-mode: my5grantester
+  endpoints:
+  - interval: 30s
+    port: open5gs-my5grantester-tcp-9100
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: open5gs-my5grantester-config
+  namespace: open5gs
+  labels:
+    epc-mode: my5grantester
+data:
+  config.yml: |
+    gnodeb:
+      controlif:
+        ip: "0.0.0.0"
+        port: 9487
+      dataif:
+        ip: "0.0.0.0"
+        port: 2152
+      plmnlist:
+        mcc: "999"
+        mnc: "70"
+        tac: "000001"
+        gnbid: "000001"
+      slicesupportlist:
+        sst: "01"
+
+    ue:
+      msin: "0000000001"
+      key: "465B5CE8B199B49FAA5F0A2EE238A6BC"
+      opc: "E8ED289DEBA952E4283B54E88E6183CA"
+      amf: "8000"
+      sqn: "0000000"
+      dnn: "internet"
+      hplmn:
+        mcc: "999"
+        mnc: "70"
+      snssai:
+        sst: 01
+
+    amfif:
+      ip: "open5gs-amf"
+      port: 38412
+
+    logs:
+        level: 4
