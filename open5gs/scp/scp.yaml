@@ -19,6 +19,10 @@ spec:
     - name: open5gs-scp-sctp-38412
       protocol: SCTP
       port: 38412
+    - name: open5gs-scp-tcp-9100
+      protocol: TCP
+      port: 9100
+      targetPort: 9100
 ---    
 apiVersion: apps/v1 # for versions before 1.9.0 use apps/v1beta2
 kind: Deployment
@@ -66,3 +70,18 @@ spec:
         - name: lib-modules
           hostPath:
             path: /lib/modules
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: open5gs-scp
+  namespace: open5gs
+  labels:
+    epc-mode: scp
+spec:
+  selector:
+    matchLabels:
+      epc-mode: scp
+  endpoints:
+  - interval: 30s
+    port: open5gs-scp-tcp-9100

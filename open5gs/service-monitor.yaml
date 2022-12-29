@@ -98,6 +98,21 @@ spec:
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
+  name: open5gs-bsf
+  namespace: open5gs
+  labels:
+    epc-mode: bsf
+spec:
+  selector:
+    matchLabels:
+      epc-mode: bsf
+  endpoints:
+  - interval: 30s
+    port: open5gs-bsf-tcp-9100
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
   name: open5gs-upf
   namespace: open5gs
   labels:
