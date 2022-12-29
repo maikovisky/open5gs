@@ -15,6 +15,54 @@ spec:
     - name: open5gs-ueransim-tcp-3000
       protocol: TCP
       port: 3000
+    - name: open5gs-ueransim-tcp-9100
+      protocol: TCP
+      port: 9100
+    - name: open5gs-ueransim-udp-2152
+      protocol: UDP
+      port: 2152
+    - name: open5gs-ueransim-udp-36743
+      protocol: UDP
+      port: 36743
+    - name: open5gs-ueransim-udp-4997
+      protocol: UDP
+      port: 4997
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: open5gs-ingress-ueransim-2152
+  namespace: open5gs
+spec:
+  defaultBackend:
+    service:
+      name: open5gs-ueransim-udp-2152
+      port:
+        number: 2152
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: open5gs-ingress-ueransim-36743
+  namespace: open5gs
+spec:
+  defaultBackend:
+    service:
+      name: open5gs-ueransim-udp-36743
+      port:
+        number: 36743
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: open5gs-ingress-ueransim-4997
+  namespace: open5gs
+spec:
+  defaultBackend:
+    service:
+      name: open5gs-ueransim-udp-4997
+      port:
+        number: 4997
 ---    
 apiVersion: apps/v1 # for versions before 1.9.0 use apps/v1beta2
 kind: Deployment
@@ -39,6 +87,14 @@ spec:
         kubernetes.io/arch: amd64
         kubernetes.io/hostname: molejo
       containers:
+        - name: metrics-ueransim
+          image: maikovisky/open5gs:latest  
+          command: ["/usr/bin/node_exporter"]
+          volumeMounts:
+            - name: "dev-net-tun"
+              mountPath: "/dev/net/tun" # Needed for VPN
+
+
         - name: ueransim
           image: maikovisky/ueransim:latest  
           securityContext:
@@ -93,3 +149,18 @@ spec:
           hostPath:
             path: /dev/net/tun
 
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: open5gs-ueransim
+  namespace: open5gs
+  labels:
+    epc-mode: ueransim
+spec:
+  selector:
+    matchLabels:
+      epc-mode: ueransim
+  endpoints:
+  - interval: 30s
+    port: open5gs-ueransim-tcp-9100

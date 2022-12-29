@@ -9,9 +9,14 @@ spec:
   selector:
     epc-mode: nrf
   ports:
-    - protocol: TCP
+    - name: open5gs-nrf-tcp-80
+      protocol: TCP
       port: 80
       targetPort: 80
+    - name: open5gs-nrf-tcp-9100
+      protocol: TCP
+      port: 9100
+      targetPort: 9100
 ---    
 apiVersion: apps/v1 # for versions before 1.9.0 use apps/v1beta2
 kind: Deployment
@@ -34,8 +39,12 @@ spec:
     spec:  
       nodeSelector:
         kubernetes.io/arch: amd64
-        kubernetes.io/hostname: molejo
+        nodetype: server
       containers:
+        - name: metrics-nrf
+          image: maikovisky/open5gs:latest  
+          command: ["/usr/bin/node_exporter"]
+
         - name: nrf
           image: maikovisky/open5gs:latest  
           securityContext:
@@ -47,8 +56,8 @@ spec:
             - name: open5gs-nrf-config
               mountPath: /open5gs/config-map/nrf.yaml
               subPath: "nrf.yaml"
-            - name: logfile-persistent-storage
-              mountPath: /var/log/open5gs
+            # - name: logfile-persistent-storage
+            #   mountPath: /var/log/open5gs
             - name: "dev-net-tun"
               mountPath: "/dev/net/tun" # Needed for VPN
           command: ["open5gs-nrfd", "-c", "/open5gs/config-map/nrf.yaml"]
@@ -59,7 +68,21 @@ spec:
         - name: dev-net-tun
           hostPath:
             path: /dev/net/tun
-        - name: logfile-persistent-storage
-          persistentVolumeClaim:
-            claimName: open5gs-logfile-pv-claim
-
+        # - name: logfile-persistent-storage
+        #   persistentVolumeClaim:
+        #     claimName: open5gs-logfile-pv-claim
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: open5gs-nrf
+  namespace: open5gs
+  labels:
+    epc-mode: nrf
+spec:
+  selector:
+    matchLabels:
+      epc-mode: nrf
+  endpoints:
+  - interval: 30s
+    port: open5gs-nrf-tcp-9100

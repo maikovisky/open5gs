@@ -9,9 +9,14 @@ spec:
   selector:
     epc-mode: udm
   ports:
-    - protocol: TCP
+    - name: open5gs-udm-tcp-80
+      protocol: TCP
       port: 80
       targetPort: 80
+    - name: open5gs-udm-tcp-9100
+      protocol: TCP
+      port: 9100
+      targetPort: 9100
 ---    
 apiVersion: apps/v1 # for versions before 1.9.0 use apps/v1beta2
 kind: Deployment
@@ -36,6 +41,10 @@ spec:
         kubernetes.io/arch: amd64
         kubernetes.io/hostname: molejo
       containers:
+        - name: metrics-udm
+          image: maikovisky/open5gs:latest  
+          command: ["/usr/bin/node_exporter"]
+
         - name: udm
           image: maikovisky/open5gs:latest  
           securityContext:
@@ -58,3 +67,18 @@ spec:
           hostPath:
             path: /dev/net/tun
 
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: open5gs-udm
+  namespace: open5gs
+  labels:
+    epc-mode: udm
+spec:
+  selector:
+    matchLabels:
+      epc-mode: udm
+  endpoints:
+  - interval: 30s
+    port: open5gs-udm-tcp-9100

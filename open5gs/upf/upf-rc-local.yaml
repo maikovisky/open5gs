@@ -11,4 +11,10 @@ data:
     ip tuntap add name ogstun mode tun
     ip addr add 10.45.0.1/16 dev ogstun
     ip link set ogstun up
+    ip tuntap add name ogstun mode tun
+    ip addr add 10.46.0.1/16 dev ogstun1
+    ip link set ogstun1 up
+    ip tuntap add name ogstun mode tun
+    ip addr add 10.47.0.1/16 dev ogstun2
+    ip link set ogstun2 up
     sysctl -w net.ipv4.ip_forward=1

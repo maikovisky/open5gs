@@ -29,6 +29,12 @@ data:
         - addr: 10.45.0.1/16
           dnn: internet
         - addr: 2001:db8:cafe::1/48
+        - addr: 10.46.0.1/16
+          dnn: slice01
+        - addr: 10.47.0.1/16
+          dnn: slice02
+        - addr: 10.48.0.1/16
+          dnn: slice03
       dns:
         - 8.8.8.8
         - 8.8.4.4
@@ -45,6 +51,9 @@ data:
     upf:
       pfcp:
         - addr: open5gs-upf
+          dnn: [internet, slice01, slice02]
+        - addr: open5gs-upf2
+          dnn: [slice03]
 
     metrics:
         addr: 0.0.0.0
