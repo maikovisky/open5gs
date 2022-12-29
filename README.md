@@ -13,6 +13,14 @@ terraform apply -parallelism=n
 gcloud container clusters get-credentials gke-slice --region $env:GOOGLE_REGION --project $env:GOOGLE_PROJECT
 ```
 
+
+## Change context
+
+```
+kubectl config get-contexts
+kubectl config use-context kubernetes-admin@kubernetes  
+```
+
 # Docker
 
 ```
@@ -62,7 +70,7 @@ kubectl sniff <pod>
 
 # Troubleshooting
 
-
+- [UPF and SMF core dump](https://github.com/open5gs/open5gs/issues/1911)
 
 # Links
 - (https://brito.com.br/posts/build-docker-arm64/)

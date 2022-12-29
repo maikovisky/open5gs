@@ -47,9 +47,11 @@ spec:
             - name: open5gs-nrf-config
               mountPath: /open5gs/config-map/nrf.yaml
               subPath: "nrf.yaml"
+            - name: logfile-persistent-storage
+              mountPath: /var/log/open5gs
             - name: "dev-net-tun"
               mountPath: "/dev/net/tun" # Needed for VPN
-          command: ["open5gs-nrfd", "-d", "-c", "/open5gs/config-map/nrf.yaml"]
+          command: ["open5gs-nrfd", "-c", "/open5gs/config-map/nrf.yaml"]
       volumes:
         - name: open5gs-nrf-config
           configMap:
@@ -57,4 +59,7 @@ spec:
         - name: dev-net-tun
           hostPath:
             path: /dev/net/tun
+        - name: logfile-persistent-storage
+          persistentVolumeClaim:
+            claimName: open5gs-logfile-pv-claim
 

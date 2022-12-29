@@ -5,6 +5,7 @@ metadata:
   namespace: open5gs
   labels:
     epc-mode: upf
+    promotheus: open5gs-monitor
 spec:
   selector:
     epc-mode: upf
@@ -13,6 +14,10 @@ spec:
       protocol: TCP
       port: 80
       targetPort: 80
+    - name: open5gs-upf-tcp-9090
+      protocol: TCP
+      port: 9090
+      targetPort: 9090
     - name: open5gs-upf-udp-2152
       protocol: UDP
       port: 2152
@@ -29,6 +34,7 @@ metadata:
   namespace: open5gs
   labels:
     epc-mode: upf
+    promotheus: open5gs-monitor
 spec:
   replicas: 1
   selector:
@@ -43,6 +49,7 @@ spec:
     spec:  
       nodeSelector:
         kubernetes.io/arch: amd64
+        kubernetes.io/hostname: molejo
       containers:
         - name: upf
           image: maikovisky/open5gs:latest  
@@ -63,8 +70,8 @@ spec:
               mountPath: "/etc/rc.d/rc.local" 
               subPath: "rc.local"
 
-          #command: ["open5gs-upfd", "-t", "-d", "-c", "/open5gs/config-map/upf.yaml"]
-          command: ["sleep", "1d"]
+          command: ["open5gs-upfd", "-c", "/open5gs/config-map/upf.yaml"]
+          #command: ["sleep", "1d"]
       volumes:
         - name: open5gs-upf-config
           configMap:

@@ -12,7 +12,8 @@ data:
 
     ausf:
         sbi:
-          addr: 0.0.0.0
+          - addr: 0.0.0.0
+            advertise: open5gs-ausf
     nrf:
         sbi:
           name: open5gs-nrf

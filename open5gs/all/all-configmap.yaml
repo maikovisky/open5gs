@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: open5gs-all-open5gs-service
+  namespace: open5gs
+  labels:
+    epc-mode: all
+data:
+  open5gs-service: |-
+    #!/sbin/openrc-run
+
+    command="/bin/$(RC_SVCNAMAE)d"
+    command_arg="-D"
+    command_background=true
+    pidfile="/var/run/$(RC_SVCNAME).pid"
+
+    depend() {
+            need net
+    }

@@ -1,75 +1,68 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: open5gs-amf
+  name: open5gs-all-services
   namespace: open5gs
   labels:
-    epc-mode: amf
-    promotheus: open5gs-monitor
+    epc-mode: all-services
 spec:
   selector:
-    epc-mode: amf
+    epc-mode: all-services
   ports:
-    - name: open5gs-amf-tcp-80
+    - name: open5gs-all-tcp-80
       protocol: TCP
       port: 80 
-    - name: open5gs-amf-tcp-7777
+    - name: open5gs-all-tcp-7777
       protocol: TCP
       port: 7777  
-    - name: open5gs-amf-tcp-9090
+    - name: open5gs-all-tcp-9090
       protocol: TCP
       port: 9090 
-    - name: open5gs-amf-sctp-38412
+    - name: open5gs-all-sctp-38412
       protocol: SCTP
       port: 38412
 ---    
 apiVersion: apps/v1 
 kind: Deployment
 metadata:
-  name: open5gs-amf
+  name: open5gs-all-services
   namespace: open5gs
   labels:
-    epc-mode: amf
-    promotheus: open5gs-monitor
+    epc-mode: all-services
 spec:
   replicas: 1
   selector:
     matchLabels:
-      epc-mode: amf
+      epc-mode: all-services
   template:
     metadata:
       labels:
-        epc-mode: amf
+        epc-mode: all-services
     spec:   
       nodeSelector:
         kubernetes.io/arch: amd64
         kubernetes.io/hostname: molejo
+       # kubernetes.io/hostname: petwin-574524
       containers:
-        - name: amf
+        - name: all-services
           image: maikovisky/open5gs:latest      
           securityContext:
             privileged: true
             capabilities:
               add: ["NET_ADMIN", "SYS_MODULE"]
           volumeMounts:
-            - name: open5gs-amf-config
-              mountPath: /open5gs/config-map/amf.yaml
-              subPath: "amf.yaml"
-
             - name: logfile-persistent-storage
               mountPath: /var/log/open5gs
 
             - name: "dev-net-tun"
               mountPath: "/dev/net/tun" # Needed for VPN
 
-          #command: ["open5gs-amfd", "-d","-c", "/open5gs/config-map/amf.yaml"]
-          command: ["open5gs-amfd",  "-c", "/open5gs/config-map/amf.yaml"]
-          #command: ["sleep", "1d"]
+          command: ["sleep", "1d"]
           
       volumes:
-        - name: open5gs-amf-config
+        - name: open5gs-all-open5gs-service
           configMap:
-            name: open5gs-amf-config
+            name: open5gs-all-open5gs-service
         - name: dev-net-tun
           hostPath:
             path: /dev/net/tun
