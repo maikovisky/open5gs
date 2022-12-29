@@ -1,0 +1,15 @@
+auto lo
+iface lo inet loopback
+iface lo inet6 loopback
+
+auto eth0
+iface eth0 inet dhcp
+iface eth0 inet6 auto
+
+auto ogstun
+iface ogstun inet static
+  pre-up ip tuntap add name ogstun mode tun
+  pre-up ip addr add 10.45.0.1/16 dev ogstun
+  pre-up ip addr add 2001:db8:cafe::1/48 dev ogstun
+  pre-up ip link set ogstun up
+
