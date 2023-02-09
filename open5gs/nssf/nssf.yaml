@@ -37,6 +37,9 @@ spec:
       labels:
         epc-mode: nssf
     spec:  
+      nodeSelector:
+        kubernetes.io/arch: amd64
+        nodetype: server
       containers:
         - name: metrics-nssf
           image: maikovisky/open5gs:latest  
@@ -48,21 +51,16 @@ spec:
             privileged: true
             capabilities:
               add: ["NET_ADMIN", "SYS_MODULE"]
-          #imagePullPolicy: {{ .Values.open5gs.image.pullPolicy }}
           volumeMounts:
             - name: open5gs-nssf-config
               mountPath: /open5gs/config-map/nssf.yaml
               subPath: "nssf.yaml"
-            - name: "dev-net-tun"
-              mountPath: "/dev/net/tun" # Needed for VPN
+
           command: ["open5gs-nssfd", "-c", "/open5gs/config-map/nssf.yaml"]
       volumes:
         - name: open5gs-nssf-config
           configMap:
             name: open5gs-nssf-config
-        - name: dev-net-tun
-          hostPath:
-            path: /dev/net/tun
 ---
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor

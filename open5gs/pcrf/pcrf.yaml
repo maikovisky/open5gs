@@ -34,12 +34,13 @@ spec:
         kubernetes.io/arch: amd64
       containers:
         - name: pcrf
-          image: maikovisky/open5gs:latest  
+          image: maikovisky/open5gs:latest 
+
           securityContext:
             privileged: true
             capabilities:
               add: ["NET_ADMIN", "SYS_MODULE"]
-          #imagePullPolicy: {{ .Values.open5gs.image.pullPolicy }}
+              
           volumeMounts:
             - name: open5gs-pcrf-config
               mountPath: /open5gs/config-map/pcrf.yaml
@@ -47,8 +48,7 @@ spec:
             - name: freediameter-pcrf-config
               mountPath: /etc/freeDiameter/pcrf.conf
               subPath: "pcrf.conf"
-            - name: "dev-net-tun"
-              mountPath: "/dev/net/tun" # Needed for VPN
+
           command: ["open5gs-pcrfd", "-c", "/open5gs/config-map/pcrf.yaml"]
           #command: ["sleep", "1d"]
       volumes:
@@ -58,7 +58,6 @@ spec:
         - name: freediameter-pcrf-config
           configMap:
             name: freediameter-pcrf-config
-        - name: dev-net-tun
-          hostPath:
-            path: /dev/net/tun
+
+
 

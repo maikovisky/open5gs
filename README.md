@@ -72,6 +72,58 @@ kubectl sniff <pod>
 
 - [UPF and SMF core dump](https://github.com/open5gs/open5gs/issues/1911)
 
+## Problema de Roteamento entre UE e o UPF. 
+
+Um problema que esta sendo enfrentado é permitir com que UE consiga acessar algum conteúdo na Internet. Para isso é necessário que o UE faça a conexção com o UPF, onde irá receber um IP e criar um tunel entre os dois. A baixo a topologia:
+
+!(/imagens/open5gs-UE-UPF.png)
+
+
+### Status
+```
+[ OK] eth0 (upf) => Internet
+[ OK] uesimtun0  => ogstun
+[NOK] uesimtun0  => eth0 (upf)
+[NOK] ogstun     => eth0 (upf)
+[NOK] ogstun     => Internet
+```
+
+### Solução sugerida
+
+Na máquina UPF configurar o TUN.
+
+```
+ip tuntap add name ogstun mode tun
+ip addr add 10.45.0.1/16 dev ogstun
+ip addr add 2001:db8:cafe::1/48 dev ogstun
+ip link set ogstun up
+```
+
+Permitir o encaminhamento entre as interfaces
+```
+### Enable IPv4/IPv6 Forwarding
+sysctl -w net.ipv4.ip_forward=1
+sysctl -w net.ipv6.conf.all.forwarding=1
+
+### Add NAT Rule
+iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
+```
+
+### Testando
+
+Rodar os comandos abaixo no POD UERAMSIM enquanto captura o trafego de rede usando o comando kubectl sniff <UPF_POD_ID>
+
+```
+ping -I uesimtun0 8.8.8.8
+iperf -B 192.168.0.2 -c 10.244.43.121 -w 300k
+```
+
+
+### Algumas discuções sobre o assunto
+- [Promissor](https://unix.stackexchange.com/questions/442760/cant-forward-traffic-from-eth-to-tun-tap)
+- [Base do trabalho do Grabriel](https://github.com/my5G/my5G-RANTester/wiki/Tutorial-open5GS-v2.3.6)
+
+
 # Links
 - (https://brito.com.br/posts/build-docker-arm64/)
 - (https://bitbucket.org/infinitydon/workspace/projects/PROJ)

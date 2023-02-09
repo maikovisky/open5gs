@@ -16,6 +16,7 @@ metadata:
   namespace: open5gs
 spec:
   selector:
+
     matchLabels:
       app: open5gs-mongodb
   template:
@@ -23,6 +24,8 @@ spec:
       labels:
         app: open5gs-mongodb
     spec:
+      nodeSelector:
+        kubernetes.io/arch: amd64
       containers:
       - image: free5gmano/nextepc-mongodb
         name: open5gs-mongodb

@@ -53,14 +53,10 @@ spec:
             - name: open5gs-pcf-config
               mountPath: /open5gs/config-map/pcf.yaml
               subPath: "pcf.yaml"
-            - name: "dev-net-tun"
-              mountPath: "/dev/net/tun" # Needed for VPN
+
           command: ["open5gs-pcfd", "-c", "/open5gs/config-map/pcf.yaml"]
       volumes:
         - name: open5gs-pcf-config
           configMap:
             name: open5gs-pcf-config
-        - name: dev-net-tun
-          hostPath:
-            path: /dev/net/tun
 

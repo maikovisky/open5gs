@@ -50,19 +50,16 @@ spec:
             privileged: true
             capabilities:
               add: ["NET_ADMIN", "SYS_MODULE"]
-          #imagePullPolicy: {{ .Values.open5gs.image.pullPolicy }}
+
           volumeMounts:
             - name: open5gs-bsf-config
               mountPath: /open5gs/config-map/bsf.yaml
               subPath: "bsf.yaml"
-            - name: "dev-net-tun"
-              mountPath: "/dev/net/tun" # Needed for VPN
+
           command: ["open5gs-bsfd", "-c", "/open5gs/config-map/bsf.yaml"]
       volumes:
         - name: open5gs-bsf-config
           configMap:
             name: open5gs-bsf-config
-        - name: dev-net-tun
-          hostPath:
-            path: /dev/net/tun
+
 

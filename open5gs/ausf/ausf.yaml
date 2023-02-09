@@ -54,16 +54,13 @@ spec:
             - name: open5gs-ausf-config
               mountPath: /open5gs/config-map/ausf.yaml
               subPath: "ausf.yaml"
-            - name: "dev-net-tun"
-              mountPath: "/dev/net/tun" # Needed for VPN
+
           command: ["open5gs-ausfd", "-d", "-c", "/open5gs/config-map/ausf.yaml"]
       volumes:
         - name: open5gs-ausf-config
           configMap:
             name: open5gs-ausf-config
-        - name: dev-net-tun
-          hostPath:
-            path: /dev/net/tun
+
 ---
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor

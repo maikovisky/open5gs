@@ -53,16 +53,13 @@ spec:
             - name: open5gs-udr-config
               mountPath: /open5gs/config-map/udr.yaml
               subPath: "udr.yaml"
-            - name: "dev-net-tun"
-              mountPath: "/dev/net/tun" # Needed for VPN
+
           command: ["open5gs-udrd", "-c", "/open5gs/config-map/udr.yaml"]
       volumes:
         - name: open5gs-udr-config
           configMap:
             name: open5gs-udr-config
-        - name: dev-net-tun
-          hostPath:
-            path: /dev/net/tun
+
 ---
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor

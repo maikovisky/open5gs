@@ -43,6 +43,9 @@ spec:
       labels:
         epc-mode: scp
     spec:  
+      nodeSelector:
+        kubernetes.io/arch: amd64
+        nodetype: server
       containers:
         - name: scp
           image: maikovisky/open5gs:latest  
@@ -55,8 +58,7 @@ spec:
             - name: open5gs-scp-config
               mountPath: /open5gs/config-map/scp.yaml
               subPath: "scp.yaml"
-            - name: "dev-net-tun"
-              mountPath: "/dev/net/tun" # Needed for VPN
+
             - name: "lib-modules"
               mountPath: "/lib/modules" # Needed for VPN
           command: ["open5gs-scpd", "-c", "/open5gs/config-map/scp.yaml"]
@@ -64,9 +66,7 @@ spec:
         - name: open5gs-scp-config
           configMap:
             name: open5gs-scp-config
-        - name: dev-net-tun
-          hostPath:
-            path: /dev/net/tun
+
         - name: lib-modules
           hostPath:
             path: /lib/modules

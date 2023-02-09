@@ -9,6 +9,7 @@ metadata:
 spec:
   selector:
     epc-mode: upf
+  publishNotReadyAddresses: true
   ports:
     - name: open5gs-upf-tcp-80
       protocol: TCP
@@ -55,30 +56,41 @@ spec:
         kubernetes.io/arch: amd64
         kubernetes.io/hostname: molejo
       containers:
-        - name: metrics-upf
-          image: maikovisky/open5gs:latest  
-          command: ["/usr/bin/node_exporter"]
-          volumeMounts:
-            - name: "dev-net-tun"
-              mountPath: "/dev/net/tun" # Needed for VPN
+        # - name: metrics-upf
+        #   image: maikovisky/open5gs:latest  
+        #   command: ["/usr/bin/node_exporter"]
+        #   volumeMounts:
+        #     - name: "dev-net-tun"
+        #       mountPath: "/dev/net/tun" # Needed for VPN
 
-            - name: open5gs-upf-rclocal
-              mountPath: "/etc/rc.d/rc.local" 
-              subPath: "rc.local"
+        #     - name: open5gs-upf-rclocal
+        #       mountPath: "/etc/rc.d/rc.local" 
+        #       subPath: "rc.local"
 
         - name: upf
           image: maikovisky/open5gs:latest  
+          #image: openg5s/open5gs:latest
           securityContext:
             privileged: true
             capabilities:
-              add: ["NET_ADMIN", "SYS_MODULE"]
-          #imagePullPolicy: {{ .Values.open5gs.image.pullPolicy }}
+              add: ["NET_ADMIN", "SYS_MODULE", "NET_RAW"]
+
+          ports:
+            - name: pfcp
+              containerPort: 8805
+              protocol: UDP
+            - name: gtpu
+              containerPort: 2152
+              protocol: UDP
           volumeMounts:
             - name: open5gs-upf-config
               mountPath: /open5gs/config-map/upf.yaml
               subPath: "upf.yaml"
+
             - name: "dev-net-tun"
               mountPath: "/dev/net/tun" # Needed for VPN
+            - name: "lib-modules"
+              mountPath: "/lib/modules" # Needed for VPN
 
             # Needed for tunnel
             - name: open5gs-upf-rclocal
@@ -94,6 +106,11 @@ spec:
         - name: dev-net-tun
           hostPath:
             path: /dev/net/tun
+
+        - name: lib-modules
+          hostPath:
+            path: /lib/modules
+
         - name: open5gs-upf-rclocal
           configMap:
             name: open5gs-upf-rclocal

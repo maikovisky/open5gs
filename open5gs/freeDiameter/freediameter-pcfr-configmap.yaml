@@ -24,7 +24,7 @@ data:
     # This must be a valid FQDN that resolves to the local host.
     # Default: hostname's FQDN
     #Identity = "aaa.koganei.freediameter.net";
-    Identity = "pcrf.localdomain";
+    Identity = "open5gs-pcrf";
 
     # The Diameter Realm of this daemon.
     # Default: the domain part of Identity (after the first dot).
@@ -269,6 +269,6 @@ data:
     # Examples:
     #ConnectPeer = "aaa.wide.ad.jp";
     #ConnectPeer = "old.diameter.serv" { TcTimer = 60; TLS_old_method; No_SCTP; Port=3868; } ;
-    ConnectPeer = "smf.localdomain" { ConnectTo = "open5gs-smf"; No_TLS; };
+    ConnectPeer = "open5gs-smf" { ConnectTo = "open5gs-smf"; No_TLS; };
 
     ##############################################################

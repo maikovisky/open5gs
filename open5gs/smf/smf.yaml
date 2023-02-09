@@ -87,8 +87,8 @@ spec:
               mountPath: /etc/freeDiameter/cacert.pem
               subPath: "cacert.pem"            
 
-            - name: "dev-net-tun"
-              mountPath: "/dev/net/tun" # Needed for VPN
+            # - name: "dev-net-tun"
+            #   mountPath: "/dev/net/tun" # Needed for VPN
               
           command: ["open5gs-smfd", "-c", "/open5gs/config-map/smf.yaml"]
           #command: ["sleep", "1d"]
@@ -113,7 +113,7 @@ spec:
           configMap:
             name: freediameter-cacert-config
 
-        - name: dev-net-tun
-          hostPath:
-            path: /dev/net/tun
+        # - name: dev-net-tun
+        #   hostPath:
+        #     path: /dev/net/tun
 
