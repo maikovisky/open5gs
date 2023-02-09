@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: open5gs-upf2-rclocal
+  namespace: open5gs
+  labels:
+    epc-mode: upf
+data:
+  rc.local: |
+    #!/bin/sh
+    ip tuntap add name ogstun mode tun
+    ip addr add 10.48.0.1/16 dev ogstun3
+    ip link set ogstun3 up
+    sysctl -w net.ipv4.ip_forward=1

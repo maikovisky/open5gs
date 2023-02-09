@@ -1,0 +1,156 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: open5gs-upf
+  namespace: open5gs
+  labels:
+    epc-mode: upf
+    promotheus: open5gs-monitor
+spec:
+  selector:
+    epc-mode: upf
+  publishNotReadyAddresses: true
+  ports:
+    - name: open5gs-upf-tcp-80
+      protocol: TCP
+      port: 80
+      targetPort: 80
+    - name: open5gs-upf-tcp-9090
+      protocol: TCP
+      port: 9090
+      targetPort: 9090
+    - name: open5gs-upf-tcp-9100
+      protocol: TCP
+      port: 9100
+      targetPort: 9100
+    - name: open5gs-upf-udp-2152
+      protocol: UDP
+      port: 2152
+      targetPort: 2152
+    - name: open5gs-upf-udp-8805
+      protocol: UDP
+      port: 8805
+      targetPort: 8805
+---    
+apiVersion: apps/v1 # for versions before 1.9.0 use apps/v1beta2
+kind: Deployment
+metadata:
+  name: open5gs-upf
+  namespace: open5gs
+  labels:
+    epc-mode: upf
+    promotheus: open5gs-monitor
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      epc-mode: upf
+  template:
+    metadata:
+#      annotations:
+#        "helm.sh/hook": pre-install    
+      labels:
+        epc-mode: upf
+    spec:  
+      nodeSelector:
+        kubernetes.io/arch: amd64
+        kubernetes.io/hostname: molejo
+      initContainers:
+        - name: upf-tun-create
+          image: maikovisky/open5gs:latest  
+          imagePullPolicy: IfNotPresent
+          command:
+            - "/bin/bash" 
+            - "-c"
+            - "/bin/entrypoint.sh"
+          securityContext:
+            privileged: true
+            capabilities:
+              add: ["NET_ADMIN"]
+          volumeMounts:
+            - name: open5gs-upf-entrypoint
+              mountPath:  /bin/entrypoint.sh
+              subPath: entrypoint.sh
+      containers:
+        # - name: metrics-upf
+        #   image: maikovisky/open5gs:latest  
+        #   command: ["/usr/bin/node_exporter"]
+        #   volumeMounts:
+        #     - name: "dev-net-tun"
+        #       mountPath: "/dev/net/tun" # Needed for VPN
+
+        #     - name: open5gs-upf-rclocal
+        #       mountPath: "/etc/rc.d/rc.local" 
+        #       subPath: "rc.local"
+
+        - name: upf
+          image: maikovisky/open5gs:latest  
+          #image: openg5s/open5gs:latest
+          securityContext:
+            privileged: true
+            capabilities:
+              add: ["NET_ADMIN", "SYS_MODULE", "NET_RAW"]
+
+          ports:
+            - name: pfcp
+              containerPort: 8805
+              protocol: UDP
+            - name: gtpu
+              containerPort: 2152
+              protocol: UDP
+          volumeMounts:
+            - name: open5gs-upf-config
+              mountPath: /open5gs/config-map/upf.yaml
+              subPath: "upf.yaml"
+
+            # - name: "dev-net-tun"
+            #   mountPath: "/dev/net/tun" # Needed for VPN
+            - name: "lib-modules"
+              mountPath: "/lib/modules" # Needed for VPN
+
+            # Needed for tunnel
+            # - name: open5gs-upf-rclocal
+            #   mountPath: "/etc/rc.d/rc.local" 
+            #   subPath: "rc.local"
+
+          command: ["open5gs-upfd", "-c", "/open5gs/config-map/upf.yaml"]
+          #command: ["sleep", "1d"]
+      volumes:
+        - name: open5gs-upf-config
+          configMap:
+            name: open5gs-upf-config
+
+        # - name: dev-net-tun
+        #   hostPath:
+        #     path: /dev/net/tun
+
+        - name: lib-modules
+          hostPath:
+            path: /lib/modules
+
+        # - name: open5gs-upf-rclocal
+        #   configMap:
+        #     name: open5gs-upf-rclocal
+        #     defaultMode: 0777
+        
+        - name: open5gs-upf-entrypoint
+          configMap:
+            name: open5gs-upf-entrypoint
+            defaultMode: 0777
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: open5gs-upf
+  namespace: open5gs
+  labels:
+    epc-mode: upf
+spec:
+  selector:
+    matchLabels:
+      epc-mode: upf
+  endpoints:
+  - interval: 30s
+    port: open5gs-upf-tcp-9100
+
+

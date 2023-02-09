@@ -1,0 +1,42 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: open5gs-upf2-config
+  namespace: open5gs
+  labels:
+    epc-mode: upf2
+data:
+  upf.yaml: |-
+    logger:
+        file: /var/log/open5gs/upf2.log
+    
+    #  <PFCP Server>
+    upf:
+      pfcp:
+        - dev eth0
+      gtpu:
+        - dev eth0
+      metrics:
+        - addr: 0.0.0.0
+          port: 9090
+      subnet:
+        - addr: 10.48.0.1/16
+          dnn: slice03
+          dev: ogstun3
+       
+    #
+    # smf:
+    #
+    #  <PFCP Client>>
+    #
+    #  o PFCP Client(127.0.0.4:8805)
+    #
+    #    pfcp:
+    #      addr: 127.0.0.4
+    #
+    #smf:
+    #    pfcp:
+    #      name: openg5s-smf
+    #
+    smf:
+      
