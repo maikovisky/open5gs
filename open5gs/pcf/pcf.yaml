@@ -33,14 +33,13 @@ spec:
     matchLabels:
       epc-mode: pcf
   template:
-    metadata:
-#      annotations:
-#        "helm.sh/hook": pre-install    
+    metadata:  
       labels:
         epc-mode: pcf
     spec:  
       nodeSelector:
         kubernetes.io/arch: amd64
+        kubernetes.io/hostname: molejo
       containers:
         - name: pcf
           image: maikovisky/open5gs:latest  

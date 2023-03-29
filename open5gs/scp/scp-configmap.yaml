@@ -10,6 +10,12 @@ data:
     logger:
         file: /var/log/open5gs/scp.log
 
+    sbi:
+      server:
+        no_tls: true
+      client:
+        no_tls: true
+
     scp:
         sbi:
           - addr: 0.0.0.0

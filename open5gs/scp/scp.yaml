@@ -37,14 +37,13 @@ spec:
     matchLabels:
       epc-mode: scp
   template:
-    metadata:
-#      annotations:
-#        "helm.sh/hook": pre-install    
+    metadata:   
       labels:
         epc-mode: scp
     spec:  
       nodeSelector:
         kubernetes.io/arch: amd64
+        kubernetes.io/hostname: molejo
         nodetype: server
       containers:
         - name: scp

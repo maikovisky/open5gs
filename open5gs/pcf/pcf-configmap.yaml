@@ -12,6 +12,12 @@ data:
 
     db_uri: mongodb://open5gs-mongodb-svc/open5gs
 
+    sbi:
+      server:
+        no_tls: true
+      client:
+        no_tls: true
+
     pcf:
       sbi:
         - addr: 0.0.0.0

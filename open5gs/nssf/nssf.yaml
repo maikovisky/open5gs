@@ -39,6 +39,7 @@ spec:
     spec:  
       nodeSelector:
         kubernetes.io/arch: amd64
+        kubernetes.io/hostname: molejo
         nodetype: server
       containers:
         - name: metrics-nssf

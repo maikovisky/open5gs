@@ -38,6 +38,7 @@ spec:
     spec:  
       nodeSelector:
         kubernetes.io/arch: amd64
+        kubernetes.io/hostname: molejo
       containers:
         - name: metrics-ausf
           image: maikovisky/open5gs:latest  

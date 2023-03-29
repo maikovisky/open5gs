@@ -31,9 +31,7 @@ spec:
     matchLabels:
       epc-mode: udm
   template:
-    metadata:
-#      annotations:
-#        "helm.sh/hook": pre-install    
+    metadata:  
       labels:
         epc-mode: udm
     spec:  

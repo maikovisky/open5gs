@@ -9,6 +9,12 @@ data:
   nssf.yaml: |
     logger:
         file: /var/log/open5gs/nssf.log
+    
+    sbi:
+      server:
+        no_tls: true
+      client:
+        no_tls: true
 
     nssf:
         sbi:
