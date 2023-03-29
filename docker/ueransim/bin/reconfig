@@ -1,0 +1,5 @@
+#!/bin/bash
+sed "s/HOSTNAME/$HOSTNAME/g" /etc/ueransim/open5gs-gnb-base.yaml > /etc/ueransim/open5gs-gnb-01.yaml
+sed "s/HOSTNAME/$HOSTNAME/g" /etc/ueransim/open5gs-ue-base.yaml > /etc/ueransim/open5gs-ue-01.yaml
+export POD_INDEX=${HOSTNAME##*-}
+export IMIS=$MCC$MNC$(printf \"%10d\" $POD_INDEX)

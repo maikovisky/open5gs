@@ -7,6 +7,8 @@ RUN apk update && \
        iproute2 \
        curl \
        lksctp-tools \
+       prometheus-node-exporter \
+       iperf \
        net-tools  
     
 
@@ -33,6 +35,7 @@ RUN mkdir -p /var/log/ueransim && \
        iproute2 \
        curl \
        lksctp-tools \
+       iperf \
        net-tools  
 	
 WORKDIR /
@@ -43,6 +46,7 @@ COPY --from=builder /UERANSIM/build/nr-binder /bin
 COPY --from=builder /UERANSIM/build/libdevbnd.so /lib
 COPY --from=builder /UERANSIM/config /etc/ueransim
 COPY etc /etc
+COPY bin /bin
 
 
 
