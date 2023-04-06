@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: open5gs-pcrf-config
+  namespace: open5gs
+  labels:
+    epc-mode: pcrfd
+data:
+  pcrfd.yaml: |
+    db_uri: mongodb://open5gs-mongodb-svc/open5gs
+    logger:
+        file: /var/log/open5gs/pcrfd.log
+
+    pcrf:
+        freeDiameter: /etc/freeDiameter/pcrf.conf

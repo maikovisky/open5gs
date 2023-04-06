@@ -1,0 +1,90 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: open5gs-mme
+  namespace: open5gs
+  labels:
+    epc-mode: mme
+spec:
+  selector:
+    epc-mode: mme
+  ports:
+    - name: open5gs-mme-tcp-s1ap
+      protocol: TCP
+      port: 36412
+    - name: open5gs-mme-tcp-gtpc
+      protocol: TCP
+      port: 2123
+    - name: open5gs-mme-tcp-sgsap
+      protocol: TCP
+      port: 29119
+    - name: open5gs-mme-tcp-usrstcp
+      protocol: TCP
+      port: 9899
+    - name: open5gs-mme-tcp-metrics
+      protocol: TCP
+      port: 9090
+
+---    
+apiVersion: apps/v1 # for versions before 1.9.0 use apps/v1beta2
+kind: Deployment
+metadata:
+  name: open5gs-mme
+  namespace: open5gs
+  labels:
+    epc-mode: mme
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      epc-mode: mme
+  template:
+    metadata:
+#      annotations:
+#        "helm.sh/hook": pre-install    
+      labels:
+        epc-mode: mme
+    spec:  
+      nodeSelector:
+        kubernetes.io/arch: amd64
+      containers:
+        - name: mme
+          image: maikovisky/open5gs:latest  
+          securityContext:
+            privileged: true
+            capabilities:
+              add: ["NET_ADMIN", "SYS_MODULE"]
+          #imagePullPolicy: {{ .Values.open5gs.image.pullPolicy }}
+          volumeMounts:
+            - name: open5gs-mme-config
+              mountPath: /open5gs/config-map/mme.yaml
+              subPath: "mme.yaml"
+            - name: freediameter-mme-config
+              mountPath: /etc/freeDiameter/mme.conf
+              subPath: "mme.conf"
+            - name: freediameter-mme-cert-config
+              mountPath: /etc/freeDiameter/mme.cert.pem
+              subPath: "mme.cert.pem"
+            - name: freediameter-mme-key-config
+              mountPath: /etc/freeDiameter/mme.key.pem
+              subPath: "mme.key.pem"
+            - name: "dev-net-tun"
+              mountPath: "/dev/net/tun" # Needed for VPN
+          command: ["open5gs-mmed", "-d", "-c", "/open5gs/config-map/mme.yaml"]
+      volumes:
+        - name: open5gs-mme-config
+          configMap:
+            name: open5gs-mme-config
+        - name: freediameter-mme-config
+          configMap:
+            name: freediameter-mme-config
+        - name: freediameter-mme-cert-config
+          configMap:
+            name: freediameter-mme-cert-config
+        - name: freediameter-mme-key-config
+          configMap:
+            name: freediameter-mme-key-config
+        - name: dev-net-tun
+          hostPath:
+            path: /dev/net/tun
+
