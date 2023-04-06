@@ -43,11 +43,11 @@ spec:
         nodetype: server
       containers:
         - name: metrics-nssf
-          image: maikovisky/open5gs:latest  
-          command: ["/usr/bin/node_exporter"]
+          image: maikovisky/open5gs:ubuntu-latest    
+          command: ["/bin/prometheus-node-exporter"]
 
         - name: nssf
-          image: maikovisky/open5gs:latest  
+          image: maikovisky/open5gs:ubuntu-latest  
           securityContext:
             privileged: true
             capabilities:
@@ -57,7 +57,9 @@ spec:
               mountPath: /open5gs/config-map/nssf.yaml
               subPath: "nssf.yaml"
 
-          command: ["open5gs-nssfd", "-c", "/open5gs/config-map/nssf.yaml"]
+          command: ["open5gs-nssfd", "-d", "-c", "/open5gs/config-map/nssf.yaml"]
+         
+          
       volumes:
         - name: open5gs-nssf-config
           configMap:

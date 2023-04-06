@@ -41,13 +41,17 @@ spec:
         kubernetes.io/arch: amd64
         kubernetes.io/hostname: molejo
       containers:
+        - name: metrics-pcf
+          image: maikovisky/open5gs:ubuntu-latest    
+          command: ["/bin/prometheus-node-exporter"]
+
         - name: pcf
-          image: maikovisky/open5gs:latest  
+          image: maikovisky/open5gs:ubuntu-latest    
           securityContext:
             privileged: true
             capabilities:
               add: ["NET_ADMIN", "SYS_MODULE"]
-          #imagePullPolicy: {{ .Values.open5gs.image.pullPolicy }}
+
           volumeMounts:
             - name: open5gs-pcf-config
               mountPath: /open5gs/config-map/pcf.yaml

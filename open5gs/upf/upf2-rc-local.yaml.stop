@@ -9,6 +9,6 @@ data:
   rc.local: |
     #!/bin/sh
     ip tuntap add name ogstun mode tun
-    ip addr add 10.48.0.1/16 dev ogstun3
-    ip link set ogstun3 up
+    ip addr add 10.42.0.1/16 dev ogstun1
+    ip link set ogstun1 up
     sysctl -w net.ipv4.ip_forward=1

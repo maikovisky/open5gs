@@ -21,8 +21,10 @@ data:
         sbi:
           - addr: 0.0.0.0
             advertise: open5gs-bsf
+    # nrf:
+    #     sbi:
+    #       - name: open5gs-nrf
 
-          
-    nrf:
-        sbi:
-          name: open5gs-nrf
+    scp:
+      sbi:
+        - name: open5gs-scp

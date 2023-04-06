@@ -40,11 +40,11 @@ spec:
         kubernetes.io/hostname: molejo
       containers:
         - name: metrics-udm
-          image: maikovisky/open5gs:latest  
-          command: ["/usr/bin/node_exporter"]
+          image: maikovisky/open5gs:ubuntu-latest    
+          command: ["/bin/prometheus-node-exporter"]
 
         - name: udm
-          image: maikovisky/open5gs:latest  
+          image: maikovisky/open5gs:ubuntu-latest    
           securityContext:
             privileged: true
             capabilities:
@@ -55,7 +55,7 @@ spec:
               mountPath: /open5gs/config-map/udm.yaml
               subPath: "udm.yaml"
 
-          command: ["open5gs-udmd",  "-c", "/open5gs/config-map/udm.yaml"]
+          command: ["open5gs-udmd", "-d", "-c", "/open5gs/config-map/udm.yaml"]
       volumes:
         - name: open5gs-udm-config
           configMap:

@@ -36,6 +36,20 @@ resource "kubectl_manifest" "mongodb" {
     yaml_body = element(data.kubectl_path_documents.mongodb_manifests.documents, count.index)
 }
 
+# WEBUI
+data "kubectl_path_documents" "webui_manifests" {
+    pattern = "./webui/*.yaml"
+}
+
+resource "kubectl_manifest" "webui" {
+    count     = length(data.kubectl_path_documents.webui_manifests.documents)
+    yaml_body = element(data.kubectl_path_documents.webui_manifests.documents, count.index)
+
+    depends_on = [
+      data.kubectl_path_documents.nrf_manifests
+    ]
+}
+
 # freeDiameter
 data "kubectl_path_documents" "free_diameter_manifests" {
     pattern = "./freeDiameter/*.yaml"
@@ -59,6 +73,21 @@ resource "kubectl_manifest" "nrf" {
 
     depends_on = [
       data.kubectl_path_documents.mongodb_manifests,
+      data.kubectl_path_documents.logfile_manifests
+    ]
+}
+
+# AMF Database
+data "kubectl_path_documents" "amf_manifests" {
+    pattern = "./amf/*.yaml"
+}
+
+resource "kubectl_manifest" "amf" {
+    count     = length(data.kubectl_path_documents.amf_manifests.documents)
+    yaml_body = element(data.kubectl_path_documents.amf_manifests.documents, count.index)
+
+    depends_on = [
+      data.kubectl_path_documents.nrf_manifests,
       data.kubectl_path_documents.logfile_manifests
     ]
 }
@@ -93,18 +122,20 @@ resource "kubectl_manifest" "scp" {
 #     ]
 # }
 
-# AMF Database
-data "kubectl_path_documents" "amf_manifests" {
-    pattern = "./amf/*.yaml"
+
+
+
+# NSSF Database
+data "kubectl_path_documents" "nssf_manifests" {
+    pattern = "./nssf/*.yaml"
 }
 
-resource "kubectl_manifest" "amf" {
-    count     = length(data.kubectl_path_documents.amf_manifests.documents)
-    yaml_body = element(data.kubectl_path_documents.amf_manifests.documents, count.index)
+resource "kubectl_manifest" "nssf" {
+    count     = length(data.kubectl_path_documents.nssf_manifests.documents)
+    yaml_body = element(data.kubectl_path_documents.nssf_manifests.documents, count.index)
 
     depends_on = [
-      data.kubectl_path_documents.nrf_manifests,
-      data.kubectl_path_documents.logfile_manifests
+      data.kubectl_path_documents.nrf_manifests
     ]
 }
 
@@ -138,65 +169,6 @@ resource "kubectl_manifest" "bsf" {
 }
 
 
-# HSS Database
-# data "kubectl_path_documents" "hss_manifests" {
-#     pattern = "./hss/*.yaml"
-# }
-
-# resource "kubectl_manifest" "hss" {
-#     count     = length(data.kubectl_path_documents.hss_manifests.documents)
-#     yaml_body = element(data.kubectl_path_documents.hss_manifests.documents, count.index)
-
-#     depends_on = [
-#       data.kubectl_path_documents.nrf_manifests,
-#       resource.kubectl_manifest.free_diameter
-#     ]
-# }
-
-
-# MME Database
-# data "kubectl_path_documents" "mme_manifests" {
-#     pattern = "./mme/*.yaml"
-# }
-
-# resource "kubectl_manifest" "mme" {
-#     count     = length(data.kubectl_path_documents.mme_manifests.documents)
-#     yaml_body = element(data.kubectl_path_documents.mme_manifests.documents, count.index)
-
-#     depends_on = [
-#       data.kubectl_path_documents.nrf_manifests,
-#       resource.kubectl_manifest.free_diameter
-#     ]
-# }
-
-# NSSF Database
-data "kubectl_path_documents" "nssf_manifests" {
-    pattern = "./nssf/*.yaml"
-}
-
-resource "kubectl_manifest" "nssf" {
-    count     = length(data.kubectl_path_documents.nssf_manifests.documents)
-    yaml_body = element(data.kubectl_path_documents.nssf_manifests.documents, count.index)
-
-    depends_on = [
-      data.kubectl_path_documents.nrf_manifests
-    ]
-}
-
-# PCRF Database
-# data "kubectl_path_documents" "pcrf_manifests" {
-#     pattern = "./pcrf/*.yaml"
-# }
-
-# resource "kubectl_manifest" "pcrf" {
-#     count     = length(data.kubectl_path_documents.pcrf_manifests.documents)
-#     yaml_body = element(data.kubectl_path_documents.pcrf_manifests.documents, count.index)
-
-#     depends_on = [
-#       data.kubectl_path_documents.nrf_manifests
-#     ]
-# }
-
 # PCF Database
 data "kubectl_path_documents" "pcf_manifests" {
     pattern = "./pcf/*.yaml"
@@ -211,20 +183,6 @@ resource "kubectl_manifest" "pcf" {
     ]
 }
 
-
-# sgwc
-# data "kubectl_path_documents" "sgwc_manifests" {
-#     pattern = "./sgwc/*.yaml"
-# }
-
-# resource "kubectl_manifest" "sgwc" {
-#     count     = length(data.kubectl_path_documents.sgwc_manifests.documents)
-#     yaml_body = element(data.kubectl_path_documents.sgwc_manifests.documents, count.index)
-
-#     depends_on = [
-#       data.kubectl_path_documents.nrf_manifests
-#     ]
-# }
 
 # SMF
 data "kubectl_path_documents" "smf_manifests" {
@@ -256,19 +214,6 @@ resource "kubectl_manifest" "udm" {
     ]
 }
 
-# sgwu
-# data "kubectl_path_documents" "sgwu_manifests" {
-#     pattern = "./sgwu/*.yaml"
-# }
-
-# resource "kubectl_manifest" "sgwu" {
-#     count     = length(data.kubectl_path_documents.sgwu_manifests.documents)
-#     yaml_body = element(data.kubectl_path_documents.sgwu_manifests.documents, count.index)
-
-#     depends_on = [
-#       data.kubectl_path_documents.nrf_manifests
-#     ]
-# }
 
 # UDR
 data "kubectl_path_documents" "udr_manifests" {
@@ -299,33 +244,21 @@ resource "kubectl_manifest" "upf" {
     ]
 }
 
-# webui
-data "kubectl_path_documents" "webui_manifests" {
-    pattern = "./webui/*.yaml"
-}
 
-resource "kubectl_manifest" "webui" {
-    count     = length(data.kubectl_path_documents.webui_manifests.documents)
-    yaml_body = element(data.kubectl_path_documents.webui_manifests.documents, count.index)
-
-    depends_on = [
-      data.kubectl_path_documents.nrf_manifests
-    ]
-}
 
 # POD for teste
-#data "kubectl_path_documents" "test_manifests" {
-#    pattern = "./test/*.yaml"
-#}
+data "kubectl_path_documents" "test_manifests" {
+   pattern = "./test/*.yaml"
+}
 
-#resource "kubectl_manifest" "test" {
-#    count     = length(data.kubectl_path_documents.test_manifests.documents)
-#    yaml_body = element(data.kubectl_path_documents.test_manifests.documents, count.index)
+resource "kubectl_manifest" "test" {
+   count     = length(data.kubectl_path_documents.test_manifests.documents)
+   yaml_body = element(data.kubectl_path_documents.test_manifests.documents, count.index)
 
-#    depends_on = [
-#      data.kubectl_path_documents.nrf_manifests
-#    ]
-#}
+   depends_on = [
+     data.kubectl_path_documents.nrf_manifests
+   ]
+}
 
 # POD for ueransim
 data "kubectl_path_documents" "ueransim_manifests" {
@@ -343,5 +276,13 @@ resource "kubectl_manifest" "ueransim" {
     ]
 }
 
+# IPERF
+data "kubectl_path_documents" "iperf_manifests" {
+    pattern = "./iperf/*.yaml"
+}
 
+resource "kubectl_manifest" "iperf" {
+    count     = length(data.kubectl_path_documents.iperf_manifests.documents)
+    yaml_body = element(data.kubectl_path_documents.iperf_manifests.documents, count.index)
+}
 

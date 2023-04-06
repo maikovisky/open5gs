@@ -1,0 +1,38 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: open5gs-ue-reconfig
+  namespace: open5gs
+  labels:
+    epc-mode: ueransim
+  defaultMode: 0777
+data:
+  reconfig: |
+    #!/bin/bash 
+    set -e
+
+    RESULT=`mongosh --quiet mongodb://open5gs-mongodb-svc:27017/open5gs /etc/ueransim/open5gs.js`
+    IN=($${RESULT// / })
+    SLICE=$${IN[0]}
+    IMSI=$${IN[1]}
+
+    echo "Slice: $SLICE IMSI: $IMSI"
+    sed "s/HOSTNAME/$OPEN5GS_UERANSIM_SERVICE_HOST/g" /etc/ueransim/open5gs-ue-$SLICE.yaml > /etc/ueransim/tmp/open5gs-ue-01.yaml
+    sed -i "s/999700000000001/$IMSI/g" /etc/ueransim/tmp/open5gs-ue-01.yaml
+
+    nr-ue -c /etc/ueransim/tmp/open5gs-ue-01.yaml 
+    # sleep 20s
+
+    # uesimtun0=$(ifconfig uesimtun0 | awk '/inet / {print $6}')
+    # uesimtun1=$(ifconfig uesimtun1 | awk '/inet / {print $6}')
+    # if (expr "$uesimtun0" : "10\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*$"")
+    # then
+    #   uesimtun=$uesimtun0
+    # else
+    #   uesimtun=$uesimtun1
+    # fi
+
+    # iperf3 -B $uesimtun -c open5gs-iperf -w 300k -t 60
+    # sleep 1d
+
+  

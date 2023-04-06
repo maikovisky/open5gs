@@ -10,10 +10,15 @@ data:
     logger:
         file: /var/log/open5gs/smf.log
 
+    sbi:
+      server:
+        no_tls: true
+      client:
+        no_tls: true
+
     smf:
-      freeDiameter: /etc/freeDiameter/smf.conf
       sbi:
-        - addr: 0.0.0.0
+        - dev: eth0
           port: 80
           advertise: open5gs-smf
       metrics:
@@ -28,13 +33,14 @@ data:
       subnet:
         - addr: 192.168.0.1/16
           dnn: internet
-        - addr: 2001:db8:cafe::1/48
-        - addr: 10.46.0.1/16
+        - addr: 10.41.0.1/16
           dnn: slice01
-        - addr: 10.47.0.1/16
+        - addr: 10.42.0.1/16
           dnn: slice02
-        - addr: 10.48.0.1/16
+        - addr: 10.43.0.1/16
           dnn: slice03
+        - addr: 10.44.0.1/16
+          dnn: slice04
       dns:
         - 8.8.8.8
         - 8.8.4.4
@@ -43,22 +49,54 @@ data:
       mtu: 1400
       ctf:
         enabled: auto
+      freeDiameter: /etc/freeDiameter/smf.conf
+      info:
+        - s_nssai:
+          - sst: 1
+            dnn:
+              - internet
+          - sst: 1
+            sd: 000001
+            dnn:
+              - slice01
+          - sst: 2
+            sd: 000002
+            dnn:
+              - slice02
+          - sst: 3
+            sd: 000003
+            dnn:
+              - slice03
+          - sst: 4
+            sd: 000004
+            dnn:
+              - slice04
+
+
         
-    nrf:
+    # nrf:
+    #   sbi:
+    #     - name: open5gs-nrf
+    
+    scp:
       sbi:
-        name: open5gs-nrf
+        - name: open5gs-scp
 
     upf:
       pfcp:
-        - addr: open5gs-upf
-          dnn: [internet, slice01, slice02]
-        - addr: open5gs-upf2
-          dnn: [slice03]
+        # - addr: open5gs-upf
+        #   dnn: [internet]
+        - addr: open5gs-upf-1
+          dnn: [internet, slice01]
+        - addr: open5gs-upf-2
+          dnn: [internet, slice02]
+        - addr: open5gs-upf-3
+          dnn: [internet, slice03]
+        - addr: open5gs-upf-4
+          dnn: [internet, slice04]
 
     metrics:
         addr: 0.0.0.0
         port: 9090
 
-    scp:
-      sbi:
-        - addr: open5gs-scp
+

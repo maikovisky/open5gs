@@ -50,22 +50,27 @@ spec:
     matchLabels:
       epc-mode: smf
   template:
-    metadata:
-#      annotations:
-#        "helm.sh/hook": pre-install    
+    metadata:  
       labels:
         epc-mode: smf
     spec:  
       nodeSelector:
         kubernetes.io/arch: amd64
+        kubernetes.io/hostname: molejo
       containers:
+        - name: metrics-smf
+          image: maikovisky/open5gs:ubuntu-latest    
+          command: ["/bin/prometheus-node-exporter"]
+          volumeMounts:
+            - name: "dev-net-tun"
+              mountPath: "/dev/net/tun" # Needed for VPN
         - name: smf
-          image: maikovisky/open5gs:latest  
+          image: maikovisky/open5gs:ubuntu-latest    
           securityContext:
             privileged: true
             capabilities:
               add: ["NET_ADMIN", "SYS_MODULE"]
-          #imagePullPolicy: {{ .Values.open5gs.image.pullPolicy }}
+
           volumeMounts:
             - name: open5gs-smf-config
               mountPath: /open5gs/config-map/smf.yaml
@@ -87,8 +92,8 @@ spec:
               mountPath: /etc/freeDiameter/cacert.pem
               subPath: "cacert.pem"            
 
-            # - name: "dev-net-tun"
-            #   mountPath: "/dev/net/tun" # Needed for VPN
+            - name: "dev-net-tun"
+              mountPath: "/dev/net/tun" # Needed for VPN
               
           command: ["open5gs-smfd", "-c", "/open5gs/config-map/smf.yaml"]
           #command: ["sleep", "1d"]
@@ -113,7 +118,7 @@ spec:
           configMap:
             name: freediameter-cacert-config
 
-        # - name: dev-net-tun
-        #   hostPath:
-        #     path: /dev/net/tun
+        - name: dev-net-tun
+          hostPath:
+            path: /dev/net/tun
 

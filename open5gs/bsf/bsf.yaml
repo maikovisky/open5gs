@@ -40,11 +40,14 @@ spec:
         kubernetes.io/hostname: molejo
       containers:
         - name: metrics-bsf
-          image: maikovisky/open5gs:latest  
-          command: ["/usr/bin/node_exporter"]
+          image: maikovisky/open5gs:ubuntu-latest    
+          command: ["/bin/prometheus-node-exporter"]
+          volumeMounts:
+            - name: "dev-net-tun"
+              mountPath: "/dev/net/tun" # Needed for VPN
 
         - name: bsf
-          image: maikovisky/open5gs:latest  
+          image: maikovisky/open5gs:ubuntu-latest    
           securityContext:
             privileged: true
             capabilities:
@@ -54,11 +57,15 @@ spec:
             - name: open5gs-bsf-config
               mountPath: /open5gs/config-map/bsf.yaml
               subPath: "bsf.yaml"
+            - name: "dev-net-tun"
+              mountPath: "/dev/net/tun" # Needed for VPN
 
-          command: ["open5gs-bsfd", "-c", "/open5gs/config-map/bsf.yaml"]
+          command: ["open5gs-bsfd", "-d", "-c", "/open5gs/config-map/bsf.yaml"]
       volumes:
         - name: open5gs-bsf-config
           configMap:
             name: open5gs-bsf-config
-
-
+        - name: dev-net-tun
+          hostPath:
+            path: /dev/net/tun
+        

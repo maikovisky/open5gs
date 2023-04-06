@@ -13,12 +13,6 @@ spec:
       protocol: TCP
       port: 80
       targetPort: 80
-    - name: open5gs-scp-sctp-31412
-      protocol: SCTP
-      port: 31412
-    - name: open5gs-scp-sctp-38412
-      protocol: SCTP
-      port: 38412
     - name: open5gs-scp-tcp-9100
       protocol: TCP
       port: 9100
@@ -46,13 +40,17 @@ spec:
         kubernetes.io/hostname: molejo
         nodetype: server
       containers:
+        - name: metrics-scp
+          image: maikovisky/open5gs:ubuntu-latest    
+          command: ["/bin/prometheus-node-exporter"]
+
         - name: scp
-          image: maikovisky/open5gs:latest  
+          image: maikovisky/open5gs:ubuntu-latest    
           securityContext:
             privileged: true
             capabilities:
               add: ["NET_ADMIN", "SYS_MODULE"]
-          #imagePullPolicy: {{ .Values.open5gs.image.pullPolicy }}
+
           volumeMounts:
             - name: open5gs-scp-config
               mountPath: /open5gs/config-map/scp.yaml
@@ -60,7 +58,7 @@ spec:
 
             - name: "lib-modules"
               mountPath: "/lib/modules" # Needed for VPN
-          command: ["open5gs-scpd", "-c", "/open5gs/config-map/scp.yaml"]
+          command: ["open5gs-scpd", "-d", "-c", "/open5gs/config-map/scp.yaml"]
       volumes:
         - name: open5gs-scp-config
           configMap:

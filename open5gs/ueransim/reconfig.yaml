@@ -5,10 +5,15 @@ metadata:
   namespace: open5gs
   labels:
     epc-mode: ueransim
+  defaultMode: 0777
 data:
   reconfig: |
-    #!/bin/bash
-    sed "s/HOSTNAME/$HOSTNAME/g" /etc/ueransim/open5gs-gnb-base.yaml > /etc/ueransim/open5gs-gnb-01.yaml
-    sed "s/HOSTNAME/$HOSTNAME/g" /etc/ueransim/open5gs-ue-base.yaml > /etc/ueransim/open5gs-ue-01.yaml
-    nr-gnb -c /etc/ueransim/open5gs-gnb-01.yaml
+    #!/bin/bash 
+    set -e
+    sed "s/HOSTNAME/$HOSTNAME/g" /etc/ueransim/open5gs-gnb-base.yaml > /etc/ueransim/tmp/open5gs-gnb-01.yaml
+    #sed "s/HOSTNAME/$HOSTNAME/g" /etc/ueransim/open5gs-ue-base.yaml > /etc/ueransim/tmp/open5gs-ue-01.yaml
+    #export SET_INDEX=$${HOSTNAME##*-}
+    #export IMSI=99970$(printf "%010d" $(expr $SET_INDEX + 1))
+    #sed -i "s/999700000000001/$IMSI/g" /etc/ueransim/tmp/open5gs-ue-01.yaml
+    nr-gnb -c /etc/ueransim/tmp/open5gs-gnb-01.yaml 
     #top

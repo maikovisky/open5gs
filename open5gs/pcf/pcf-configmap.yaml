@@ -25,6 +25,7 @@ data:
       metrics:
         - addr: 0.0.0.0
           port: 9090
-    nrf:
+
+    scp:
       sbi:
-        name: open5gs-nrf
+        - name: open5gs-scp

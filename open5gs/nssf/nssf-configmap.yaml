@@ -21,9 +21,31 @@ data:
           - addr: 0.0.0.0
             advertise: open5gs-nssf
         nsi:
-          - addr: 0.0.0.0
+          - name: open5gs-nrf
             s_nssai:
               sst: 1
-    nrf:
+          - name: open5gs-nrf
+            s_nssai:
+              sst: 1
+              sd: 1
+          - name: open5gs-nrf
+            s_nssai:
+              sst: 2
+              sd: 2
+          - name: open5gs-nrf
+            s_nssai:
+              sst: 3
+              sd: 3
+          - name: open5gs-nrf
+            s_nssai:
+              sst: 4
+              sd: 4
+
+              
+    # nrf:
+    #     sbi:
+    #       - name: open5gs-nrf
+    
+    scp:
         sbi:
-          name: open5gs-nrf
+          - name: open5gs-scp

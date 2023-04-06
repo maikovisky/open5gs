@@ -37,24 +37,25 @@ spec:
     spec:  
       nodeSelector:
         kubernetes.io/arch: amd64
+        kubernetes.io/hostname: molejo
       containers:
         - name: metrics-udr
-          image: maikovisky/open5gs:latest  
-          command: ["/usr/bin/node_exporter"]
+          image: maikovisky/open5gs:ubuntu-latest    
+          command: ["/bin/prometheus-node-exporter"]
 
         - name: udr
-          image: maikovisky/open5gs:latest  
+          image: maikovisky/open5gs:ubuntu-latest    
           securityContext:
             privileged: true
             capabilities:
               add: ["NET_ADMIN", "SYS_MODULE"]
-          #imagePullPolicy: {{ .Values.open5gs.image.pullPolicy }}
+
           volumeMounts:
             - name: open5gs-udr-config
               mountPath: /open5gs/config-map/udr.yaml
               subPath: "udr.yaml"
 
-          command: ["open5gs-udrd", "-c", "/open5gs/config-map/udr.yaml"]
+          command: ["open5gs-udrd", "-d", "-c", "/open5gs/config-map/udr.yaml"]
       volumes:
         - name: open5gs-udr-config
           configMap:

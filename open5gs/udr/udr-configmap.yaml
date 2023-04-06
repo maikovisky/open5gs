@@ -10,12 +10,18 @@ data:
     db_uri: mongodb://open5gs-mongodb-svc/open5gs
     logger:
         file: /var/log/open5gs/udr.log
+    
+    sbi:
+      server:
+        no_tls: true
+      client:
+        no_tls: true
 
     udr:
         sbi:
-          - addr: 0.0.0.0
+          - dev: eth0
             advertise: open5gs-udr
 
-    nrf:
+    scp:
         sbi:
-          name: open5gs-nrf
+          - name: open5gs-scp

@@ -17,15 +17,31 @@ data:
         no_tls: true
 
     udm:
-        sbi:
-          - addr: 0.0.0.0
-            port: 80
-            advertise: open5gs-udm
-            
-        discovery:
-          option:
-            no_service_names: true
+      hnet:
+        - id: 1
+          scheme: 1
+          key: /etc/open5gs/hnet/curve25519-1.key
+        - id: 2
+          scheme: 2
+          key: /etc/open5gs/hnet/secp256r1-2.key
+        - id: 3
+          scheme: 1
+          key: /etc/open5gs/hnet/curve25519-3.key
+        - id: 4
+          scheme: 2
+          key: /etc/open5gs/hnet/secp256r1-4.key
+        - id: 5
+          scheme: 1
+          key: /etc/open5gs/hnet/curve25519-5.key
+        - id: 6
+          scheme: 2
+          key: /etc/open5gs/hnet/secp256r1-6.key
+      sbi:
+        - dev: eth0
+          advertise: open5gs-udm
+
           
-    nrf:
-        sbi:
-          name: open5gs-nrf
+    scp:
+      sbi:
+        - name: open5gs-scp
+

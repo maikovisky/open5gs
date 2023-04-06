@@ -13,42 +13,14 @@ spec:
     - name: open5gs-amf-tcp-80
       protocol: TCP
       port: 80 
-    - name: open5gs-amf-tcp-7777
-      protocol: TCP
-      port: 7777  
-    - name: open5gs-amf-tcp-9090
-      protocol: TCP
-      port: 9090 
-    # - name: open5gs-amf-sctp-38412
-    #   protocol: SCTP
-    #   port: 38412
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: open5gs-amf
-  namespace: open5gs
-  labels:
-    epc-mode: amf
-    promotheus: open5gs-monitor
-spec:
-  selector:
-    epc-mode: amf
-  ports:
-    - name: open5gs-amf-tcp-80
-      protocol: TCP
-      port: 80 
-    - name: open5gs-amf-tcp-7777
-      protocol: TCP
-      port: 7777  
     - name: open5gs-amf-tcp-9090
       protocol: TCP
       port: 9090 
     - name: open5gs-amf-sctp-38412
       protocol: SCTP
       port: 38412
-  externalIPs:
-    - 143.54.85.27
+  # externalIPs:
+  #   - 143.54.85.27
 ---    
 apiVersion: apps/v1 
 kind: Deployment
@@ -71,25 +43,55 @@ spec:
       nodeSelector:
         kubernetes.io/arch: amd64
         kubernetes.io/hostname: molejo
+
       containers:
+        - name: metrics-amf
+          image: maikovisky/open5gs:ubuntu-latest    
+          command: ["/bin/prometheus-node-exporter"]
+          volumeMounts:
+            - name: "dev-net-tun"
+              mountPath: "/dev/net/tun" # Needed for VPN
+              
         - name: amf
-          image: maikovisky/open5gs:latest      
+          image: maikovisky/open5gs:ubuntu-latest    
           securityContext:
             privileged: true
             capabilities:
               add: ["NET_ADMIN", "SYS_MODULE"]
+
           volumeMounts:
             - name: open5gs-amf-config
               mountPath: /open5gs/config-map/amf.yaml
               subPath: "amf.yaml"
-          command: ["open5gs-amfd",  "-c", "/open5gs/config-map/amf.yaml"]
-          
+            - name: "dev-net-tun"
+              mountPath: "/dev/net/tun" # Needed for VPN
+
+          command: ["open5gs-amfd",  "-d", "-c", "/open5gs/config-map/amf.yaml"]
+
       volumes:
         - name: open5gs-amf-config
           configMap:
             name: open5gs-amf-config
+        - name: dev-net-tun
+          hostPath:
+            path: /dev/net/tun
 
         # - name: logfile-persistent-storage
         #   persistentVolumeClaim:
         #     claimName: open5gs-logfile-pv-claim
 
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: open5gs-amf
+  namespace: open5gs
+  labels:
+    epc-mode: amf
+spec:
+  selector:
+    matchLabels:
+      epc-mode: amf
+  endpoints:
+  - interval: 5s
+    port: open5gs-amf-tcp-9090

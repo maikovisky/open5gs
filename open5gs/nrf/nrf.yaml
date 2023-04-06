@@ -12,11 +12,9 @@ spec:
     - name: open5gs-nrf-tcp-80
       protocol: TCP
       port: 80
-      targetPort: 80
     - name: open5gs-nrf-tcp-9100
       protocol: TCP
       port: 9100
-      targetPort: 9100
 ---    
 apiVersion: apps/v1 # for versions before 1.9.0 use apps/v1beta2
 kind: Deployment
@@ -31,9 +29,7 @@ spec:
     matchLabels:
       epc-mode: nrf
   template:
-    metadata:
-#      annotations:
-#        "helm.sh/hook": pre-install    
+    metadata: 
       labels:
         epc-mode: nrf
     spec:  
@@ -43,27 +39,36 @@ spec:
         nodetype: server
       containers:
         - name: metrics-nrf
-          image: maikovisky/open5gs:latest  
-          command: ["/usr/bin/node_exporter"]
+          image: maikovisky/open5gs:ubuntu-latest    
+          command: ["/bin/prometheus-node-exporter"]
+          volumeMounts:
+            - name: "dev-net-tun"
+              mountPath: "/dev/net/tun" # Needed for VPN
 
         - name: nrf
-          image: maikovisky/open5gs:latest  
+          image: maikovisky/open5gs:ubuntu-latest  
           securityContext:
             privileged: true
             capabilities:
               add: ["NET_ADMIN", "SYS_MODULE"]
-          #imagePullPolicy: {{ .Values.open5gs.image.pullPolicy }}
+
           volumeMounts:
             - name: open5gs-nrf-config
               mountPath: /open5gs/config-map/nrf.yaml
               subPath: "nrf.yaml"
-            # - name: logfile-persistent-storage
-            #   mountPath: /var/log/open5gs
+            - name: "dev-net-tun"
+              mountPath: "/dev/net/tun" # Needed for VPN
+
           command: ["open5gs-nrfd", "-c", "/open5gs/config-map/nrf.yaml"]
+
       volumes:
         - name: open5gs-nrf-config
           configMap:
             name: open5gs-nrf-config
+
+        - name: dev-net-tun
+          hostPath:
+            path: /dev/net/tun
         # - name: logfile-persistent-storage
         #   persistentVolumeClaim:
         #     claimName: open5gs-logfile-pv-claim
