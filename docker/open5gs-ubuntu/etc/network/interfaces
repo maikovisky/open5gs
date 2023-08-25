@@ -1,0 +1,15 @@
+auto lo
+iface lo inet loopback
+iface lo inet6 loopback
+
+auto eth0
+iface eth0 inet dhcp
+iface eth0 inet6 auto
+
+auto ogstun
+iface ogstun inet static
+  pre-up ip tuntap add name ogstun mode tun
+
+auto ogstun1
+iface ogstun1 inet static
+  pre-up ip tuntap add name ogstun1 mode tun

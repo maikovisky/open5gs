@@ -1,12 +1,20 @@
-FROM alpine:latest as base
+FROM ubuntu:jammy as base
 MAINTAINER Maiko de Andrade <maikovisky@gmail.com>
-RUN apk update && \
-    apk add --no-cache \
-       bash \
-       iproute2 \
-       iperf \
-       curl \
-       prometheus-node-exporter 
+RUN apt update && \
+    apt upgrade -y && \
+    apt install -y curl \
+        bash \
+        prometheus-node-exporter \
+        net-tools \
+        iproute2 \
+        iptables \
+        iperf3 \
+        iperf \
+        mosquitto \
+        iputils-ping \
+        dnsutils \
+        vim
+
 
 WORKDIR /
 

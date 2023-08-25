@@ -1,4 +1,4 @@
-FROM alpine:latest as base
+FROM alpine:3.16.5 as base-3.16.5
 MAINTAINER Maiko de Andrade <maikovisky@gmail.com>
 RUN apk update && \
     apk add --no-cache \
@@ -19,7 +19,7 @@ RUN apk update && \
        mongo-c-driver 
     
 
-FROM base as builder
+FROM base-3.16.5 as builder
 RUN apk add --no-cache \
         alpine-sdk \
         bison \
@@ -43,31 +43,16 @@ RUN apk add --no-cache \
         iproute2 && \
         git clone --recursive https://github.com/open5gs/open5gs && \
         cd open5gs && \
-	git checkout main  && \
         meson build --prefix=/ && \
-#	meson configure -Dmetrics_impl=prometheus build && \
         ninja -C  build && \
         cd build && \
         DESTDIR=/open5gs/install ninja install 
 
 WORKDIR /
 
-
-FROM base as final
+FROM base-3.16.5 as final
 RUN mkdir -p /var/log/open5gs \
     rc-update add node-exporter default
-#    echo "tun" >> /etc/modules-load.d/tun.conf && \
-#    echo "net.ipv4.ip_forward = 1" >> /etc/sysctl.d/open5gs.conf && \
-#    echo "net.ipv6.conf.all.disable_ipv6=0" >> /etc/sysctl.d/open5gs.conf && \
-#    echo "net.ipv6.conf.default.disable_ipv6=0" >> /etc/sysctl.d/open5gs.conf && \
-#    echo "net.ipv6.conf.lo.disable_ipv6=0" >> /etc/sysctl.d/open5gs.conf && \
-#    echo "net.ipv6.conf.eth0.disable_ipv6=0" >> /etc/sysctl.d/open5gs.conf && \
-#    echo "auto ogstun" >> /etc/network/interfaces && \
-#    echo "iface ogstun inet static" >> /etc/network/interfaces && \
-#    echo "  pre-up ip tuntap add name ogstun mode tun" >> /etc/network/interfaces
-#    echo "  pre-up ip addr add 10.45.0.1/16 dev ogstun" >> /etc/network/interfaces
-#    echo "  pre-up ip addr add 2001:db8:cafe::1/48 dev ogstun" >> /etc/network/interfaces
-#    echo "   pre-up ip link set ogstun up" >> /etc/network/interfaces
 
 WORKDIR /
 COPY --from=builder /open5gs/install/bin  /bin 

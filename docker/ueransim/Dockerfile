@@ -1,43 +1,52 @@
-FROM alpine:latest as base
+FROM ubuntu:jammy as base
 MAINTAINER Maiko de Andrade <maikovisky@gmail.com>
-RUN apk update && \
-    apk add --no-cache \
-       bash \
-       libstdc++ \
-       iproute2 \
-       curl \
-       lksctp-tools \
-       prometheus-node-exporter \
-       iperf \
-       net-tools  
-    
+ARG DEBIAN_FRONTEND=noninteractive
+RUN apt update && \
+    apt upgrade -y && \
+    apt install -y curl \
+        gdb \
+	prometheus-node-exporter \
+	gnupg \
+	libsctp1 \
+	lksctp-tools \
+	libmongoc-1.0-0 \
+	net-tools \
+	iproute2 \
+	iptables \
+	iperf3 \
+	iperf \
+        python3-pip \
+        mosquitto-clients \
+	iputils-ping \
+	dnsutils \
+        jq \
+	wget \
+        vim && \
+    wget -qO - https://www.mongodb.org/static/pgp/server-6.0.asc | apt-key add - && \
+    echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu jammy/mongodb-org/6.0 multiverse" | tee /etc/apt/sources.list.d/mongodb-org-6.0.list && \
+    apt update && \
+    TZ="America/Sao_Paulo" apt -y install mongodb-org && \  
+    pip install pymongo psutil
+   
 
 FROM base as builder
-RUN apk add --no-cache \
-        alpine-sdk \
-        gcc \
-        g++ \
-        linux-headers \
-        lksctp-tools-dev \
-        cmake \
-        iproute2 && \
-    git clone --recursive https://github.com/aligungr/UERANSIM && \
-    cd UERANSIM && make && chmod a+x build/nr-binder 
+RUN apt install -y  \ 
+        build-essential \
+        git \
+	gcc \
+	g++ \
+	cmake \
+	libsctp-dev && \
+    	git clone https://github.com/aligungr/UERANSIM && \
+    	cd UERANSIM && make && chmod a+x build/nr-binder
+
 
 WORKDIR /
 
 
 FROM base as final
-RUN mkdir -p /var/log/ueransim && \
-    apk add --no-cache \
-       bash \
-       libstdc++ \
-       iproute2 \
-       curl \
-       lksctp-tools \
-       iperf \
-       net-tools  
-	
+RUN mkdir -p /var/log/ueransim 
+
 WORKDIR /
 COPY --from=builder /UERANSIM/build/nr-gnb /bin
 COPY --from=builder /UERANSIM/build/nr-ue /bin
@@ -47,7 +56,4 @@ COPY --from=builder /UERANSIM/build/libdevbnd.so /lib
 COPY --from=builder /UERANSIM/config /etc/ueransim
 COPY etc /etc
 COPY bin /bin
-
-
-
 
