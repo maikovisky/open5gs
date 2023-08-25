@@ -1,25 +1,20 @@
 # Mestrado
 
-# Terraform para GKE
+This repository houses the tools and applications developed during the 5G-focused master's program. Within this repository, you'll discover the configurations employed by Open5gs within a Kubernetes cluster, along with Dockerfiles for generating the application images. Additionally, there are other details provided for the deployment of a 5G core.
 
-```
-$env:GOOGLE_PROJECT="maiko-359801"
-$env:GOOGLE_REGION="us-central1"
-$env:KUBE_CONFIG_PATH="~/.kube/config" 
-gcloud config set project $env:GOOGLE_PROJECT
-cd gke
-terraform init
-terraform apply -parallelism=n
-gcloud container clusters get-credentials gke-slice --region $env:GOOGLE_REGION --project $env:GOOGLE_PROJECT
-```
+## Open5gs
 
+Open5GS is a C-language Open Source implementation of 5GC and EPC, i.e. the core network of NR/LTE network.
 
-## Change context
+### Imagens 
 
-```
-kubectl config get-contexts
-kubectl config use-context kubernetes-admin@kubernetes  
-```
+These are the images employed in the project, all based on Ubuntu and each with its own unique characteristics. Further information about the images can be found in the [Docker](docker/README.md) folder.
+
+- [**maikovisky/open5gs:2.6.4**](https://hub.docker.com/repository/docker/maikovisky/open5gs): Use in AMF, AUSF, BSF, NSSF, PCF, SCP, SMF, UDM, UDR
+- [**maikovisky/open5gs-upf:2.6.4**](https://hub.docker.com/repository/docker/maikovisky/open5gs-upf): Use in UPF
+- [**maikovisky/open5gs-webui:latest**](https://hub.docker.com/repository/docker/maikovisky/open5gs-webui): Use in Webui
+- [**maikovisky/ueransim:3.2.6**](https://hub.docker.com/repository/docker/maikovisky/ueransim): Use in gNB, UE 
+
 
 # Docker
 
@@ -49,9 +44,9 @@ docker buildx build --platform linux/amd64,linux/arm64,linux/arm/v6,linux/arm/v7
 docker buildx build --platform linux/amd64 --push -t maikovisky/open5gs:2.5.5 -t maikovisky/open5gs:latest .
 ```
 
-# Wireshark (sniffer)
+## Wireshark (sniffer)
 
-## Install
+### Install
 
 Need [insall krew](https://krew.sigs.k8s.io/docs/) and after plugin sniff 
 
@@ -61,25 +56,25 @@ kubectl krew install sniff
 ```
 
 
-## Capture packets in wireshark
+### Capture packets in wireshark
 
 ```
 kubectl sniff <pod>
 ```
 
 
-# Troubleshooting
+## Troubleshooting
 
 - [UPF and SMF core dump](https://github.com/open5gs/open5gs/issues/1911)
 
-## Problema de Roteamento entre UE e o UPF. 
+### Problema de Roteamento entre UE e o UPF. 
 
 Um problema que esta sendo enfrentado é permitir com que UE consiga acessar algum conteúdo na Internet. Para isso é necessário que o UE faça a conexção com o UPF, onde irá receber um IP e criar um tunel entre os dois. A baixo a topologia:
 
 !(/imagens/open5gs-UE-UPF.png)
 
 
-### Status
+#### Status
 ```
 [ OK] eth0 (upf) => Internet
 [ OK] uesimtun0  => ogstun
@@ -88,7 +83,7 @@ Um problema que esta sendo enfrentado é permitir com que UE consiga acessar alg
 [NOK] ogstun     => Internet
 ```
 
-### Solução sugerida
+#### Solução sugerida
 
 Na máquina UPF configurar o TUN.
 
@@ -109,7 +104,7 @@ sysctl -w net.ipv6.conf.all.forwarding=1
 iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
 ```
 
-### Testando
+#### Testando
 
 Rodar os comandos abaixo no POD UERAMSIM enquanto captura o trafego de rede usando o comando kubectl sniff <UPF_POD_ID>
 
@@ -127,16 +122,16 @@ iperf -B 10.41.0.13 -c open5gs-iperf -t 60 -i 5 --trip-times --txstart-time $(ex
 kubectl cp <POD_ID>:/var/tcpdump .
 ```
 
-### Algumas discuções sobre o assunto
+#### Algumas discuções sobre o assunto
 - [Promissor](https://unix.stackexchange.com/questions/442760/cant-forward-traffic-from-eth-to-tun-tap)
 - [Base do trabalho do Grabriel](https://github.com/my5G/my5G-RANTester/wiki/Tutorial-open5GS-v2.3.6)
 
 
-## [error] Initial Registration failed [UE_IDENTITY_CANNOT_BE_DERIVED_FROM_NETWORK]
+### [error] Initial Registration failed [UE_IDENTITY_CANNOT_BE_DERIVED_FROM_NETWORK]
 
 UERANSIM não esta conseguindo conectar. 
 
-# Links
+## Links
 - (https://brito.com.br/posts/build-docker-arm64/)
 - (https://bitbucket.org/infinitydon/workspace/projects/PROJ)
 - (https://bitbucket.org/infinitydon/opensource-5g-core-service-mesh/src/main/)
