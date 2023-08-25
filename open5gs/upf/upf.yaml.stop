@@ -55,33 +55,21 @@ spec:
       nodeSelector:
         kubernetes.io/arch: amd64
         kubernetes.io/hostname: molejo
+      
       containers:
-        # - name: metrics-upf
-        #   image: maikovisky/open5gs:latest  
-        #   command: ["/usr/bin/node_exporter"]
-        #   volumeMounts:
-        #     - name: "dev-net-tun"
-        #       mountPath: "/dev/net/tun" # Needed for VPN
-
-        #     - name: open5gs-upf-rclocal
-        #       mountPath: "/etc/rc.d/rc.local" 
-        #       subPath: "rc.local"
+        - name: metrics-upf
+          image: maikovisky/open5gs:ubuntu-latest    
+          command: ["/bin/prometheus-node-exporter"]
+          volumeMounts:
+            - name: "dev-net-tun"
+              mountPath: "/dev/net/tun" # Needed for VPN
 
         - name: upf
-          image: maikovisky/open5gs:latest  
-          #image: openg5s/open5gs:latest
+          image: maikovisky/open5gs:ubuntu-latest    
           securityContext:
             privileged: true
             capabilities:
               add: ["NET_ADMIN", "SYS_MODULE", "NET_RAW"]
-
-          ports:
-            - name: pfcp
-              containerPort: 8805
-              protocol: UDP
-            - name: gtpu
-              containerPort: 2152
-              protocol: UDP
           volumeMounts:
             - name: open5gs-upf-config
               mountPath: /open5gs/config-map/upf.yaml
@@ -89,6 +77,7 @@ spec:
 
             - name: "dev-net-tun"
               mountPath: "/dev/net/tun" # Needed for VPN
+
             - name: "lib-modules"
               mountPath: "/lib/modules" # Needed for VPN
 
@@ -96,13 +85,21 @@ spec:
             - name: open5gs-upf-rclocal
               mountPath: "/etc/rc.d/rc.local" 
               subPath: "rc.local"
+          
+            - name: open5gs-upf-entrypoint
+              mountPath:  /bin/entrypoint.sh
+              subPath: entrypoint.sh
 
-          command: ["open5gs-upfd", "-c", "/open5gs/config-map/upf.yaml"]
+          command:
+            - "/bin/bash" 
+            - "-c"
+            - "/bin/entrypoint.sh"
           #command: ["sleep", "1d"]
       volumes:
         - name: open5gs-upf-config
           configMap:
             name: open5gs-upf-config
+
         - name: dev-net-tun
           hostPath:
             path: /dev/net/tun
@@ -115,6 +112,11 @@ spec:
           configMap:
             name: open5gs-upf-rclocal
             defaultMode: 0777
+        
+        - name: open5gs-upf-entrypoint
+          configMap:
+            name: open5gs-upf-entrypoint
+            defaultMode: 0777       
 ---
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
@@ -128,7 +130,7 @@ spec:
     matchLabels:
       epc-mode: upf
   endpoints:
-  - interval: 30s
+  - interval: 5s
     port: open5gs-upf-tcp-9100
 
 

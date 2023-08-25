@@ -10,10 +10,24 @@ metadata:
 data:
   amf.yaml: |
     logger:
+        # level: debug
         file: /var/log/open5gs/amf.log
+
+    sbi:
+      server:
+        no_tls: true
+        cacert: /etc/open5gs/tls/ca.crt
+        key: /etc/open5gs/tls/amf.key
+        cert: /etc/open5gs/tls/amf.crt
+      client:
+        no_tls: true
+        cacert: /etc/open5gs/tls/ca.crt
+        key: /etc/open5gs/tls/amf.key
+        cert: /etc/open5gs/tls/amf.crt
+
     amf:
         sbi:
-          - addr: 0.0.0.0
+          - dev: eth0
             advertise: open5gs-amf
 
         ngap: 
@@ -31,17 +45,27 @@ data:
               mcc: 999
               mnc: 70
             tac: 1
+
         plmn_support:
           - plmn_id:
               mcc: 999
               mnc: 70
             s_nssai:
               - sst: 1
+              - sst: 1
+                sd: 000001
+              - sst: 2
+                sd: 000002
+              - sst: 3
+                sd: 000003
+              - sst: 4
+                sd: 000004
+
         security:
             integrity_order : [ NIA2, NIA1, NIA0 ]
             ciphering_order : [ NEA0, NEA1, NEA2 ]
         network_name:
-            full: open5gs
+            full: Open5GS
         amf_name: open5gs-amf
 
         metrics:
@@ -50,7 +74,19 @@ data:
 
     nrf:
       sbi:
-        name: open5gs-nrf
+        - name: open5gs-nrf
+
+    # scp:
+    #   sbi:
+    #     - name: open5gs-scp
         
     usrsctp:
-
+    time:
+      t3512:
+        value: 540     # 9 mintues * 60 = 540 seconds
+      nf_instance:
+        heartbeat: 20
+      message:
+        duration: 3000
+      handover:
+        duration: 500

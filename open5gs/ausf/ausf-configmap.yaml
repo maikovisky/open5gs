@@ -13,13 +13,23 @@ data:
     sbi:
       server:
         no_tls: true
+        cacert: /etc/open5gs/tls/ca.crt
+        key: /etc/open5gs/tls/ausf.key
+        cert: /etc/open5gs/tls/ausf.crt
       client:
         no_tls: true
+        cacert: /etc/open5gs/tls/ca.crt
+        key: /etc/open5gs/tls/ausf.key
+        cert: /etc/open5gs/tls/ausf.crt
 
     ausf:
         sbi:
-          - addr: 0.0.0.0
+          - dev: eth0
             advertise: open5gs-ausf
     nrf:
         sbi:
-          name: open5gs-nrf
+          - name: open5gs-nrf
+
+    # scp:
+    #   sbi:
+    #     - name: open5gs-scp

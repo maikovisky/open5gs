@@ -8,15 +8,31 @@ metadata:
 data:
   nrf.yaml: |
     logger:
+    #    level: debug
         file: /var/log/open5gs/nrf.log
     
     sbi:
       server:
         no_tls: true
+        cacert: /etc/open5gs/tls/ca.crt
+        key: /etc/open5gs/tls/nrf.key
+        cert: /etc/open5gs/tls/nrf.crt
       client:
         no_tls: true
+        cacert: /etc/open5gs/tls/ca.crt
+        key: /etc/open5gs/tls/nrf.key
+        cert: /etc/open5gs/tls/nrf.crt
 
     nrf:
-        sbi:
-          - addr: 0.0.0.0
-            advertise: open5gs-nrf
+      sbi:
+        - addr: 0.0.0.0
+          advertise: open5gs-nrf
+
+    # scp:
+    #   sbi:
+    #     - name: open5gs-scp
+
+    parameter:
+    max:
+    time:
+

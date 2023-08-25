@@ -29,9 +29,7 @@ spec:
     matchLabels:
       epc-mode: test
   template:
-    metadata:
-#      annotations:
-#        "helm.sh/hook": pre-install    
+    metadata:   
       labels:
         epc-mode: test
     spec:  
@@ -39,18 +37,28 @@ spec:
         kubernetes.io/arch: amd64
       containers:
         - name: test
-          image: maikovisky/open5gs:latest  
+          image: maikovisky/open5gs:ubuntu-latest  
           securityContext:
             privileged: true
             capabilities:
               add: ["NET_ADMIN", "SYS_MODULE"]
-          #imagePullPolicy: {{ .Values.open5gs.image.pullPolicy }}
+
           volumeMounts:
             - name: "dev-net-tun"
               mountPath: "/dev/net/tun" # Needed for VPN
-          command: ["top"]
+
+            - name: open5gs-test-sample
+              mountPath: /open5gs/config-map/sample.yaml
+              subPath: "sample.yaml"
+
+          command: ["sleep", "1d"]
       volumes:
         - name: dev-net-tun
           hostPath:
             path: /dev/net/tun
+        - name: open5gs-test-sample
+          configMap:
+            name: open5gs-test-sample
+
+
 

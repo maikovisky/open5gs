@@ -1,0 +1,210 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: open5gs-upf-2
+  namespace: open5gs
+  labels:
+    epc-mode: upf2
+    promotheus: open5gs-monitor
+spec:
+  selector:
+    epc-mode: upf2
+  ports:
+    - name: http2-open5gs-upf2-80
+      protocol: TCP
+      port: 80
+      targetPort: 80
+    - name: http-open5gs-upf2-9090
+      protocol: TCP
+      port: 9090
+      targetPort: 9090
+    - name: open5gs-upf2-udp-2152
+      protocol: UDP
+      port: 2152
+      targetPort: 2152
+    - name: open5gs-upf2-udp-8805
+      protocol: UDP
+      port: 8805
+      targetPort: 8805
+    # - name: http-open5gs-upf2-9100
+    #   protocol: TCP
+    #   port: 9100
+    #   targetPort: 9100
+---    
+apiVersion: apps/v1 # for versions before 1.9.0 use apps/v1beta2
+kind: Deployment
+metadata:
+  name: open5gs-upf-2
+  namespace: open5gs
+  labels:
+    epc-mode: upf2
+    promotheus: open5gs-monitor
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      epc-mode: upf2
+  template:
+    metadata:  
+      labels:
+        epc-mode: upf2
+        app: open5gs-upf
+        # version: v2.6.1-26
+    spec:  
+      nodeSelector:
+        kubernetes.io/arch: amd64
+        kubernetes.io/hostname: erasure
+      containers:
+        # - name: tcpdump-upf2
+        #   image: maikovisky/open5gs:ubuntu-latest  
+        #   imagePullPolicy: Always  
+        #   command: ["/bin/tcpdump", "-i", "eth0", "-s", "65535", "-G", "3600", "-w", "/var/tcpdump/upf2-%F_%H%M.pcap"]
+        #   volumeMounts:
+        #     - name: "dev-net-tun"
+        #       mountPath: "/dev/net/tun" # Needed for VPN
+        #     - name: tcpdump-persistent-storage
+        #       mountPath: /var/tcpdump
+
+        - name: upf2
+          image: maikovisky/open5gs:ubuntu-latest    
+          imagePullPolicy: Always
+          securityContext:
+            privileged: true
+            capabilities:
+              add: ["NET_ADMIN", "SYS_MODULE"]
+          resources:
+            limits:
+              memory: "350Mi"
+              cpu: "100m"
+            requests:
+              memory: "250Mi"
+              cpu: "50m"
+
+          volumeMounts:
+            - name: open5gs-upf2-config
+              mountPath: /open5gs/config-map/upf.yaml
+              subPath: "upf.yaml"
+
+            - name: "dev-net-tun"
+              mountPath: "/dev/net/tun" # Needed for VPN
+           
+            - name: open5gs-upf2-config
+              mountPath:  /bin/entrypoint.sh
+              subPath: entrypoint.sh
+
+          #command: ["open5gs-upfd", "-c", "/open5gs/config-map/upf.yaml"]
+          command: ["/bin/entrypoint.sh"]
+
+        # - name: metrics-upf2
+        #   image: maikovisky/open5gs:ubuntu-latest    
+        #   command: ["/bin/prometheus-node-exporter", "--collector.disable-defaults","--collector.arp","--collector.netclass" ,"--collector.netdev" ,"--collector.netstat" ,"--collector.udp_queues","--collector.ipvs","--collector.cpu","--collector.cpufreq","--collector.meminfo"]
+        #   volumeMounts:
+        #     - name: "dev-net-tun"
+        #       mountPath: "/dev/net/tun" # Needed for VPN
+
+      volumes:
+        - name: open5gs-upf2-config
+          configMap:
+            name: open5gs-upf2-config
+            defaultMode: 0777
+        - name: dev-net-tun
+          hostPath:
+            path: /dev/net/tun
+        - name: tcpdump-persistent-storage
+          persistentVolumeClaim:
+            claimName: open5gs-tcpdump-pv-claim
+
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: open5gs-upf-2
+  namespace: open5gs
+  labels:
+    epc-mode: upf2
+    prometheus: open5gs-monitor
+spec:
+  selector:
+    matchLabels:
+      epc-mode: upf2
+  endpoints:
+  # - interval: 5s
+  #   port: http-open5gs-upf2-9100
+  - interval: 5s
+    port: http-open5gs-upf2-9090
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: open5gs-upf2-config
+  namespace: open5gs
+  labels:
+    epc-mode: upf2
+data:
+  upf.yaml: |-
+    logger:
+        file: /var/log/open5gs/upf.log
+    
+    #  <PFCP Server>
+    sbi:
+      server:
+        no_tls: true
+      client:
+        no_tls: true
+    upf:
+      pfcp:
+        - dev eth0
+      gtpu:
+        - dev eth0
+      metrics:
+        - addr: 0.0.0.0
+          port: 9090
+      subnet:
+        - addr: 192.168.0.1/16
+          dnn: internet
+          dev: ogstun
+        - addr: 10.42.0.1/16
+          dnn: slice02
+          dev: ogstun1       
+    smf:
+      pfcp:
+        addr: open5gs-smf
+
+  entrypoint.sh: |-
+    #!/bin/bash
+    set -e
+
+    echo "Executing k8s customized entrypoint.sh"
+    #echo "Creating net device {{ .dev }}"
+    if grep "ogstun" /proc/net/dev > /dev/null; then
+      echo "[WARNING] Net device ogstun already exists!"
+      ip addr add 192.168.0.1/16 dev ogstun || true
+      ip link set ogstun up
+    else 
+      echo "[INFO] Create device ogstun!"
+      ip tuntap add name ogstun mode tun
+      ip addr add 192.168.0.1/16 dev ogstun || true
+      ip link set ogstun up
+    fi
+
+
+    if grep "ogstun1" /proc/net/dev > /dev/null; then
+      echo "[WARNING] Net device ogstun1 already exists!"
+      ip addr add 10.42.0.1/16 dev ogstun1 || true
+      ip link set ogstun1 up
+    else 
+      echo "[INFO] Create device ogstun1 !"
+      ip tuntap add name ogstun1 mode tun
+      ip addr add 10.42.0.1/16 dev ogstun1 || true
+      ip link set ogstun1 up
+    fi
+
+    echo "[INFO] Config sysctl"
+    sysctl -w net.ipv4.ip_forward=1
+    sysctl -w net.ipv6.conf.all.forwarding=1
+
+    echo "Enable NAT"
+    iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
+
+
+    open5gs-upfd -c /open5gs/config-map/upf.yaml

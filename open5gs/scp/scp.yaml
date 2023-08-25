@@ -3,26 +3,18 @@ kind: Service
 metadata:
   name: open5gs-scp
   namespace: open5gs
-  labels:
-    epc-mode: scp
 spec:
   selector:
     epc-mode: scp
   ports:
-    - name: open5gs-scp-tcp-80
+    - name: http2-open5gs-scp-80
       protocol: TCP
       port: 80
       targetPort: 80
-    - name: open5gs-scp-sctp-31412
-      protocol: SCTP
-      port: 31412
-    - name: open5gs-scp-sctp-38412
-      protocol: SCTP
-      port: 38412
-    - name: open5gs-scp-tcp-9100
-      protocol: TCP
-      port: 9100
-      targetPort: 9100
+    # - name: http-open5gs-scp-9100
+    #   protocol: TCP
+    #   port: 9100
+    #   targetPort: 9100
 ---    
 apiVersion: apps/v1 # for versions before 1.9.0 use apps/v1beta2
 kind: Deployment
@@ -31,6 +23,7 @@ metadata:
   namespace: open5gs
   labels:
     epc-mode: scp
+    prometheus: open5gs-monitor
 spec:
   replicas: 1
   selector:
@@ -40,27 +33,50 @@ spec:
     metadata:   
       labels:
         epc-mode: scp
+        app: open5gs-scp
+
     spec:  
       nodeSelector:
-        kubernetes.io/arch: amd64
-        kubernetes.io/hostname: molejo
         nodetype: server
-      containers:
+        kubernetes.io/arch: amd64
+        #kubernetes.io/hostname: molejo
+
+      containers:  
+        # - name: tcpdump-scp
+        #   image: maikovisky/open5gs:ubuntu-latest    
+        #   command: ["/bin/tcpdump", "-i", "eth0", "-s", "65535", "-G", "3600", "-w", "/var/tcpdump/scp-%F_%H%M.pcap"]
+        #   volumeMounts:
+        #     - name: tcpdump-persistent-storage
+        #       mountPath: /var/tcpdump
+
         - name: scp
-          image: maikovisky/open5gs:latest  
+          image: maikovisky/open5gs:ubuntu-latest    
+          imagePullPolicy: Always
           securityContext:
             privileged: true
             capabilities:
               add: ["NET_ADMIN", "SYS_MODULE"]
-          #imagePullPolicy: {{ .Values.open5gs.image.pullPolicy }}
+          resources:
+            requests:
+              memory: "150Mi"
+              cpu: "100m"
+            limits:
+              memory: "250Mi"
+              cpu: "200m"
           volumeMounts:
             - name: open5gs-scp-config
               mountPath: /open5gs/config-map/scp.yaml
               subPath: "scp.yaml"
 
             - name: "lib-modules"
-              mountPath: "/lib/modules" # Needed for VPN
+              mountPath: "/lib/modules" 
           command: ["open5gs-scpd", "-c", "/open5gs/config-map/scp.yaml"]
+
+
+
+        # - name: metrics-scp
+        #   image: maikovisky/open5gs:ubuntu-latest    
+        #   command: ["/bin/prometheus-node-exporter"]
       volumes:
         - name: open5gs-scp-config
           configMap:
@@ -69,18 +85,22 @@ spec:
         - name: lib-modules
           hostPath:
             path: /lib/modules
----
-apiVersion: monitoring.coreos.com/v1
-kind: ServiceMonitor
-metadata:
-  name: open5gs-scp
-  namespace: open5gs
-  labels:
-    epc-mode: scp
-spec:
-  selector:
-    matchLabels:
-      epc-mode: scp
-  endpoints:
-  - interval: 30s
-    port: open5gs-scp-tcp-9100
+
+        - name: tcpdump-persistent-storage
+          persistentVolumeClaim:
+            claimName: open5gs-tcpdump-pv-claim
+# ---
+# apiVersion: monitoring.coreos.com/v1
+# kind: ServiceMonitor
+# metadata:
+#   name: open5gs-scp
+#   namespace: open5gs
+#   labels:
+#     epc-mode: scp
+# spec:
+#   selector:
+#     matchLabels:
+#       epc-mode: scp
+#   endpoints:
+#   - interval: 30s
+#     port: http-open5gs-scp-9100

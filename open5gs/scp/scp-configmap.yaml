@@ -18,9 +18,19 @@ data:
 
     scp:
         sbi:
-          - addr: 0.0.0.0
+          - dev: eth0
             advertise: open5gs-scp
+            delegated: yes
 
     nrf:
         sbi:
-          name: open5gs-nrf
+          - name: open5gs-nrf
+
+    parameter:
+    max:
+    time:
+      nf_instance:
+        heartbeat: 20
+      message:
+        duration: 3000
+

@@ -5,18 +5,19 @@ metadata:
   namespace: open5gs
   labels:
     epc-mode: nssf
+    prometheus: open5gs-monitor
 spec:
   selector:
     epc-mode: nssf
   ports:
-    - name: open5gs-nssf-tcp-80
+    - name: http2-open5gs-nssf-80
       protocol: TCP
       port: 80
       targetPort: 80
-    - name: open5gs-nssf-tcp-9100
-      protocol: TCP
-      port: 9100
-      targetPort: 9100
+    # - name: http-open5gs-nssf-9100
+    #   protocol: TCP
+    #   port: 9100
+    #   targetPort: 9100
 ---    
 apiVersion: apps/v1 # for versions before 1.9.0 use apps/v1beta2
 kind: Deployment
@@ -25,29 +26,34 @@ metadata:
   namespace: open5gs
   labels:
     epc-mode: nssf
+
 spec:
   replicas: 1
   selector:
     matchLabels:
       epc-mode: nssf
   template:
-    metadata:
-#      annotations:
-#        "helm.sh/hook": pre-install    
+    metadata:   
       labels:
         epc-mode: nssf
+        app: open5gs-nssf
+        # version: v2.6.1-26
     spec:  
       nodeSelector:
-        kubernetes.io/arch: amd64
-        kubernetes.io/hostname: molejo
         nodetype: server
+        kubernetes.io/arch: amd64
+        #kubernetes.io/hostname: molejo
       containers:
-        - name: metrics-nssf
-          image: maikovisky/open5gs:latest  
-          command: ["/usr/bin/node_exporter"]
-
+        # - name: tcpdump-nssf
+        #   image: maikovisky/open5gs:ubuntu-latest    
+        #   command: ["/bin/tcpdump", "-i", "eth0", "-s", "65535", "-G", "3600", "-w", "/var/tcpdump/nssf-%F_%H%M.pcap"]
+        #   volumeMounts:
+        #     - name: tcpdump-persistent-storage
+        #       mountPath: /var/tcpdump
+        
         - name: nssf
-          image: maikovisky/open5gs:latest  
+          image: maikovisky/open5gs:ubuntu-latest 
+          imagePullPolicy: Always
           securityContext:
             privileged: true
             capabilities:
@@ -58,22 +64,32 @@ spec:
               subPath: "nssf.yaml"
 
           command: ["open5gs-nssfd", "-c", "/open5gs/config-map/nssf.yaml"]
+
+        # - name: metrics-nssf
+        #   image: maikovisky/open5gs:ubuntu-latest    
+        #   command: ["/bin/prometheus-node-exporter"]
+
+          
       volumes:
         - name: open5gs-nssf-config
           configMap:
             name: open5gs-nssf-config
----
-apiVersion: monitoring.coreos.com/v1
-kind: ServiceMonitor
-metadata:
-  name: open5gs-nssf
-  namespace: open5gs
-  labels:
-    epc-mode: nssf
-spec:
-  selector:
-    matchLabels:
-      epc-mode: nssf
-  endpoints:
-  - interval: 30s
-    port: open5gs-nssf-tcp-9100
+
+        - name: tcpdump-persistent-storage
+          persistentVolumeClaim:
+            claimName: open5gs-tcpdump-pv-claim
+# ---
+# apiVersion: monitoring.coreos.com/v1
+# kind: ServiceMonitor
+# metadata:
+#   name: open5gs-nssf
+#   namespace: open5gs
+#   labels:
+#     epc-mode: nssf
+# spec:
+#   selector:
+#     matchLabels:
+#       epc-mode: nssf
+#   endpoints:
+#   - interval: 30s
+#     port: http-open5gs-nssf-9100

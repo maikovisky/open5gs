@@ -9,10 +9,11 @@ spec:
   selector:
     epc-mode: webui
   ports:
-    - name: open5gs-webui-tcp-80
+    - name: http2-open5gs-webui-80
       protocol: TCP
       port: 80
-    - name: open5gs-webui-tcp-3000
+      targetPort: 3000
+    - name: http2-open5gs-webui-3000
       protocol: TCP
       port: 3000
 ---    
@@ -23,20 +24,28 @@ metadata:
   namespace: open5gs
   labels:
     epc-mode: webui
+    app: webui
+    version: v2.4.11
 spec:
   replicas: 1
   selector:
     matchLabels:
       epc-mode: webui
+      
   template:
     metadata:
 #      annotations:
 #        "helm.sh/hook": pre-install    
       labels:
         epc-mode: webui
+        app: webui
+        version: v2.4.11
     spec:  
       nodeSelector:
         kubernetes.io/arch: amd64
+        #kubernetes.io/hostname: molejo
+        nodetype: server
+
       containers:
         - name: webui
           image: maikovisky/open5gs-webui:latest  

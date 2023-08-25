@@ -1,0 +1,33 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: open5gs-upf-entrypoint
+  namespace: open5gs
+  labels:
+    epc-mode: upf
+data:
+  entrypoint.sh: |-
+    #!/bin/bash
+    set -e
+
+    echo "Executing k8s customized entrypoint.sh"
+    #echo "Creating net device {{ .dev }}"
+    if grep "ogstun" /proc/net/dev > /dev/null; then
+      echo "[WARNING] Net device ogstun already exists!"
+      ip addr add 192.168.0.1/16 dev ogstun || true
+      ip link set ogstun up
+    else 
+      echo "[INFO] Create device ogstun!"
+      ip tuntap add name ogstun mode tun
+      ip addr add 192.168.0.1/16 dev ogstun || true
+      ip link set ogstun up
+    fi
+
+    echo "[INFO] Config sysctl"
+    sysctl -w net.ipv4.ip_forward=1
+    sysctl -w net.ipv6.conf.all.forwarding=1
+
+    echo "Enable NAT"
+    iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
+
+    open5gs-upfd -c /open5gs/config-map/upf.yaml

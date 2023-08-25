@@ -20,9 +20,12 @@ data:
         - addr: 0.0.0.0
           port: 9090
       subnet:
-        - addr: 10.48.0.1/16
-          dnn: slice03
-          dev: ogstun3
+        - addr: 192.168.0.1/16
+          dnn: internet
+          dev: ogstun
+        - addr: 10.42.0.1/16
+          dnn: slice02
+          dev: ogstun1
        
     #
     # smf:

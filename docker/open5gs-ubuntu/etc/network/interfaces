@@ -9,7 +9,14 @@ iface eth0 inet6 auto
 auto ogstun
 iface ogstun inet static
   pre-up ip tuntap add name ogstun mode tun
+<<<<<<< HEAD
 
 auto ogstun1
 iface ogstun1 inet static
   pre-up ip tuntap add name ogstun1 mode tun
+=======
+  pre-up ip addr add 10.45.0.1/16 dev ogstun
+  pre-up ip addr add 2001:db8:cafe::1/48 dev ogstun
+  pre-up ip link set ogstun up
+
+>>>>>>> 44441c3b73e223ec3a8458af5fea81148d030065

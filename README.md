@@ -94,7 +94,7 @@ Na máquina UPF configurar o TUN.
 
 ```
 ip tuntap add name ogstun mode tun
-ip addr add 10.45.0.1/16 dev ogstun
+ip addr add 192.168.0.1/16 dev ogstun
 ip addr add 2001:db8:cafe::1/48 dev ogstun
 ip link set ogstun up
 ```
@@ -115,14 +115,26 @@ Rodar os comandos abaixo no POD UERAMSIM enquanto captura o trafego de rede usan
 
 ```
 ping -I uesimtun0 8.8.8.8
-iperf -B 192.168.0.2 -c 10.244.43.121 -w 300k
+iperf -B 192.168.0.2 -c open5gs-iperf -w 300k
+iperf -B 192.168.0.2 -c open5gs-iperf -w 300k -u
+iperf -B 192.168.0.2 -c open5gs-iperf -w 300k -r
+iperf -B 192.168.0.2 -c open5gs-iperf -w 300k -r -u
+
+iperf -B 10.41.0.13 -c open5gs-iperf -t 60 -i 5 --trip-times --txstart-time $(expr $(date +%s) + 1).$(date+%N)
 ```
 
+```
+kubectl cp <POD_ID>:/var/tcpdump .
+```
 
 ### Algumas discuções sobre o assunto
 - [Promissor](https://unix.stackexchange.com/questions/442760/cant-forward-traffic-from-eth-to-tun-tap)
 - [Base do trabalho do Grabriel](https://github.com/my5G/my5G-RANTester/wiki/Tutorial-open5GS-v2.3.6)
 
+
+## [error] Initial Registration failed [UE_IDENTITY_CANNOT_BE_DERIVED_FROM_NETWORK]
+
+UERANSIM não esta conseguindo conectar. 
 
 # Links
 - (https://brito.com.br/posts/build-docker-arm64/)
