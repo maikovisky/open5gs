@@ -5,7 +5,7 @@ metadata:
   namespace: open5gs
   labels:
     epc-mode: ueransim
-  defaultMode: 0777
+  #defaultMode: 0777
 data:
   reconfig: |
     #!/bin/bash 

@@ -1,0 +1,32 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: open5gs-ue-testing
+  namespace: open5gs
+  labels:
+    epc-mode: ueransim
+  defaultMode: 0777
+data:
+  testing: |
+    #!/bin/bash 
+    set -e
+    uesimtun0=$(ifconfig uesimtun0 | awk '/inet / {print $6}')
+    uesimtun1=$(ifconfig uesimtun1 | awk '/inet / {print $6}')
+    if (expr "$uesimtun0" : "10\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*$")
+    then
+      uesimtun=$uesimtun0
+    else
+      uesimtun=$uesimtun1
+    fi
+
+    while :
+    do
+      t=$(($RANDOM % 600))
+      iperf -B $uesimtun -c open5gs-iperf -t $t
+      # iperf -B $uesimtun -c open5gs-iperf -w 500k
+      sleep 30s
+      # iperf -B $uesimtun -c open5gs-iperf -w 500k -u
+      # iperf -B $uesimtun -c open5gs-iperf -w 500k -r
+      # iperf -B $uesimtun -c open5gs-iperf -w 500k -r -u
+    done
+    #nr-cli imsi-999700000000001 -e ps-release-all

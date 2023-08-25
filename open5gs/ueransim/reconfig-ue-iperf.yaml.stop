@@ -1,0 +1,64 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: open5gs-ue-reconfig-iperf
+  namespace: open5gs
+  labels:
+    epc-mode: ueransim
+data:
+  reconfig-iperf: |
+    #!/bin/bash 
+    set -e
+
+    hasSlice() {
+      for s in $slices;
+          if [ "$s" = "$1" ]; then
+            return 0
+          fi
+      done
+      return 1
+    }
+
+    echo "Sleep 90s for configure UE"
+    sleep 90s
+
+    uesimtun0=$(ifconfig uesimtun0 | awk '/inet / {print $6}')
+    uesimtun1=$(ifconfig uesimtun1 | awk '/inet / {print $6}')
+    if (expr "$uesimtun0" : "10\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*$")
+    then
+      uesimtun=$uesimtun0
+    else
+      uesimtun=$uesimtun1
+    fi
+
+    imsi=$(nr-cli --dump)
+    slice=$(nr-cli $imsi -e ps-list | awk '/apn: / {print $2}' | awk 'END{print}')
+
+    while true 
+    do
+      mosquitto_sub -h open5gs-mqtt -t $slice -C 1 > mqtt.json
+      status=$(jq -r .status mqtt.json)
+      cmd=$(jq -r .cmd mqtt.json)
+
+      if [ $status != "config" ]; then
+        continue
+      fi
+
+      mosquitto_pub -h open5gs-mqtt -t $slice/ue -m "{\"imsi\": \"$imsi\", \"slice\"": \"$slice\"}"
+      mosquitto_sub -h open5gs-mqtt -t $slice/ue/$imsi -C 1 > mqtt.json
+      status=$(jq -r .status mqtt.json)
+      if [ $status == 'NOK' ]; then
+        continue
+      fi
+
+      nr-cli $imsi -e ps-release-all
+      nr-cli $imsi -e ps-list
+
+      echo "Waiting start..."
+      mosquitto_sub -h open5gs-mqtt -t start -C 1 
+      iperf -B $uesimtun -c open5gs-iperf -i $cmd
+    
+    done
+
+    nr-cli $imsi -e ps-release-all
+  

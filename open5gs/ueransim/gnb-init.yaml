@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: open5gs-ueransim-gnbinit
+  namespace: open5gs
+  labels:
+    epc-mode: ueransim
+data:
+  gnbinit: |
+    #!/bin/bash 
+    set -e
+    echo "Config gNB"
+    sed "s/HOSTNAME/$HOSTNAME/g" /etc/ueransim/open5gs-gnb-base.yaml > /etc/ueransim/tmp/open5gs-gnb-01.yaml
+    #nr-gnb -c /etc/ueransim/tmp/open5gs-gnb-01.yaml 

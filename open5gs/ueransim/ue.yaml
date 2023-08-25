@@ -9,13 +9,13 @@ spec:
   selector:
     epc-mode: ue
   ports:
-    - name: open5gs-ue-tcp-80
+    - name: http2-open5gs-ue-80
       protocol: TCP
       port: 80
     - name: open5gs-ue-tcp-3000
       protocol: TCP
       port: 3000
-    - name: open5gs-ue-tcp-9100
+    - name: http2-open5gs-ue-9100
       protocol: TCP
       port: 9100
     - name: open5gs-ue-udp-2152
@@ -36,7 +36,7 @@ metadata:
   labels:
     epc-mode: ue
 spec:
-  replicas: 12
+  replicas: 1
   selector:
     matchLabels:
       epc-mode: ue
@@ -44,12 +44,48 @@ spec:
     metadata:    
       labels:
         epc-mode: ue
+        app: ueransim-ue
     spec:  
       nodeSelector:
+        nodetype: server
         kubernetes.io/arch: amd64
-        kubernetes.io/hostname: molejo
+        #kubernetes.io/hostname: molejo
+      initContainers:
+        - name: init-ue
+          image: maikovisky/ueransim:3.2.6
+          imagePullPolicy: Always
+          command: ["/bin/ueinit"]
+          env:            
+            - name: DATABASE_URL
+              value: mongodb://open5gs-mongodb-svc:27017
+            - name: IMSI
+              value: "999700000000000"
+          volumeMounts:
+            - name: open5gs-ue-init
+              mountPath: /bin/ueinit
+              subPath: "ueinit"
 
+            - name: open5gs-ue-init
+              mountPath: "/bin/initUE.py"
+              subPath: "initUE.py"
+
+            - name:  open5gs-ue-config
+              mountPath: /etc/ueransim/open5gs-ue-base.yaml
+              subPath: "open5gs-ue-base.yaml"
+
+            - name: etc-ue-tmp
+              mountPath: /etc/ueransim/tmp
       containers:      
+        # - name: tcpdump-ue
+        #   image: maikovisky/open5gs:ubuntu-latest    
+        #   command: ["/bin/tcpdump", "-i", "eth0", "-s", "65535", "-G", "3600", "-w", "/var/tcpdump/ue-%F_%H%M.pcap"]
+        #   volumeMounts:
+        #     - name: "dev-net-tun"
+        #       mountPath: "/dev/net/tun" # Needed for VPN
+        #     - name: tcpdump-persistent-storage
+        #       mountPath: /var/tcpdump
+
+
         - name: main-ue
           image: maikovisky/ueransim:3.2.6  
           imagePullPolicy: "Always" 
@@ -84,23 +120,25 @@ spec:
               mountPath: /etc/ueransim/open5gs-ue-base.yaml
               subPath: "open5gs-ue-base.yaml"
             
-            - name: open5gs-ue-config
-              mountPath: /etc/ueransim/open5gs.js
-              subPath: "open5gs.js"
-          
-            - name: open5gs-ue-reconfig
-              mountPath: /bin/reconfig
-              subPath: "reconfig"
+            - name: open5gs-ue-init
+              mountPath: "/bin/initUE.py"
+              subPath: "initUE.py"
 
             - name: etc-ue-tmp
               mountPath: /etc/ueransim/tmp
 
             - name: "dev-net-tun"
               mountPath: "/dev/net/tun" # Needed for VPN
-          #command: ["nr-ue", "-c", "/etc/ueransim/tmp/open5gs-ue-01.yaml"]
-          #command: ["sleep", "1d"]
-          command: ["/bin/reconfig"]
 
+          command: ["nr-ue", "-c", "/etc/ueransim/tmp/open5gs-ue-01.yaml"]
+
+        # - name: metrics-ue
+        #   image: maikovisky/ueransim:3.2.6     
+        #   imagePullPolicy: "Always"
+        #   command: ["/bin/prometheus-node-exporter", "--collector.disable-defaults", "--collector.textfile", "--collector.arp","--collector.netclass" ,"--collector.netdev" ,"--collector.netstat" ,"--collector.udp_queues","--collector.ipvs","--collector.cpu","--collector.cpufreq","--collector.meminfo"]
+        #   volumeMounts:
+        #     - name: "dev-net-tun"
+        #       mountPath: "/dev/net/tun" # Needed for VPN
         - name: iperf-ue
           image: maikovisky/ueransim:3.2.6  
           imagePullPolicy: "Always" 
@@ -108,36 +146,28 @@ spec:
             privileged: true
             capabilities:
               add: ["NET_ADMIN", "SYS_MODULE"]
-          command: ["/bin/reconfig-iperf"]
-
+          command: ["/bin/testing"]
           volumeMounts:
             - name: "dev-net-tun"
               mountPath: "/dev/net/tun" # Needed for VPN
-            - name: open5gs-ue-reconfig-iperf
-              mountPath: /bin/reconfig-iperf
-              subPath: "reconfig-iperf"
 
-        - name: metrics-ue
-          image: maikovisky/ueransim:3.2.6     
-          imagePullPolicy: "Always"
-          command: ["/bin/prometheus-node-exporter"]
-          volumeMounts:
-            - name: "dev-net-tun"
-              mountPath: "/dev/net/tun" # Needed for VPN
+            - name: open5gs-ue-testing
+              mountPath: /bin/testing
+              subPath: "testing"
           
       volumes:
         - name: open5gs-ue-config
           configMap:
             name: open5gs-ue-config
 
-        - name: open5gs-ue-reconfig-iperf
+        - name: open5gs-ue-testing
           configMap:
-            name: open5gs-ue-reconfig-iperf
+            name: open5gs-ue-testing
             defaultMode: 0777
-        
-        - name: open5gs-ue-reconfig
+
+        - name: open5gs-ue-init
           configMap:
-            name: open5gs-ue-reconfig
+            name: open5gs-ue-init
             defaultMode: 0777
 
         - name: dev-net-tun
@@ -146,21 +176,25 @@ spec:
 
         - name: etc-ue-tmp
           emptyDir: {}
----
-apiVersion: monitoring.coreos.com/v1
-kind: ServiceMonitor
-metadata:
-  name: open5gs-ue
-  namespace: open5gs
-  labels:
-    epc-mode: ue
-spec:
-  selector:
-    matchLabels:
-      epc-mode: ue
-  endpoints:
-  - interval: 10s
-    port: open5gs-ue-tcp-9100
+
+        - name: tcpdump-persistent-storage
+          persistentVolumeClaim:
+            claimName: open5gs-tcpdump-pv-claim
+# ---
+# apiVersion: monitoring.coreos.com/v1
+# kind: ServiceMonitor
+# metadata:
+#   name: open5gs-ue
+#   namespace: open5gs
+#   labels:
+#     epc-mode: ue
+# spec:
+#   selector:
+#     matchLabels:
+#       epc-mode: ue
+#   endpoints:
+#   - interval: 10s
+#     port: open5gs-ue-tcp-9100
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -219,6 +253,26 @@ data:
         apn: 'internet'
         slice:
           sst: 1
+      - type: 'IPv4'
+        apn: 'slice01'
+        slice:
+          sst: 1
+          sd: 1
+      - type: 'IPv4'
+        apn: 'slice02'
+        slice:
+          sst: 2
+          sd: 2
+      - type: 'IPv4'
+        apn: 'slice03'
+        slice:
+          sst: 3
+          sd: 3
+      - type: 'IPv4'
+        apn: 'slice04'
+        slice:
+          sst: 4
+          sd: 4
 
 
     # Configured NSSAI for this UE by HPLMN
@@ -228,7 +282,7 @@ data:
     # Default Configured NSSAI for this UE
     default-nssai:
       - sst: 1
-        sd: 1
+        # sd: 1
 
 
     # Supported integrity algorithms by this UE
@@ -268,6 +322,7 @@ data:
             fields: {"imsi": 1},
             new: true
         });
+
     if( ret != null)
         print(slice + " " + ret.imsi);
       
