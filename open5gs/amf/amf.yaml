@@ -1,27 +1,3 @@
-apiVersion: v1
-kind: Service
-metadata:
-  name: open5gs-amf
-  namespace: open5gs
-  labels:
-    epc-mode: amf
-    promotheus: open5gs-monitor
-spec:
-  selector:
-    epc-mode: amf
-  ports:
-    - name: open5gs-amf-tcp-80
-      protocol: TCP
-      port: 80 
-    - name: open5gs-amf-tcp-9090
-      protocol: TCP
-      port: 9090 
-    - name: open5gs-amf-sctp-38412
-      protocol: SCTP
-      port: 38412
-  # externalIPs:
-  #   - 143.54.85.27
----    
 apiVersion: apps/v1 
 kind: Deployment
 metadata:
@@ -30,34 +6,50 @@ metadata:
   labels:
     epc-mode: amf
     promotheus: open5gs-monitor
+    version:  2.6.4
+    app.kubernetes.io/version: 2.6.4-25-g93012c4
+    app.kubernetes.io/part-of: open5gs
 spec:
+  istio_labels:
+    app_label_name: "app"
+    version_label_name: "version"
   replicas: 1
   selector:
     matchLabels:
       epc-mode: amf
   template:
     metadata:
+      annotations:
+        readiness.status.sidecar.istio.io/applicationPorts: "80"
       labels:
         epc-mode: amf
+        app: open5gs-amf
+        version:  2.6.4
     spec:   
       nodeSelector:
+        nodetype: server
         kubernetes.io/arch: amd64
-        kubernetes.io/hostname: molejo
+        #kubernetes.io/hostname: molejo
 
-      containers:
-        - name: metrics-amf
-          image: maikovisky/open5gs:ubuntu-latest    
-          command: ["/bin/prometheus-node-exporter"]
-          volumeMounts:
-            - name: "dev-net-tun"
-              mountPath: "/dev/net/tun" # Needed for VPN
-              
+      containers:             
         - name: amf
-          image: maikovisky/open5gs:ubuntu-latest    
+          image: maikovisky/open5gs:ubuntu-latest  
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80
+            - containerPort: 38412
+            - containerPort: 9090
           securityContext:
             privileged: true
             capabilities:
               add: ["NET_ADMIN", "SYS_MODULE"]
+          resources:
+            requests:
+              memory: "150Mi"
+              cpu: "100m"
+            limits:
+              memory: "250Mi"
+              cpu: "200m"
 
           volumeMounts:
             - name: open5gs-amf-config
@@ -65,21 +57,57 @@ spec:
               subPath: "amf.yaml"
             - name: "dev-net-tun"
               mountPath: "/dev/net/tun" # Needed for VPN
+            - name: tcpdump-persistent-storage
+              mountPath: /var/tcpdump
 
-          command: ["open5gs-amfd",  "-d", "-c", "/open5gs/config-map/amf.yaml"]
+          command: ["open5gs-amfd",  "-c", "/open5gs/config-map/amf.yaml"]
+          #command: ["sleep", "1d"]
+
+        # - name: ebpf-amf
+        #   image: maikovisky/ebpf:latest
+        #   command: ["sleep", "1d"]
+        #   securityContext:
+        #     privileged: true
+        #     capabilities:
+        #       add: ["NET_ADMIN", "SYS_MODULE"]
+        #   volumeMounts:
+        #     - name: "dev-net-tun"
+        #       mountPath: "/dev/net/tun" # Needed for VPN
+
+        # - name: metrics-amf
+        #   image: maikovisky/open5gs:ubuntu-latest    
+        #   command: ["/bin/prometheus-node-exporter"]
+        #   volumeMounts:
+        #     - name: "dev-net-tun"
+        #       mountPath: "/dev/net/tun" # Needed for VPN
+
+        # - name: tcpdump-amf
+        #   image: maikovisky/open5gs:ubuntu-latest    
+        #   command: ["/bin/tcpdump", "-i", "eth0", "-s", "65535", "-G", "3600", "-w", "/var/tcpdump/amf-%F_%H%M.pcap"]
+        #   volumeMounts:
+        #     - name: "dev-net-tun"
+        #       mountPath: "/dev/net/tun" # Needed for VPN
+        #     - name: tcpdump-persistent-storage
+        #       mountPath: /var/tcpdump
+
 
       volumes:
         - name: open5gs-amf-config
           configMap:
             name: open5gs-amf-config
+
         - name: dev-net-tun
           hostPath:
             path: /dev/net/tun
 
-        # - name: logfile-persistent-storage
-        #   persistentVolumeClaim:
-        #     claimName: open5gs-logfile-pv-claim
+        - name: tcpdump-persistent-storage
+          persistentVolumeClaim:
+            claimName: open5gs-tcpdump-pv-claim
 
+        # - name: tcpdump-persistent-storage
+        #   persistentVolumeClaim:
+        #     claimName: open5gs-tcpdump-pv-claim
+                        
 ---
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
@@ -94,4 +122,29 @@ spec:
       epc-mode: amf
   endpoints:
   - interval: 5s
-    port: open5gs-amf-tcp-9090
+    port: http-open5gs-amf-9090
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: open5gs-amf
+  namespace: open5gs
+  labels:
+    epc-mode: amf
+    prometheus: open5gs-monitor
+spec:
+  selector:
+    epc-mode: amf
+  ports:
+    - name: http2-open5gs-amf-80
+      protocol: TCP
+      port: 80 
+      targetPort: 80
+    - name: http-open5gs-amf-9090
+      protocol: TCP
+      port: 9090 
+    - name: sctp-open5gs-amf-38412
+      protocol: SCTP
+      targetPort: 38412
+      port: 38412
+ 

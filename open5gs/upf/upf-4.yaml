@@ -10,11 +10,11 @@ spec:
   selector:
     epc-mode: upf4
   ports:
-    - name: open5gs-upf4-tcp-80
+    - name: http2-open5gs-upf4-80
       protocol: TCP
       port: 80
       targetPort: 80
-    - name: open5gs-upf4-tcp-9090
+    - name: http-open5gs-upf4-9090
       protocol: TCP
       port: 9090
       targetPort: 9090
@@ -26,10 +26,10 @@ spec:
       protocol: UDP
       port: 8805
       targetPort: 8805
-    - name: open5gs-upf4-tcp-9100
-      protocol: TCP
-      port: 9100
-      targetPort: 9100
+    # - name: http-open5gs-upf4-9100
+    #   protocol: TCP
+    #   port: 9100
+    #   targetPort: 9100
 ---    
 apiVersion: apps/v1 # for versions before 1.9.0 use apps/v1beta2
 kind: Deployment
@@ -48,24 +48,33 @@ spec:
     metadata:  
       labels:
         epc-mode: upf4
+        app: open5gs-upf
+        # version: v2.6.1-26
     spec:  
       nodeSelector:
         kubernetes.io/arch: amd64
-        kubernetes.io/hostname: molejo
+        kubernetes.io/hostname: erasure
       containers:
-        - name: metrics-upf4
-          image: maikovisky/open5gs:ubuntu-latest    
-          command: ["/bin/prometheus-node-exporter"]
-          volumeMounts:
-            - name: "dev-net-tun"
-              mountPath: "/dev/net/tun" # Needed for VPN
+        # - name: tcpdump-upf4
+        #   image: maikovisky/open5gs:ubuntu-latest   
+        #   imagePullPolicy: Always
+        #   command: ["/bin/tcpdump", "-i", "eth0", "-s", "65535", "-G", "3600", "-w", "/var/tcpdump/upf4-%F_%H%M.pcap"]
+        #   volumeMounts:
+        #     - name: "dev-net-tun"
+        #       mountPath: "/dev/net/tun" # Needed for VPN
+        #     - name: tcpdump-persistent-storage
+        #       mountPath: /var/tcpdump
         - name: upf4
-          image: maikovisky/open5gs:ubuntu-latest    
+          image: maikovisky/open5gs:ubuntu-latest  
+          imagePullPolicy: Always  
           securityContext:
             privileged: true
             capabilities:
               add: ["NET_ADMIN", "SYS_MODULE"]
-
+          resources:
+            limits:
+              memory: "250Mi"
+              cpu: "1000m"
           volumeMounts:
             - name: open5gs-upf4-config
               mountPath: /open5gs/config-map/upf.yaml
@@ -82,6 +91,12 @@ spec:
           #command: ["open5gs-upfd", "-c", "/open5gs/config-map/upf.yaml"]
           command: ["/bin/entrypoint.sh"]
 
+        # - name: metrics-upf4
+        #   image: maikovisky/open5gs:ubuntu-latest    
+        #   command: ["/bin/prometheus-node-exporter", "--collector.disable-defaults","--collector.arp","--collector.netclass" ,"--collector.netdev" ,"--collector.netstat" ,"--collector.udp_queues","--collector.ipvs","--collector.cpu","--collector.cpufreq","--collector.meminfo"]
+        #   volumeMounts:
+        #     - name: "dev-net-tun"
+        #       mountPath: "/dev/net/tun" # Needed for VPN
 
       volumes:
         - name: open5gs-upf4-config
@@ -91,6 +106,9 @@ spec:
         - name: dev-net-tun
           hostPath:
             path: /dev/net/tun
+        - name: tcpdump-persistent-storage
+          persistentVolumeClaim:
+            claimName: open5gs-tcpdump-pv-claim
 
 ---
 apiVersion: monitoring.coreos.com/v1
@@ -105,10 +123,10 @@ spec:
     matchLabels:
       epc-mode: upf4
   endpoints:
-  - interval: 30s
-    port: open5gs-upf4-tcp-9100
-  - interval: 30s
-    port: open5gs-upf4-tcp-9090
+  # - interval: 5s
+  #   port: http-open5gs-upf4-9100
+  - interval: 5s
+    port: http-open5gs-upf4-9090
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -142,8 +160,36 @@ data:
           dev: ogstun
         - addr: 10.44.0.1/16
           dnn: slice04
-          dev: ogstun1       
+          dev: slice04       
     smf:
+      pfcp:
+        addr: open5gs-smf
+
+    #
+    # o Maximum Number of UE
+    # max:
+    #   ue: 1024
+    #
+    # o Maximum Number of Peer(S1AP/NGAP, DIAMETER, GTP, PFCP or SBI)
+    # max:
+    #   peer: 64
+    #
+    max:
+      ue: 1024
+
+    #
+    #
+    #  o Message Wait Duration (Default : 10,000 ms = 10 seconds)
+    #    (Default values are used, so no configuration is required)
+    #
+    #  o Message Wait Duration (3000 ms)
+    #  time:
+    #    message:
+    #        duration: 3000
+    time:
+      message:
+        duration: 3000
+
   entrypoint.sh: |-
     #!/bin/bash
     set -e
@@ -162,15 +208,15 @@ data:
     fi
 
 
-    if grep "ogstun1" /proc/net/dev > /dev/null; then
-      echo "[WARNING] Net device ogstun1 already exists!"
-      ip addr add 10.44.0.1/16 dev ogstun1 || true
-      ip link set ogstun1 up
+    if grep "slice04" /proc/net/dev > /dev/null; then
+      echo "[WARNING] Net device slice04 already exists!"
+      ip addr add 10.44.0.1/16 dev slice04 || true
+      ip link set slice04 up
     else 
-      echo "[INFO] Create device ogstun1 !"
-      ip tuntap add name ogstun1 mode tun
-      ip addr add 10.44.0.1/16 dev ogstun1 || true
-      ip link set ogstun1 up
+      echo "[INFO] Create device slice04 !"
+      ip tuntap add name slice04 mode tun
+      ip addr add 10.44.0.1/16 dev slice04 || true
+      ip link set slice04 up
     fi
 
     echo "[INFO] Config sysctl"

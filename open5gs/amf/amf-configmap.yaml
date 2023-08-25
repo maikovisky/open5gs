@@ -72,16 +72,21 @@ data:
           addr: 0.0.0.0
           port: 9090
 
-    # nrf:
-    #   sbi:
-    #     - name: open5gs-nrf
-
-    scp:
+    nrf:
       sbi:
-        - name: open5gs-scp
+        - name: open5gs-nrf
+
+    # scp:
+    #   sbi:
+    #     - name: open5gs-scp
         
     usrsctp:
     time:
       t3512:
         value: 540     # 9 mintues * 60 = 540 seconds
-
+      nf_instance:
+        heartbeat: 20
+      message:
+        duration: 3000
+      handover:
+        duration: 500

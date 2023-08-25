@@ -10,11 +10,11 @@ spec:
   selector:
     epc-mode: upf1
   ports:
-    - name: open5gs-upf1-tcp-80
+    - name: http2-open5gs-upf1-80
       protocol: TCP
       port: 80
       targetPort: 80
-    - name: open5gs-upf1-tcp-9090
+    - name: http-open5gs-upf1-9090
       protocol: TCP
       port: 9090
       targetPort: 9090
@@ -26,10 +26,10 @@ spec:
       protocol: UDP
       port: 8805
       targetPort: 8805
-    - name: open5gs-upf1-tcp-9100
-      protocol: TCP
-      port: 9100
-      targetPort: 9100
+    # - name: http-open5gs-upf1-9100
+    #   protocol: TCP
+    #   port: 9100
+    #   targetPort: 9100
 ---    
 apiVersion: apps/v1 # for versions before 1.9.0 use apps/v1beta2
 kind: Deployment
@@ -48,19 +48,26 @@ spec:
     metadata:  
       labels:
         epc-mode: upf1
+        app: open5gs-upf
+        prometheus: open5gs-monitor
     spec:  
       nodeSelector:
         kubernetes.io/arch: amd64
-        kubernetes.io/hostname: molejo
+        kubernetes.io/hostname: erasure
       containers:
-        - name: metrics-upf1
-          image: maikovisky/open5gs:ubuntu-latest    
-          command: ["/bin/prometheus-node-exporter"]
-          volumeMounts:
-            - name: "dev-net-tun"
-              mountPath: "/dev/net/tun" # Needed for VPN
+        # - name: tcpdump-upf1
+        #   image: maikovisky/open5gs:ubuntu-latest
+        #   imagePullPolicy: Always    
+        #   command: ["/bin/tcpdump", "-i", "eth0", "-s", "65535", "-G", "3600", "-w", "/var/tcpdump/upf1-%F_%H%M.pcap"]
+        #   volumeMounts:
+        #     - name: "dev-net-tun"
+        #       mountPath: "/dev/net/tun" # Needed for VPN
+        #     - name: tcpdump-persistent-storage
+        #       mountPath: /var/tcpdump
+
         - name: upf1
           image: maikovisky/open5gs:ubuntu-latest    
+          imagePullPolicy: Always
           securityContext:
             privileged: true
             capabilities:
@@ -81,6 +88,13 @@ spec:
 
           #command: ["open5gs-upfd", "-c", "/open5gs/config-map/upf.yaml"]
           command: ["/bin/entrypoint.sh"]
+          
+        # - name: metrics-upf1
+        #   image: maikovisky/open5gs:ubuntu-latest    
+        #   command: ["/bin/prometheus-node-exporter", "--collector.disable-defaults","--collector.arp","--collector.netclass" ,"--collector.netdev" ,"--collector.netstat" ,"--collector.udp_queues","--collector.ipvs","--collector.cpu","--collector.cpufreq","--collector.meminfo"]
+        #   volumeMounts:
+        #     - name: "dev-net-tun"
+        #       mountPath: "/dev/net/tun" # Needed for VPN
 
 
       volumes:
@@ -91,6 +105,9 @@ spec:
         - name: dev-net-tun
           hostPath:
             path: /dev/net/tun
+        - name: tcpdump-persistent-storage
+          persistentVolumeClaim:
+            claimName: open5gs-tcpdump-pv-claim
 
 ---
 apiVersion: monitoring.coreos.com/v1
@@ -100,15 +117,16 @@ metadata:
   namespace: open5gs
   labels:
     epc-mode: upf1
+    prometheus: open5gs-monitor
 spec:
   selector:
     matchLabels:
       epc-mode: upf1
   endpoints:
-  - interval: 30s
-    port: open5gs-upf1-tcp-9100
-  - interval: 30s
-    port: open5gs-upf1-tcp-9090
+  # - interval: 5s
+  #   port: http-open5gs-upf1-9100
+  - interval: 5s
+    port: http-open5gs-upf1-9090
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -142,8 +160,10 @@ data:
           dev: ogstun
         - addr: 10.41.0.1/16
           dnn: slice01
-          dev: ogstun1       
+          dev: slice01       
     smf:
+      pfcp:
+        addr: open5gs-smf
   entrypoint.sh: |-
     #!/bin/bash
     set -e
@@ -166,15 +186,15 @@ data:
     # ip addr add 192.168.0.1/16 dev ogstun 
     # ip link set ogstun up
 
-    if grep "ogstun1" /proc/net/dev > /dev/null; then
-      echo "[WARNING] Net device ogstun1 already exists!"
-      ip addr add 10.41.0.1/16 dev ogstun1 || true
-      ip link set ogstun1 up
+    if grep "slice01" /proc/net/dev > /dev/null; then
+      echo "[WARNING] Net device slice01 already exists!"
+      ip addr add 10.41.0.1/16 dev slice01 || true
+      ip link set slice01 up
     else 
-      echo "[INFO] Create device ogstun1 !"
-      ip tuntap add name ogstun1 mode tun
-      ip addr add 10.41.0.1/16 dev ogstun1 || true
-      ip link set ogstun1 up
+      echo "[INFO] Create device slice01 !"
+      ip tuntap add name slice01 mode tun
+      ip addr add 10.41.0.1/16 dev slice01 || true
+      ip link set slice01 up
     fi
 
     echo "[INFO] Config sysctl"
@@ -183,6 +203,5 @@ data:
 
     echo "Enable NAT"
     iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
-
 
     open5gs-upfd -c /open5gs/config-map/upf.yaml

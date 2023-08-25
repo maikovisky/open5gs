@@ -1,0 +1,108 @@
+{
+    "_id" : ObjectId("6478115dc4dcaf001138a70d"),
+    "imsi" : "999700000000001",
+    "subscribed_rau_tau_timer" : NumberInt(12),
+    "network_access_mode" : NumberInt(0),
+    "subscriber_status" : NumberInt(0),
+    "access_restriction_data" : NumberInt(32),
+    "slice" : [
+        {
+            "sst" : NumberInt(1),
+            "default_indicator" : true,
+            "_id" : ObjectId("6478115dc4dcaf001138a710"),
+            "session" : [
+                {
+                    "name" : "internet",
+                    "type" : NumberInt(3),
+                    "_id" : ObjectId("6478115dc4dcaf001138a711"),
+                    "pcc_rule" : [
+
+                    ],
+                    "ambr" : {
+                        "uplink" : {
+                            "value" : NumberInt(1),
+                            "unit" : NumberInt(3)
+                        },
+                        "downlink" : {
+                            "value" : NumberInt(1),
+                            "unit" : NumberInt(3)
+                        }
+                    },
+                    "qos" : {
+                        "index" : NumberInt(9),
+                        "arp" : {
+                            "priority_level" : NumberInt(8),
+                            "pre_emption_capability" : NumberInt(1),
+                            "pre_emption_vulnerability" : NumberInt(1)
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "sst" : NumberInt(1),
+            "sd" : "000001",
+            "_id" : ObjectId("6478115dc4dcaf001138a70e"),
+            "session" : [
+                {
+                    "name" : "slice01",
+                    "type" : NumberInt(3),
+                    "_id" : ObjectId("6478115dc4dcaf001138a70f"),
+                    "pcc_rule" : [
+
+                    ],
+                    "ambr" : {
+                        "uplink" : {
+                            "value" : NumberInt(1),
+                            "unit" : NumberInt(3)
+                        },
+                        "downlink" : {
+                            "value" : NumberInt(1),
+                            "unit" : NumberInt(3)
+                        }
+                    },
+                    "qos" : {
+                        "index" : NumberInt(5),
+                        "arp" : {
+                            "priority_level" : NumberInt(1),
+                            "pre_emption_capability" : NumberInt(1),
+                            "pre_emption_vulnerability" : NumberInt(1)
+                        }
+                    }
+                }
+            ]
+        }
+    ],
+    "ambr" : {
+        "uplink" : {
+            "value" : NumberInt(1),
+            "unit" : NumberInt(3)
+        },
+        "downlink" : {
+            "value" : NumberInt(1),
+            "unit" : NumberInt(3)
+        }
+    },
+    "security" : {
+        "k" : "465B5CE8B199B49FAA5F0A2EE238A6BC",
+        "amf" : "8000",
+        "op" : null,
+        "opc" : "E8ED289DEBA952E4283B54E88E6183CA",
+        "sqn" : NumberLong(32)
+    },
+    "purge_flag" : [
+
+    ],
+    "mme_realm" : [
+
+    ],
+    "mme_host" : [
+
+    ],
+    "imeisv" : "1110000000000000",
+    "msisdn" : [
+
+    ],
+    "schema_version" : NumberInt(1),
+    "__v" : NumberInt(0)
+}

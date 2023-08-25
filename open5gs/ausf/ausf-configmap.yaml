@@ -26,10 +26,10 @@ data:
         sbi:
           - dev: eth0
             advertise: open5gs-ausf
-    # nrf:
-    #     sbi:
-    #       - name: open5gs-nrf
+    nrf:
+        sbi:
+          - name: open5gs-nrf
 
-    scp:
-      sbi:
-        - name: open5gs-scp
+    # scp:
+    #   sbi:
+    #     - name: open5gs-scp

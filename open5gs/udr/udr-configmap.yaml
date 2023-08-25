@@ -22,6 +22,10 @@ data:
           - dev: eth0
             advertise: open5gs-udr
 
-    scp:
-        sbi:
-          - name: open5gs-scp
+    nrf:
+      sbi:
+        - name: open5gs-nrf
+
+    # scp:
+    #     sbi:
+    #       - name: open5gs-scp

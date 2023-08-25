@@ -1,0 +1,96 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: open5gs-mqtt
+  namespace: open5gs
+  labels:
+    epc-mode: mosquitto
+    promotheus: open5gs-monitor
+spec:
+  selector:
+    epc-mode: mosquitto
+  #clusterIP: None
+  ports:
+    - name: open5gs-mqtt-1883
+      protocol: TCP
+      port: 1883
+      targetPort: 1883
+    - name: open5gs-mqtt-9100
+      protocol: TCP
+      port: 9100
+      targetPort: 9100
+
+---    
+apiVersion: apps/v1 # for versions before 1.9.0 use apps/v1beta2
+kind: Deployment
+metadata:
+  name: open5gs-mqtt
+  namespace: open5gs
+  labels:
+    epc-mode: pcf
+    promotheus: open5gs-monitor
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      epc-mode: mosquitto
+  template:
+    metadata:   
+      labels:
+        epc-mode: mosquitto
+    spec:  
+      nodeSelector:
+        kubernetes.io/arch: amd64
+        #kubernetes.io/hostname: molejo
+      containers:       
+        - name: mosquitto
+          image: maikovisky/test:latest  
+          securityContext:
+            privileged: true
+            capabilities:
+              add: ["NET_ADMIN", "SYS_MODULE"]  
+          volumeMounts:
+            - mountPath: /etc/mosquitto/conf.d/
+              name: open5gs-mqtt-config
+          command: ["/usr/sbin/mosquitto", "-c", "/etc/mosquitto/conf.d/mosquitto.conf"]
+             
+        - name: metrics-mosquitto
+          image: maikovisky/test:latest  
+          command: ["/bin/prometheus-node-exporter", "--collector.disable-defaults","--collector.arp","--collector.netclass" ,"--collector.netdev" ,"--collector.netstat" ,"--collector.udp_queues","--collector.ipvs","--collector.cpu","--collector.cpufreq","--collector.meminfo"]
+          # ports:
+          #   - containerPort: 9100
+          #     name: o5g-mosquitto-9100
+      volumes:
+        - name: open5gs-mqtt-config
+          configMap:
+            name: open5gs-mqtt-config
+
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: open5gs-mqtt
+  namespace: open5gs
+  labels:
+    epc-mode: mosquitto
+spec:
+  selector:
+    matchLabels:
+      epc-mode: mosquitto
+  endpoints:
+  - interval: 10s
+    port: open5gs-mqtt-9100
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: open5gs-mqtt-config
+  namespace: open5gs
+  labels:
+    epc-mode: mosquitto
+data:
+  mosquitto.conf: |
+    listener 1883 0.0.0.0
+    allow_anonymous true
+    log_type debug
+

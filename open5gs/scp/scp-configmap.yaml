@@ -29,3 +29,8 @@ data:
     parameter:
     max:
     time:
+      nf_instance:
+        heartbeat: 20
+      message:
+        duration: 3000
+

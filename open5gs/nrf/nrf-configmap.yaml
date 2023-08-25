@@ -28,9 +28,9 @@ data:
         - addr: 0.0.0.0
           advertise: open5gs-nrf
 
-    scp:
-      sbi:
-        - name: open5gs-scp
+    # scp:
+    #   sbi:
+    #     - name: open5gs-scp
 
     parameter:
     max:

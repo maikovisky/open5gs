@@ -115,9 +115,17 @@ Rodar os comandos abaixo no POD UERAMSIM enquanto captura o trafego de rede usan
 
 ```
 ping -I uesimtun0 8.8.8.8
-iperf -B 192.168.0.2 -c 10.244.43.121 -w 300k
+iperf -B 192.168.0.2 -c open5gs-iperf -w 300k
+iperf -B 192.168.0.2 -c open5gs-iperf -w 300k -u
+iperf -B 192.168.0.2 -c open5gs-iperf -w 300k -r
+iperf -B 192.168.0.2 -c open5gs-iperf -w 300k -r -u
+
+iperf -B 10.41.0.13 -c open5gs-iperf -t 60 -i 5 --trip-times --txstart-time $(expr $(date +%s) + 1).$(date+%N)
 ```
 
+```
+kubectl cp <POD_ID>:/var/tcpdump .
+```
 
 ### Algumas discuções sobre o assunto
 - [Promissor](https://unix.stackexchange.com/questions/442760/cant-forward-traffic-from-eth-to-tun-tap)

@@ -247,18 +247,18 @@ resource "kubectl_manifest" "upf" {
 
 
 # POD for teste
-data "kubectl_path_documents" "test_manifests" {
-   pattern = "./test/*.yaml"
-}
+# data "kubectl_path_documents" "test_manifests" {
+#    pattern = "./test/*.yaml"
+# }
 
-resource "kubectl_manifest" "test" {
-   count     = length(data.kubectl_path_documents.test_manifests.documents)
-   yaml_body = element(data.kubectl_path_documents.test_manifests.documents, count.index)
+# resource "kubectl_manifest" "test" {
+#    count     = length(data.kubectl_path_documents.test_manifests.documents)
+#    yaml_body = element(data.kubectl_path_documents.test_manifests.documents, count.index)
 
-   depends_on = [
-     data.kubectl_path_documents.nrf_manifests
-   ]
-}
+#    depends_on = [
+#      data.kubectl_path_documents.nrf_manifests
+#    ]
+# }
 
 # POD for ueransim
 data "kubectl_path_documents" "ueransim_manifests" {

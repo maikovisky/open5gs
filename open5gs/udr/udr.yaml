@@ -5,18 +5,18 @@ metadata:
   namespace: open5gs
   labels:
     epc-mode: udr
+    prometheus: open5gs-monitor
 spec:
   selector:
     epc-mode: udr
   ports:
-    - name: open5gs-udr-tcp-80
+    - name: http2-open5gs-udr-80
       protocol: TCP
       port: 80
       targetPort: 80
-    - name: open5gs-udr-tcp-9100
-      protocol: TCP
-      port: 9100
-      targetPort: 9100
+    # - name: http-open5gs-udr-9100
+    #   protocol: TCP
+    #   port: 9100
 ---    
 apiVersion: apps/v1 # for versions before 1.9.0 use apps/v1beta2
 kind: Deployment
@@ -25,6 +25,7 @@ metadata:
   namespace: open5gs
   labels:
     epc-mode: udr
+
 spec:
   replicas: 1
   selector:
@@ -34,45 +35,67 @@ spec:
     metadata:   
       labels:
         epc-mode: udr
+        app: open5gs-udr
+        # version: v2.6.1-26
+
     spec:  
       nodeSelector:
+        nodetype: server
         kubernetes.io/arch: amd64
-        kubernetes.io/hostname: molejo
+        #kubernetes.io/hostname: molejo
       containers:
-        - name: metrics-udr
-          image: maikovisky/open5gs:ubuntu-latest    
-          command: ["/bin/prometheus-node-exporter"]
+        # - name: tcpdump-udr
+        #   image: maikovisky/open5gs:ubuntu-latest    
+        #   command: ["/bin/tcpdump", "-i", "eth0", "-s", "65535", "-G", "3600", "-w", "/var/tcpdump/udr-%F_%H%M.pcap"]
+        #   volumeMounts:
+        #     - name: tcpdump-persistent-storage
+        #       mountPath: /var/tcpdump
 
         - name: udr
-          image: maikovisky/open5gs:ubuntu-latest    
+          image: maikovisky/open5gs:ubuntu-latest 
+          imagePullPolicy: Always   
           securityContext:
             privileged: true
             capabilities:
               add: ["NET_ADMIN", "SYS_MODULE"]
+          resources:
+            requests:
+              memory: "150Mi"
+              cpu: "100m"
+            limits:
+              memory: "250Mi"
+              cpu: "200m"
 
           volumeMounts:
             - name: open5gs-udr-config
               mountPath: /open5gs/config-map/udr.yaml
               subPath: "udr.yaml"
 
-          command: ["open5gs-udrd", "-d", "-c", "/open5gs/config-map/udr.yaml"]
+          command: ["open5gs-udrd", "-c", "/open5gs/config-map/udr.yaml"]
+        # - name: metrics-udr
+        #   image: maikovisky/open5gs:ubuntu-latest    
+        #   command: ["/bin/prometheus-node-exporter"]
       volumes:
         - name: open5gs-udr-config
           configMap:
             name: open5gs-udr-config
 
----
-apiVersion: monitoring.coreos.com/v1
-kind: ServiceMonitor
-metadata:
-  name: open5gs-udr
-  namespace: open5gs
-  labels:
-    epc-mode: udr
-spec:
-  selector:
-    matchLabels:
-      epc-mode: udr
-  endpoints:
-  - interval: 30s
-    port: open5gs-udr-tcp-9100
+        - name: tcpdump-persistent-storage
+          persistentVolumeClaim:
+            claimName: open5gs-tcpdump-pv-claim
+
+# ---
+# apiVersion: monitoring.coreos.com/v1
+# kind: ServiceMonitor
+# metadata:
+#   name: open5gs-udr
+#   namespace: open5gs
+#   labels:
+#     epc-mode: udr
+# spec:
+#   selector:
+#     matchLabels:
+#       epc-mode: udr
+#   endpoints:
+#   - interval: 30s
+#     port: http-open5gs-udr-9100

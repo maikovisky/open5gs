@@ -1,26 +1,12 @@
-kind: PersistentVolume
-apiVersion: v1
-metadata:
-  name: open5gs-logfile-pv-volume
-  namespace: open5gs
-  labels:
-    type: local
-spec:
-  capacity:
-    storage: 1Gi
-  accessModes:
-    - ReadWriteOnce
-  hostPath:
-    path: "/mnt/"
----
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: open5gs-logfile-pv-claim
+  name: open5gs-tcpdump-pv-claim
   namespace: open5gs
 spec:
+  storageClassName: rook-cephfs
   accessModes:
-    - ReadWriteOnce
+    - ReadWriteMany
   resources:
     requests:
       storage: 1Gi

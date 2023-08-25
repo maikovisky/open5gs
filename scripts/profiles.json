@@ -1,0 +1,384 @@
+{
+    "_id" : ObjectId("64781455c4dcaf001138a712"),
+    "title" : "slice01",
+    "slice" : [
+        {
+            "sst" : NumberInt(1),
+            "default_indicator" : true,
+            "_id" : ObjectId("64781455c4dcaf001138a715"),
+            "session" : [
+                {
+                    "name" : "internet",
+                    "type" : NumberInt(3),
+                    "_id" : ObjectId("64781455c4dcaf001138a716"),
+                    "pcc_rule" : [
+
+                    ],
+                    "ambr" : {
+                        "uplink" : {
+                            "value" : NumberInt(1),
+                            "unit" : NumberInt(3)
+                        },
+                        "downlink" : {
+                            "value" : NumberInt(1),
+                            "unit" : NumberInt(3)
+                        }
+                    },
+                    "qos" : {
+                        "index" : NumberInt(9),
+                        "arp" : {
+                            "priority_level" : NumberInt(8),
+                            "pre_emption_capability" : NumberInt(1),
+                            "pre_emption_vulnerability" : NumberInt(1)
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "sst" : NumberInt(1),
+            "sd" : "000001",
+            "_id" : ObjectId("64781455c4dcaf001138a713"),
+            "session" : [
+                {
+                    "name" : "slice01",
+                    "type" : NumberInt(3),
+                    "_id" : ObjectId("64781455c4dcaf001138a714"),
+                    "pcc_rule" : [
+
+                    ],
+                    "ambr" : {
+                        "uplink" : {
+                            "value" : NumberInt(1),
+                            "unit" : NumberInt(3)
+                        },
+                        "downlink" : {
+                            "value" : NumberInt(1),
+                            "unit" : NumberInt(3)
+                        }
+                    },
+                    "qos" : {
+                        "index" : NumberInt(5),
+                        "arp" : {
+                            "priority_level" : NumberInt(1),
+                            "pre_emption_capability" : NumberInt(1),
+                            "pre_emption_vulnerability" : NumberInt(1)
+                        }
+                    }
+                }
+            ]
+        }
+    ],
+    "ambr" : {
+        "uplink" : {
+            "value" : NumberInt(1),
+            "unit" : NumberInt(3)
+        },
+        "downlink" : {
+            "value" : NumberInt(1),
+            "unit" : NumberInt(3)
+        }
+    },
+    "security" : {
+        "k" : "465B5CE8B199B49FAA5F0A2EE238A6BC",
+        "amf" : "8000",
+        "op" : null,
+        "opc" : "E8ED289DEBA952E4283B54E88E6183CA"
+    },
+    "imeisv" : [
+
+    ],
+    "msisdn" : [
+
+    ],
+    "schema_version" : NumberInt(1),
+    "__v" : NumberInt(0)
+}
+{
+    "_id" : ObjectId("64781486c4dcaf001138a717"),
+    "title" : "slice02",
+    "slice" : [
+        {
+            "sst" : NumberInt(1),
+            "default_indicator" : true,
+            "_id" : ObjectId("64781486c4dcaf001138a71a"),
+            "session" : [
+                {
+                    "name" : "internet",
+                    "type" : NumberInt(3),
+                    "_id" : ObjectId("64781486c4dcaf001138a71b"),
+                    "pcc_rule" : [
+
+                    ],
+                    "ambr" : {
+                        "uplink" : {
+                            "value" : NumberInt(1),
+                            "unit" : NumberInt(3)
+                        },
+                        "downlink" : {
+                            "value" : NumberInt(1),
+                            "unit" : NumberInt(3)
+                        }
+                    },
+                    "qos" : {
+                        "index" : NumberInt(9),
+                        "arp" : {
+                            "priority_level" : NumberInt(8),
+                            "pre_emption_capability" : NumberInt(1),
+                            "pre_emption_vulnerability" : NumberInt(1)
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "sst" : NumberInt(2),
+            "sd" : "000002",
+            "_id" : ObjectId("64781486c4dcaf001138a718"),
+            "session" : [
+                {
+                    "name" : "slice02",
+                    "type" : NumberInt(3),
+                    "_id" : ObjectId("64781486c4dcaf001138a719"),
+                    "pcc_rule" : [
+
+                    ],
+                    "ambr" : {
+                        "uplink" : {
+                            "value" : NumberInt(1),
+                            "unit" : NumberInt(3)
+                        },
+                        "downlink" : {
+                            "value" : NumberInt(1),
+                            "unit" : NumberInt(3)
+                        }
+                    },
+                    "qos" : {
+                        "index" : NumberInt(5),
+                        "arp" : {
+                            "priority_level" : NumberInt(1),
+                            "pre_emption_capability" : NumberInt(1),
+                            "pre_emption_vulnerability" : NumberInt(1)
+                        }
+                    }
+                }
+            ]
+        }
+    ],
+    "ambr" : {
+        "uplink" : {
+            "value" : NumberInt(1),
+            "unit" : NumberInt(3)
+        },
+        "downlink" : {
+            "value" : NumberInt(1),
+            "unit" : NumberInt(3)
+        }
+    },
+    "security" : {
+        "k" : "465B5CE8B199B49FAA5F0A2EE238A6BC",
+        "amf" : "8000",
+        "op" : null,
+        "opc" : "E8ED289DEBA952E4283B54E88E6183CA"
+    },
+    "imeisv" : [
+
+    ],
+    "msisdn" : [
+
+    ],
+    "schema_version" : NumberInt(1),
+    "__v" : NumberInt(0)
+}
+{
+    "_id" : ObjectId("647814dd997f080608104177"),
+    "title" : "slice03",
+    "slice" : [
+        {
+            "sst" : NumberInt(1),
+            "default_indicator" : true,
+            "_id" : ObjectId("64781455c4dcaf001138a715"),
+            "session" : [
+                {
+                    "name" : "internet",
+                    "type" : NumberInt(3),
+                    "_id" : ObjectId("64781455c4dcaf001138a716"),
+                    "pcc_rule" : [
+
+                    ],
+                    "ambr" : {
+                        "uplink" : {
+                            "value" : NumberInt(1),
+                            "unit" : NumberInt(3)
+                        },
+                        "downlink" : {
+                            "value" : NumberInt(1),
+                            "unit" : NumberInt(3)
+                        }
+                    },
+                    "qos" : {
+                        "index" : NumberInt(9),
+                        "arp" : {
+                            "priority_level" : NumberInt(8),
+                            "pre_emption_capability" : NumberInt(1),
+                            "pre_emption_vulnerability" : NumberInt(1)
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "sst" : NumberInt(3),
+            "sd" : "000003",
+            "_id" : ObjectId("64781455c4dcaf001138a713"),
+            "session" : [
+                {
+                    "name" : "slice03",
+                    "type" : NumberInt(3),
+                    "_id" : ObjectId("64781455c4dcaf001138a714"),
+                    "pcc_rule" : [
+
+                    ],
+                    "ambr" : {
+                        "uplink" : {
+                            "value" : NumberInt(1),
+                            "unit" : NumberInt(3)
+                        },
+                        "downlink" : {
+                            "value" : NumberInt(1),
+                            "unit" : NumberInt(3)
+                        }
+                    },
+                    "qos" : {
+                        "index" : NumberInt(5),
+                        "arp" : {
+                            "priority_level" : NumberInt(1),
+                            "pre_emption_capability" : NumberInt(1),
+                            "pre_emption_vulnerability" : NumberInt(1)
+                        }
+                    }
+                }
+            ]
+        }
+    ],
+    "ambr" : {
+        "uplink" : {
+            "value" : NumberInt(1),
+            "unit" : NumberInt(3)
+        },
+        "downlink" : {
+            "value" : NumberInt(1),
+            "unit" : NumberInt(3)
+        }
+    },
+    "security" : {
+        "k" : "465B5CE8B199B49FAA5F0A2EE238A6BC",
+        "amf" : "8000",
+        "op" : null,
+        "opc" : "E8ED289DEBA952E4283B54E88E6183CA"
+    },
+    "imeisv" : [
+
+    ],
+    "msisdn" : [
+
+    ],
+    "schema_version" : NumberInt(1),
+    "__v" : NumberInt(0)
+}
+{
+    "_id" : ObjectId("64781519c4dcaf001138a71c"),
+    "title" : "slice04",
+    "slice" : [
+        {
+            "sst" : NumberInt(1),
+            "default_indicator" : true,
+            "_id" : ObjectId("64781519c4dcaf001138a71f"),
+            "session" : [
+                {
+                    "name" : "internet",
+                    "type" : NumberInt(3),
+                    "_id" : ObjectId("64781519c4dcaf001138a720"),
+                    "pcc_rule" : [
+
+                    ],
+                    "ambr" : {
+                        "uplink" : {
+                            "value" : NumberInt(1),
+                            "unit" : NumberInt(3)
+                        },
+                        "downlink" : {
+                            "value" : NumberInt(1),
+                            "unit" : NumberInt(3)
+                        }
+                    },
+                    "qos" : {
+                        "index" : NumberInt(9),
+                        "arp" : {
+                            "priority_level" : NumberInt(8),
+                            "pre_emption_capability" : NumberInt(1),
+                            "pre_emption_vulnerability" : NumberInt(1)
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "sst" : NumberInt(4),
+            "sd" : "000004",
+            "_id" : ObjectId("64781519c4dcaf001138a71d"),
+            "session" : [
+                {
+                    "name" : "slice04",
+                    "type" : NumberInt(3),
+                    "_id" : ObjectId("64781519c4dcaf001138a71e"),
+                    "pcc_rule" : [
+
+                    ],
+                    "ambr" : {
+                        "uplink" : {
+                            "value" : NumberInt(1),
+                            "unit" : NumberInt(3)
+                        },
+                        "downlink" : {
+                            "value" : NumberInt(1),
+                            "unit" : NumberInt(3)
+                        }
+                    },
+                    "qos" : {
+                        "index" : NumberInt(5),
+                        "arp" : {
+                            "priority_level" : NumberInt(1),
+                            "pre_emption_capability" : NumberInt(1),
+                            "pre_emption_vulnerability" : NumberInt(1)
+                        }
+                    }
+                }
+            ]
+        }
+    ],
+    "ambr" : {
+        "uplink" : {
+            "value" : NumberInt(1),
+            "unit" : NumberInt(3)
+        },
+        "downlink" : {
+            "value" : NumberInt(1),
+            "unit" : NumberInt(3)
+        }
+    },
+    "security" : {
+        "k" : "465B5CE8B199B49FAA5F0A2EE238A6BC",
+        "amf" : "8000",
+        "op" : null,
+        "opc" : "E8ED289DEBA952E4283B54E88E6183CA"
+    },
+    "imeisv" : [
+
+    ],
+    "msisdn" : [
+
+    ],
+    "schema_version" : NumberInt(1),
+    "__v" : NumberInt(0)
+}
