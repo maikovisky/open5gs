@@ -11,17 +11,17 @@
 ### Files
 Files used to deploy the gNB in a Kubernetes cluster.
 
-- gnb.yaml                # Kubernet descriptor
-- gnb-init.yaml           # Script init
-- gnb-configmap.yaml      # Configmap with nr-gnb config
+- [gnb.yaml](gnb.yaml): Kubernet deplyment descriptor for gNB
+- [gnb-init.yaml](gnb-init.yaml): Script for initContainer
+- [gnb-configmap.yaml](gnb-configmap.yaml): Configmap with file nr-gnb config
 
 ## UE
 
 ### Files
 Files used to deploy the UE in a Kubernetes cluster.
 
-- [ue.yaml]
-- [ue-init.yaml]
-  - [ueinit]:                
-  - [initUE.py]:
-- [ue-testing.yaml]
+- [ue.yaml](ue.yaml): Kubernet deplyment descriptor for UE
+- [ue-init.yaml](ue-init.yaml): Scripts for initContainer
+  - [ueinit]: Script init UE                
+  - [initUE.py]: Script for get IMSI for UE
+- [ue-testing.yaml](ue-testing.yaml): Scripts for testing slices.
