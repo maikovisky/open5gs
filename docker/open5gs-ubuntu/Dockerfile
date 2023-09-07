@@ -1,43 +1,30 @@
 FROM ubuntu:jammy as base
 MAINTAINER Maiko de Andrade <maikovisky@gmail.com>
-<<<<<<< HEAD
 RUN apt update -y && \
     apt upgrade -y && \
     apt install -y curl \
         gdb \
-	prometheus-node-exporter \
-	libtalloc2 \
-	libmicrohttpd12 \
-	libyaml-0-2 \ 
-	libmongoc-1.0-0 \
-	libsctp1 \
-	lksctp-tools \
-	libmongoc-1.0-0 \
-	libidn12 \
-	libtins4.0 \
-	net-tools \
-	iproute2 \
-	iptables \
-	iputils-ping \
-	tcpdump \
-        vim 
-   
-
-FROM base as builder
-RUN apt install -y python3-pip \ 
-=======
-RUN apt upgrade && \
-    apt update && \
-    apt install curl \
-        mongo-c-driver \
-        gdb \
         prometheus-node-exporter \
-        lksctp-tools 
+        libtalloc2 \
+        libmicrohttpd12 \
+        libyaml-0-2 \
+        libmongoc-1.0-0 \
+        libsctp1 \
+        lksctp-tools \
+        libmongoc-1.0-0 \
+        libidn12 \
+        libtins4.0 \
+        net-tools \
+        iproute2 \
+        iptables \
+        iputils-ping \
+        tcpdump \
+        vim
+
    
 
 FROM base as builder
 RUN apt install python3-pip \ 
->>>>>>> 44441c3b73e223ec3a8458af5fea81148d030065
         python3-setuptools \
         python3-wheel \
         ninja-build \
@@ -60,7 +47,6 @@ RUN apt install python3-pip \
         libnghttp2-dev \
         libtins-dev \
         libtalloc-dev \
-<<<<<<< HEAD
         meson \
 	golang-go && \
         git clone --recursive https://github.com/open5gs/open5gs && \
@@ -77,17 +63,6 @@ RUN apt install python3-pip \
 	go mod download && \
 	cd cmd && \
 	go build app.go 
-=======
-        meson && \
-        git clone --recursive https://github.com/open5gs/open5gs && \
-        cd open5gs && \
-	git checkout main  && \
-        meson build --prefix=/ && \
-#	meson configure -Dmetrics_impl=prometheus build && \
-        ninja -C  build && \
-        cd build && \
-        DESTDIR=/open5gs/install ninja install 
->>>>>>> 44441c3b73e223ec3a8458af5fea81148d030065
 
 WORKDIR /
 
@@ -112,21 +87,15 @@ WORKDIR /
 COPY --from=builder /open5gs/install/bin  /bin 
 COPY --from=builder /open5gs/install/bin  /bin 
 COPY --from=builder /open5gs/install/lib  /lib
-<<<<<<< HEAD
-#COPY --from=builder /open5gs/install/usr/lib /lib
-=======
 COPY --from=builder /open5gs/install/usr/lib /lib
->>>>>>> 44441c3b73e223ec3a8458af5fea81148d030065
 COPY --from=builder /open5gs/build/configs/open5gs /etc/open5gs 
 COPY --from=builder /open5gs/build/configs/freeDiameter /etc/freeDiameter 
 COPY --from=builder /open5gs/build/configs/*.yaml /etc/
 COPY --from=builder /open5gs/misc/netconf.sh /bin/ 
-<<<<<<< HEAD
 COPY --from=builder /open5gs/build/tests /bin/tests
 COPY --from=builder /my5G-RANTester/cmd/app /bin/rantester
 COPY etc /etc
-=======
-COPY etc /etc
+
 
 
 

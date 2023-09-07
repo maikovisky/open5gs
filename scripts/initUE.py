@@ -6,6 +6,12 @@ import socket
 import struct
 import random
 
+from pydantic import TypeAdapter, ValidationError
+
+print(TypeAdapter(bool).validate_python('yes'))  
+print(TypeAdapter(bool).validate_python('no'))  
+
+exit
 IMSI = os.environ.get("IMSI", "999700000000000")
 CREATE_IMSI = os.environ.get("CREATE_IMSI", True)
 CREATE_NEW_IMSI = os.environ.get("CREATE_NEW_IMSI", False)
