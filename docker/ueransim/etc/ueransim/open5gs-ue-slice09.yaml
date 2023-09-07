@@ -46,23 +46,23 @@ sessions:
     slice:
       sst: 1
   - type: 'IPv4'
-    apn: 'slice02'
+    apn: 'slice09'
     slice:
-      sst: 2
-      sd: 2
+      sst: 9
+      sd: 9
 
 
     # Configured NSSAI for this UE by HPLMN
 configured-nssai:
   - sst: 1
-  - sst: 2
-    sd: 2
+  - sst: 9
+    sd: 9
 
 # Default Configured NSSAI for this UE
 default-nssai:
   - sst: 1
-  - sst: 2
-    sd: 2
+  - sst: 9
+    sd: 9
 
 # Supported integrity algorithms by this UE
 integrity:
