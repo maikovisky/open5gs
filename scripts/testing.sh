@@ -12,8 +12,10 @@ function annotation {
 
 upf4=$(kubectl get pod | grep open5gs-upf-4 | awk '{print $1}')
 
+# Removendo restrições de banda
+kubectl annotate pod $upf4 kubernetes.io/egress-bandwidth-
 
-varText="Inicio do experimento: Slice,CPU,MEM: [UPF1,1250,250] [UPF2,1200,250] [UPF3,1200,250] [UPF4,null,null]"
+varText="Inicio do experimento - Baseline"
 annotation
 sleep 5s
 
