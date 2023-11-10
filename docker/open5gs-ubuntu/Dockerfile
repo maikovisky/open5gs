@@ -19,12 +19,13 @@ RUN apt update -y && \
         iptables \
         iputils-ping \
         tcpdump \
+	netperf \
         vim
 
    
 
 FROM base as builder
-RUN apt install python3-pip \ 
+RUN apt install -y python3-pip \ 
         python3-setuptools \
         python3-wheel \
         ninja-build \
@@ -56,7 +57,7 @@ RUN apt install python3-pip \
         meson build --prefix=`pwd`/install && \
         ninja -C  build && \
         cd build && \
-        ninja install && \
+        ninja install && \ 
         cd / && \ 
 	git clone https://github.com/my5G/my5G-RANTester.git && \
 	cd my5G-RANTester && \
@@ -87,7 +88,7 @@ WORKDIR /
 COPY --from=builder /open5gs/install/bin  /bin 
 COPY --from=builder /open5gs/install/bin  /bin 
 COPY --from=builder /open5gs/install/lib  /lib
-COPY --from=builder /open5gs/install/usr/lib /lib
+#COPY --from=builder /open5gs/install/usr/lib /lib
 COPY --from=builder /open5gs/build/configs/open5gs /etc/open5gs 
 COPY --from=builder /open5gs/build/configs/freeDiameter /etc/freeDiameter 
 COPY --from=builder /open5gs/build/configs/*.yaml /etc/
@@ -96,7 +97,3 @@ COPY --from=builder /open5gs/build/tests /bin/tests
 COPY --from=builder /my5G-RANTester/cmd/app /bin/rantester
 COPY etc /etc
 
-
-
-
->>>>>>> 44441c3b73e223ec3a8458af5fea81148d030065
