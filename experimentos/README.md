@@ -99,3 +99,4 @@ Este experimento é composto por 4 slices, um UPF para cada slice, sendo que tod
 ### Links:
 - [Snapshot raintank](https://snapshots.raintank.io/dashboard/snapshot/0NB01YiXKN5ucm71tFOdiI9pLLmrPI1C)
 - [Snapshot local](http://localhost:3000/dashboard/snapshot/J1H7PIhXANeCujItO6XqTuexcxohXoy6)
+- [Github - Tag  vE02](https://github.com/maikovisky/open5gs/tree/vE02)
