@@ -1,0 +1,151 @@
+apiVersion: apps/v1 
+kind: Deployment
+metadata:
+  name: open5gs-amf2
+  namespace: open5gs
+  labels:
+    epc-mode: amf2
+    promotheus: open5gs-monitor
+    version:  2.6.4
+    app.kubernetes.io/version: 2.6.4-25-g93012c4
+    app.kubernetes.io/part-of: open5gs
+spec:
+  istio_labels:
+    app_label_name: "app"
+    version_label_name: "version"
+  replicas: 0
+  selector:
+    matchLabels:
+      epc-mode: amf2
+  template:
+    metadata:
+      annotations:
+        readiness.status.sidecar.istio.io/applicationPorts: "80"
+      labels:
+        epc-mode: amf2
+        app: open5gs-amf2
+        version:  2.6.4
+    spec:   
+      nodeSelector:
+        nodetype: server
+        kubernetes.io/arch: amd64
+        kubernetes.io/hostname: erasure
+        #kubernetes.io/hostname: molejo
+
+      containers:             
+        - name: amf2
+          image: maikovisky/open5gs:ubuntu-latest  
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80
+            - containerPort: 38412
+            - containerPort: 9090
+          securityContext:
+            privileged: true
+            capabilities:
+              add: ["NET_ADMIN", "SYS_MODULE"]
+          resources:
+            requests:
+              memory: "150Mi"
+              cpu: "100m"
+            limits:
+              memory: "250Mi"
+              cpu: "200m"
+
+          volumeMounts:
+            - name: open5gs-amf2-config
+              mountPath: /open5gs/config-map/amf.yaml
+              subPath: "amf.yaml"
+            - name: "dev-net-tun"
+              mountPath: "/dev/net/tun" # Needed for VPN
+            - name: tcpdump-persistent-storage
+              mountPath: /var/tcpdump
+
+          command: ["open5gs-amfd",  "-c", "/open5gs/config-map/amf.yaml"]
+          #command: ["sleep", "1d"]
+
+        # - name: ebpf-amf
+        #   image: maikovisky/ebpf:latest
+        #   command: ["sleep", "1d"]
+        #   securityContext:
+        #     privileged: true
+        #     capabilities:
+        #       add: ["NET_ADMIN", "SYS_MODULE"]
+        #   volumeMounts:
+        #     - name: "dev-net-tun"
+        #       mountPath: "/dev/net/tun" # Needed for VPN
+
+        # - name: metrics-amf
+        #   image: maikovisky/open5gs:ubuntu-latest    
+        #   command: ["/bin/prometheus-node-exporter"]
+        #   volumeMounts:
+        #     - name: "dev-net-tun"
+        #       mountPath: "/dev/net/tun" # Needed for VPN
+
+        # - name: tcpdump-amf
+        #   image: maikovisky/open5gs:ubuntu-latest    
+        #   command: ["/bin/tcpdump", "-i", "eth0", "-s", "65535", "-G", "3600", "-w", "/var/tcpdump/amf-%F_%H%M.pcap"]
+        #   volumeMounts:
+        #     - name: "dev-net-tun"
+        #       mountPath: "/dev/net/tun" # Needed for VPN
+        #     - name: tcpdump-persistent-storage
+        #       mountPath: /var/tcpdump
+
+
+      volumes:
+        - name: open5gs-amf2-config
+          configMap:
+            name: open5gs-amf2-config
+
+        - name: dev-net-tun
+          hostPath:
+            path: /dev/net/tun
+
+        - name: tcpdump-persistent-storage
+          persistentVolumeClaim:
+            claimName: open5gs-tcpdump-pv-claim
+
+        # - name: tcpdump-persistent-storage
+        #   persistentVolumeClaim:
+        #     claimName: open5gs-tcpdump-pv-claim
+                        
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: open5gs-amf2
+  namespace: open5gs
+  labels:
+    epc-mode: amf2
+spec:
+  selector:
+    matchLabels:
+      epc-mode: amf2
+  endpoints:
+  - interval: 5s
+    port: http-open5gs-amf2-9090
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: open5gs-amf2
+  namespace: open5gs
+  labels:
+    epc-mode: amf2
+    prometheus: open5gs-monitor
+spec:
+  selector:
+    epc-mode: amf2
+  ports:
+    - name: http2-open5gs-amf2-80
+      protocol: TCP
+      port: 80 
+      targetPort: 80
+    - name: http-open5gs-amf2-9090
+      protocol: TCP
+      port: 9090 
+    - name: sctp-open5gs-amf2-38412
+      protocol: SCTP
+      targetPort: 38412
+      port: 38412
+ 

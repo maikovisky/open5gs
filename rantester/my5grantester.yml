@@ -41,10 +41,7 @@ spec:
         kubernetes.io/arch: amd64
         kubernetes.io/hostname: molejo
       containers:
-        - name: metrics-my5grantester
-          image: maikovisky/my5grantester:latest  
-          command: ["/usr/bin/node_exporter", "--no-collector.filesystem", "--no-collector.vmstat", "--no-collector.powersupplyclass", "--no-collector.ntp", "--no-collector.timex"]
-
+       
         - name: my5grantester
           image:  maikovisky/my5grantester:latest
           securityContext:
@@ -61,6 +58,11 @@ spec:
           #command: ["./app load-test-parallel -n $NUM_UEs -d $SLEEP_CONN -t $START_DELAY -a"]
           #command: ["./app load-test-parallel -n 1000 -d 500 -t 60 -a"]
           command: ["sleep", "1d"]
+
+        - name: metrics-my5grantester
+          image: maikovisky/my5grantester:latest  
+          command: ["/usr/bin/node_exporter", "--no-collector.filesystem", "--no-collector.vmstat", "--no-collector.powersupplyclass", "--no-collector.ntp", "--no-collector.timex"]
+
       volumes:
         - name: open5gs-my5grantester-config
           configMap:

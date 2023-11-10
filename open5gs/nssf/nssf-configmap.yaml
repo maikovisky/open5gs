@@ -40,6 +40,38 @@ data:
             s_nssai:
               sst: 4
               sd: 4
+          - name: open5gs-nrf
+            s_nssai:
+              sst: 5
+              sd: 5
+          - name: open5gs-nrf
+            s_nssai:
+              sst: 6
+              sd: 6
+          - name: open5gs-nrf
+            s_nssai:
+              sst: 7
+              sd: 7
+          - name: open5gs-nrf
+            s_nssai:
+              sst: 8
+              sd: 8
+          # - name: open5gs-nrf
+          #   s_nssai:
+          #     sst: 9
+          #     sd: 9
+          # - name: open5gs-nrf
+          #   s_nssai:
+          #     sst: 10
+          #     sd: 10
+          # - name: open5gs-nrf
+          #   s_nssai:
+          #     sst: 11
+          #     sd: 11
+          # - name: open5gs-nrf
+          #   s_nssai:
+          #     sst: 12
+          #     sd: 12
 
               
     nrf:

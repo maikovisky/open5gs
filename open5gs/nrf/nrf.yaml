@@ -47,15 +47,15 @@ spec:
         #kubernetes.io/hostname: molejo
 
       containers:
-        - name: tcpdump-nrf
-          image: maikovisky/open5gs:ubuntu-latest  
-          imagePullPolicy: Always  
-          command: ["/bin/tcpdump", "-i", "eth0", "-s", "65535", "-G", "3600", "-w", "/var/tcpdump/nrf-%F_%H%M.pcap"]
-          volumeMounts:
-            - name: "dev-net-tun"
-              mountPath: "/dev/net/tun" # Needed for VPN
-            - name: tcpdump-persistent-storage
-              mountPath: /var/tcpdump
+        # - name: tcpdump-nrf
+        #   image: maikovisky/open5gs:ubuntu-latest  
+        #   imagePullPolicy: Always  
+        #   command: ["/bin/tcpdump", "-i", "eth0", "-s", "65535", "-G", "3600", "-w", "/var/tcpdump/nrf-%F_%H%M.pcap"]
+        #   volumeMounts:
+        #     - name: "dev-net-tun"
+        #       mountPath: "/dev/net/tun" # Needed for VPN
+        #     - name: tcpdump-persistent-storage
+        #       mountPath: /var/tcpdump
 
         - name: nrf
           image: maikovisky/open5gs:ubuntu-latest 

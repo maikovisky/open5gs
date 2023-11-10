@@ -6,7 +6,7 @@ metadata:
   labels:
     epc-mode: ueransim
 spec:
-  replicas: 1
+  replicas: 0
   selector:
     matchLabels:
       epc-mode: ueransim
@@ -19,11 +19,15 @@ spec:
       nodeSelector:
         nodetype: server
         kubernetes.io/arch: amd64
-        #kubernetes.io/hostname: molejo
+        #kubernetes.io/hostname: erasure
+        kubernetes.io/hostname: molejo
       initContainers:
         - name: init-gnb
           image: maikovisky/ueransim:3.2.6
           imagePullPolicy: Always
+          env:  
+            - name: SLICE
+              value: "1"
           command: ["/bin/gnbinit"]
           volumeMounts:
             - name: open5gs-ueransim-gnbinit

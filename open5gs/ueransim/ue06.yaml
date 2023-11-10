@@ -1,0 +1,303 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: open5gs-ue06
+  namespace: open5gs
+  labels:
+    epc-mode: ue06
+spec:
+  selector:
+    epc-mode: ue06
+  ports:
+    - name: http2-open5gs-ue06-80
+      protocol: TCP
+      port: 80
+    - name: open5gs-ue06-tcp-3000
+      protocol: TCP
+      port: 3000
+    - name: http2-open5gs-ue06-9100
+      protocol: TCP
+      port: 9100
+    - name: open5gs-ue06-udp-2152
+      protocol: UDP
+      port: 2152
+    - name: open5gs-ue06-udp-36743
+      protocol: UDP
+      port: 36743
+    - name: open5gs-ue06-udp-4997
+      protocol: UDP
+      port: 4997
+---    
+apiVersion: apps/v1 # for versions before 1.9.0 use apps/v1beta2
+kind: Deployment
+metadata:
+  name: open5gs-ue06
+  namespace: open5gs
+  labels:
+    epc-mode: ue06
+spec:
+  replicas: 0
+  selector:
+    matchLabels:
+      epc-mode: ue06
+  template:
+    metadata:    
+      labels:
+        epc-mode: ue06
+        app: ueransim-ue06
+    spec:  
+      nodeSelector:
+        #nodetype: server
+        #kubernetes.io/arch: amd64
+        #kubernetes.io/hostname: molejo
+        kubernetes.io/hostname: mac-porvir-03
+      initContainers:
+        - name: init-ue
+          image: maikovisky/ueransim:3.2.6
+          imagePullPolicy: Always
+          command: ["/bin/ueinit"]
+          env:            
+            - name: DATABASE_URL
+              value: mongodb://open5gs-mongodb-svc:27017
+            - name: IMSI
+              value: "999700000000000"
+            - name: RANDOM_SLICE
+              value: "False"
+            - name: SLICE
+              value: "6"
+
+          volumeMounts:
+            - name: open5gs-ue-init
+              mountPath: /bin/ueinit
+              subPath: "ueinit"
+
+            - name: open5gs-ue-init
+              mountPath: "/bin/initUE.py"
+              subPath: "initUE.py"
+
+            - name: etc-ue-tmp
+              mountPath: /etc/ueransim/tmp
+      containers:      
+        # - name: tcpdump-ue
+        #   image: maikovisky/open5gs:ubuntu-latest    
+        #   command: ["/bin/tcpdump", "-i", "eth0", "-s", "65535", "-G", "3600", "-w", "/var/tcpdump/ue-%F_%H%M.pcap"]
+        #   volumeMounts:
+        #     - name: "dev-net-tun"
+        #       mountPath: "/dev/net/tun" # Needed for VPN
+        #     - name: tcpdump-persistent-storage
+        #       mountPath: /var/tcpdump
+
+
+        - name: main-ue
+          image: maikovisky/ueransim:3.2.6  
+          imagePullPolicy: "Always" 
+          securityContext:
+            privileged: true
+            capabilities:
+              add: ["NET_ADMIN", "SYS_MODULE"]
+          env:            
+            - name: MY_NODE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
+            - name: MY_POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: MY_POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: MY_POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+            - name: MCC
+              value: "999"
+            - name: MNC
+              value: "70"
+              
+          volumeMounts:         
+            - name: open5gs-ue-init
+              mountPath: "/bin/initUE.py"
+              subPath: "initUE.py"
+
+            - name: etc-ue-tmp
+              mountPath: /etc/ueransim/tmp
+
+            - name: "dev-net-tun"
+              mountPath: "/dev/net/tun" # Needed for VPN
+
+          command: ["nr-ue", "-c", "/etc/ueransim/tmp/open5gs-ue-01.yaml"]
+
+        # - name: metrics-ue
+        #   image: maikovisky/ueransim:3.2.6     
+        #   imagePullPolicy: "Always"
+        #   command: ["/bin/prometheus-node-exporter", "--collector.disable-defaults", "--collector.textfile", "--collector.arp","--collector.netclass" ,"--collector.netdev" ,"--collector.netstat" ,"--collector.udp_queues","--collector.ipvs","--collector.cpu","--collector.cpufreq","--collector.meminfo"]
+        #   volumeMounts:
+        #     - name: "dev-net-tun"
+        #       mountPath: "/dev/net/tun" # Needed for VPN
+        - name: iperf-ue
+          image: maikovisky/ueransim:3.2.6  
+          imagePullPolicy: "Always" 
+          securityContext:
+            privileged: true
+            capabilities:
+              add: ["NET_ADMIN", "SYS_MODULE"]
+          env:  
+            - name: SLICE
+              value: "6"
+          command: ["/bin/testing"]
+          volumeMounts:
+            - name: "dev-net-tun"
+              mountPath: "/dev/net/tun" # Needed for VPN
+
+            - name: open5gs-ue-testing
+              mountPath: /bin/testing
+              subPath: "testing"
+          
+      volumes:
+        - name: open5gs-ue-testing
+          configMap:
+            name: open5gs-ue-testing
+            defaultMode: 0777
+
+        - name: open5gs-ue-init
+          configMap:
+            name: open5gs-ue-init
+            defaultMode: 0777
+
+        - name: dev-net-tun
+          hostPath:
+            path: /dev/net/tun
+
+        - name: etc-ue-tmp
+          emptyDir: {}
+
+        - name: tcpdump-persistent-storage
+          persistentVolumeClaim:
+            claimName: open5gs-tcpdump-pv-claim
+# ---
+# apiVersion: monitoring.coreos.com/v1
+# kind: ServiceMonitor
+# metadata:
+#   name: open5gs-ue
+#   namespace: open5gs
+#   labels:
+#     epc-mode: ue
+# spec:
+#   selector:
+#     matchLabels:
+#       epc-mode: ue
+#   endpoints:
+#   - interval: 10s
+#     port: open5gs-ue-tcp-9100
+# ---
+# apiVersion: v1
+# kind: ConfigMap
+# metadata:
+#   name: open5gs-ue-config
+#   namespace: open5gs
+#   labels:
+#     epc-mode: ue06
+# data:
+#   open5gs-ue-base.yaml: |
+#     # IMSI number of the UE. IMSI = [MCC|MNC|MSISDN] (In total 15 digits)
+#     supi: 'imsi-999700000000001'
+
+#     # Mobile Country Code value of HPLMN
+#     mcc: '999'
+#     # Mobile Network Code value of HPLMN (2 or 3 digits)
+#     mnc: '70'
+
+#     # Routing Indicator
+#     routingIndicator: '0000'
+
+#     # Permanent subscription key
+#     key: '465B5CE8B199B49FAA5F0A2EE238A6BC'
+#     # Operator code (OP or OPC) of the UE
+#     op: 'E8ED289DEBA952E4283B54E88E6183CA'
+#     # This value specifies the OP type and it can be either 'OP' or 'OPC'
+#     opType: 'OPC'
+#     # Authentication Management Field (AMF) value
+#     amf: '8000'
+#     # IMEI number of the device. It is used if no SUPI is provided
+#     imei: '356938035643803'
+#     # IMEISV number of the device. It is used if no SUPI and IMEI is provided
+#     imeiSv: '4370816125816151'
+
+#     # List of gNB IP addresses for Radio Link Simulation
+#     gnbSearchList:
+#       - HOSTNAME
+      
+#     # UAC Access Identities Configuration
+#     uacAic:
+#       mps: false
+#       mcs: false
+
+#     # UAC Access Control Class
+#     uacAcc:
+#       normalClass: 0
+#       class11: false
+#       class12: false
+#       class13: false
+#       class14: false
+#       class15: false
+
+#     # Initial PDU sessions to be established
+#     sessions:
+#       - type: 'IPv4'
+#         apn: 'internet'
+#         slice:
+#           sst: 1
+#       - type: 'IPv4'
+#         apn: 'slice01'
+#         slice:
+#           sst: 1
+#           sd: 1
+#       - type: 'IPv4'
+#         apn: 'slice02'
+#         slice:
+#           sst: 2
+#           sd: 2
+#       - type: 'IPv4'
+#         apn: 'slice03'
+#         slice:
+#           sst: 3
+#           sd: 3
+#       - type: 'IPv4'
+#         apn: 'slice04'
+#         slice:
+#           sst: 4
+#           sd: 4
+
+
+#     # Configured NSSAI for this UE by HPLMN
+#     configured-nssai:
+#       - sst: 1
+
+#     # Default Configured NSSAI for this UE
+#     default-nssai:
+#       - sst: 1
+#         # sd: 1
+
+
+#     # Supported integrity algorithms by this UE
+#     integrity:
+#       IA1: true
+#       IA2: true
+#       IA3: true
+
+#     # Supported encryption algorithms by this UE
+#     ciphering:
+#       EA1: true
+#       EA2: true
+#       EA3: true
+
+#     # Integrity protection maximum data rate for user plane
+#     integrityMaxRate:
+#       uplink: 'full'
+#       downlink: 'full'
+
+      
+

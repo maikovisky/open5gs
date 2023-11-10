@@ -20,7 +20,7 @@ data:
 
     # List of AMF address information
     amfConfigs:
-      - address: open5gs-amf
+      - address: open5gs-amf-sctp2
         port: 38412
 
     # List of supported S-NSSAIs by this gNB
@@ -34,6 +34,22 @@ data:
         sd: 0x000003
       - sst: 4
         sd: 0x000004
+      # - sst: 5
+      #   sd: 0x000005
+      # - sst: 6
+      #   sd: 0x000006
+      # - sst: 7
+      #   sd: 0x000007
+      # - sst: 8
+      #   sd: 0x000008
+      # - sst: 9
+      #   sd: 0x000009
+      # - sst: 10
+      #   sd: 0x000010
+      # - sst: 11
+      #   sd: 0x000011
+      # - sst: 12
+      #   sd: 0x000012
 
     # Indicates whether or not SCTP stream number errors should be ignored.
     ignoreStreamIds: true

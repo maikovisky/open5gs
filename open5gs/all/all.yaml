@@ -68,5 +68,5 @@ spec:
             path: /dev/net/tun
         - name: logfile-persistent-storage
           persistentVolumeClaim:
-            claimName: open5gs-logfile-pv-claim
+            claimName: open5gs-tcpdump-pv-claim
 
