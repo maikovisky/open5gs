@@ -9,18 +9,20 @@ data:
   ueinit: |
     #!/bin/bash 
     set -e
-    pip install pymongo psutil
+
+    S=$(printf "%02d" $SLICE)
+
+    H=OPEN5GS_UERANSIM$${S}_SERVICE_HOST
     RESULT=$(python3 /bin/initUE.py)
+
     echo $RESULT
 
     export IMSI=$(cut -d , -f 2 <<< $RESULT)
     export SLICE=$(cut -d , -f 1 <<< $RESULT)
-
-    sed "s/HOSTNAME/$OPEN5GS_UERANSIM_SERVICE_HOST/g" /etc/ueransim/open5gs-ue-$SLICE.yaml > /etc/ueransim/tmp/open5gs-ue-01.yaml
+    sed "s/HOSTNAME/$${!H}/g" /etc/ueransim/open5gs-ue-$SLICE.yaml > /etc/ueransim/tmp/open5gs-ue-01.yaml
    
     sed -i "s/999700000000001/$IMSI/g" /etc/ueransim/tmp/open5gs-ue-01.yaml
-    #nr-ue -c /etc/ueransim/tmp/open5gs-ue-01.yaml -n 10
-    #export IMSI=999700000000001
+
 
   initUE.py: |
     from pymongo import MongoClient
@@ -30,12 +32,18 @@ data:
     import socket
     import struct
     import random
+    from pydantic import TypeAdapter, ValidationError
+
 
     IMSI = os.environ.get("IMSI", "999700000000000")
-    CREATE_IMSI = os.environ.get("CREATE_IMSI", True)
-    CREATE_NEW_IMSI = os.environ.get("CREATE_NEW_IMSI", False)
-    USE_IMSI_NETWORK = os.environ.get("USE_IMSI_NETWORK", True)
-    SLICE= os.environ.get("SLICE", "slice01")
+    CREATE_IMSI = TypeAdapter(bool).validate_python(os.environ.get("CREATE_IMSI", "True"))
+    CREATE_NEW_IMSI = TypeAdapter(bool).validate_python(os.environ.get("CREATE_NEW_IMSI", "False"))
+    USE_IMSI_NETWORK = TypeAdapter(bool).validate_python(os.environ.get("USE_IMSI_NETWORK", "True"))
+    SLICE = os.environ.get("SLICE", "1")
+    RANDOM_SLICE= TypeAdapter(bool).validate_python(os.environ.get("RANDOM_SLICE", "True"))
+    RECREATE_IMSI= TypeAdapter(bool).validate_python(os.environ.get("RECREATE_IMSI", "True"))
+
+    SLICENAME="sliece0" + SLICE
 
     def getDatabase(database):
         DATABASE_URL = os.environ.get("DATABASE_URL", "mongodb://localhost:27017/open5gs")
@@ -45,11 +53,18 @@ data:
 
 
     def verifyIMSI(IMSI):
-        global SLICE
+        global SLICE, RECREATE_IMSI
+
         db = getDatabase("open5gs")
+
         if( db["subscribers"].count_documents({"imsi": IMSI}) != 0 ):
             subscribers = db["subscribers"].find({"imsi": IMSI})
-            SLICE = subscribers[0]["slice"][1]["session"][0]["name"]
+            SLICE = subscribers[0]["slice"][0]["session"][0]["name"]
+
+            if(RECREATE_IMSI):
+                db["subscribers"].delete_one({"imsi": IMSI})
+                return False
+
             return True
         
         return False
@@ -62,14 +77,21 @@ data:
         return lastIMSI
 
     def addSlice(name, sst, sd):
-        global SLICE
+        global SLICE, SLICENAME
         slice = {"sst" : sst, "sd" : sd, "default_indicator" : True, "session" : [
-                    {"name" : name, "type" : 3,"pcc_rule" : [],  "ambr" : { "uplink" : {"value" : 1,"unit" : 3}, "downlink" : { "value" : 1,"unit" : 3}},
+                    {"name" : name, "type" : 3,"pcc_rule" : [],  "ambr" : { "uplink" : {"value" : 1,"unit" : 4}, "downlink" : { "value" : 1,"unit" : 4}},
                         "qos" : {"index" : 9, "arp" : { "priority_level" : 8,"pre_emption_capability" : 1, "pre_emption_vulnerability" : 1} }}
                 ]}
-        SLICE=name
+        SLICENAME=name
         return slice
 
+    def valueSlice(s):
+        sst  = int(s)
+        #if(sst == 8):
+        #    sst = 4
+        sd   = str(s).rjust(6, "0")
+        name = "slice" + str(s).rjust(2, "0")
+        return name, sst, sd
 
     def randomSlice():
         sst = random.randint(1,4)
@@ -77,20 +99,30 @@ data:
         name = "slice" + str(sst).rjust(2, "0")
         return name, sst, sd
 
+    def getSlice():
+        global RANDOM_SLICE, SLICE
+
+        if(RANDOM_SLICE):
+            return randomSlice()
+
+        return valueSlice(SLICE)
+
+
     def addSubscribers(IMSI):
 
         db = getDatabase("open5gs")
         base = {"imsi" : IMSI,  "subscribed_rau_tau_timer" : 12, "network_access_mode" : 0, "subscriber_status" : 0, "access_restriction_data" : 32}
-        ambr = { "uplink" : {"value" : 1, "unit" : 3 },"downlink" : { "value" : 1,"unit" : 3} }
+        ambr = { "uplink" : {"value" : 1, "unit" : 4 },"downlink" : { "value" : 1,"unit" : 4} }
         security = {"k" : "465B5CE8B199B49FAA5F0A2EE238A6BC","amf" : "8000","op" : None, "opc" : "E8ED289DEBA952E4283B54E88E6183CA","sqn" : 1153 }
         values   = {"purge_flag" : [], "mme_realm" : [], "mme_host" : [], "imeisv" : "4370816125816151", "msisdn" : [], "schema_version" : 1,"__v" : 0}
 
-        slice = [{"sst" : 1, "default_indicator" : True, "session" : [
-                    {"name" : "internet", "type" : 3,"pcc_rule" : [],  "ambr" : { "uplink" : {"value" : 1,"unit" : 3}, "downlink" : { "value" : 1,"unit" : 3}},
-                        "qos" : {"index" : 9, "arp" : { "priority_level" : 8,"pre_emption_capability" : 1, "pre_emption_vulnerability" : 1} }}
-                ]}]
+        #slice = [{"sst" : 1, "default_indicator" : True, "session" : [
+        #            {"name" : "internet", "type" : 3,"pcc_rule" : [],  "ambr" : { "uplink" : {"value" : 1,"unit" : 3}, "downlink" : { "value" : 1,"unit" : 3}},
+        #                "qos" : {"index" : 9, "arp" : { "priority_level" : 8,"pre_emption_capability" : 1, "pre_emption_vulnerability" : 1} }}
+        #        ]}]
+        slice = []
         
-        name, sst, sd = randomSlice()
+        name, sst, sd = getSlice()
         s = addSlice(name, sst, sd)
         slice.append(s)
         
@@ -116,5 +148,5 @@ data:
     elif (CREATE_NEW_IMSI):
         IMSI = addIMSI(IMSI)
         
-    print(SLICE + "," + IMSI)
+    print(SLICENAME + "," + IMSI)
   

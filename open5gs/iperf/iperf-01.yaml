@@ -1,0 +1,162 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: open5gs-iperf01
+  namespace: open5gs
+  labels:
+    epc-mode: iperf01
+    promotheus: open5gs-monitor
+spec:
+  selector:
+    epc-mode: iperf01
+  ports:
+    - name: o5g-iperf01-5201
+      protocol: TCP
+      port: 5201
+      targetPort: 5201
+    - name: o5g-iperf01-udp-5201
+      protocol: UDP
+      port: 5201
+      targetPort: 5201
+
+    - name: o5g-iperf01-5001
+      protocol: TCP
+      port: 5001
+      targetPort: 5001
+    - name: o5g-iperf01-udp-5001
+      protocol: UDP
+      port: 5001
+      targetPort: 5001
+
+    - name: o5g-netiperf01-5301
+      protocol: TCP
+      port: 5301
+      targetPort: 5301
+    - name: o5g-netiperf01-udp-5301
+      protocol: UDP
+      port: 5301
+      targetPort: 5301
+
+    - name: o5g-rperf04-5199
+      protocol: TCP
+      port: 5199
+      targetPort: 5199
+    - name: o5g-rperf-udp-5199
+      protocol: UDP
+      port: 5199
+      targetPort: 5199
+    # - name: o5g-iperf01-9100
+    #   protocol: TCP
+    #   port: 9100
+    #   targetPort: 9100
+
+---    
+apiVersion: apps/v1 # for versions before 1.9.0 use apps/v1beta2
+kind: Deployment
+metadata:
+  name: open5gs-iperf01
+  namespace: open5gs
+  labels:
+    epc-mode: pcf
+    promotheus: open5gs-monitor
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      epc-mode: iperf01
+  template:
+    metadata:   
+      labels:
+        epc-mode: iperf01
+    spec:  
+      nodeSelector:
+        #kubernetes.io/arch: amd64
+        #kubernetes.io/hostname: molejo
+        kubernetes.io/hostname: mac-porvir-02
+        #kubernetes.io/hostname: erasure
+      containers:       
+        # - name: tcpdump-iperf
+        #   image: maikovisky/open5gs:ubuntu-latest    
+        #   command: ["/bin/tcpdump", "-i", "eth0", "-s", "65535", "-G", "3600", "-w", "/var/tcpdump/iperf-04-%F_%H%M.pcap"]
+        #   volumeMounts:
+        #     - name: tcpdump-persistent-storage
+        #       mountPath: /var/tcpdump
+
+        - name: iperf3
+          image: maikovisky/iperf:latest  
+          ports:
+            - containerPort: 5201
+              protocol: TCP
+            - containerPort: 5201
+              protocol: UDP
+          securityContext:
+            privileged: true
+            capabilities:
+              add: ["NET_ADMIN", "SYS_MODULE"]  
+          command: ["/bin/iperf3", "-s", "-B", "0.0.0.0", "-V", "--forceflush"]
+     
+        - name: iperf
+          image: maikovisky/iperf:latest  
+          ports:
+            - containerPort: 5001
+              protocol: TCP              
+            - containerPort: 5001
+              protocol: UDP
+          securityContext:
+            privileged: true
+            capabilities:
+              add: ["NET_ADMIN", "SYS_MODULE"]  
+          command: ["/bin/iperf", "-s", "--histograms"]
+
+        # - name: netperf
+        #   image: maikovisky/iperf:latest  
+        #   ports:
+        #     - containerPort: 5301
+        #       protocol: TCP              
+        #     - containerPort: 5301
+        #       protocol: UDP
+        #   securityContext:
+        #     privileged: true
+        #     capabilities:
+        #       add: ["NET_ADMIN", "SYS_MODULE"]  
+        #   command: ["/usr/bin/netperf", "-p", "5301", "-D"]
+
+        # - name: rperf
+        #   image: maikovisky/iperf:latest  
+        #   ports:
+        #     - containerPort: 5199
+        #       name: o5g-rperf-5199
+        #     - containerPort: 5199
+        #       name: o5g-rpf-u-5199
+        #   securityContext:
+        #     privileged: true
+        #     capabilities:
+        #       add: ["NET_ADMIN", "SYS_MODULE"]  
+        #   command: ["/bin/rperf", "-s"]
+        
+        # - name: metrics-iperf
+        #   image: maikovisky/iperf:latest  
+        #   command: ["/bin/prometheus-node-exporter", "--collector.disable-defaults","--collector.arp","--collector.netclass" ,"--collector.netdev" ,"--collector.netstat" ,"--collector.udp_queues","--collector.ipvs","--collector.cpu","--collector.cpufreq","--collector.meminfo"]
+        #   ports:
+        #     - containerPort: 9100
+        #       name: o5g-iperf-9100
+      volumes:
+        - name: tcpdump-persistent-storage
+          persistentVolumeClaim:
+            claimName: open5gs-tcpdump-pv-claim
+
+# ---
+# apiVersion: monitoring.coreos.com/v1
+# kind: ServiceMonitor
+# metadata:
+#   name: open5gs-iperf
+#   namespace: open5gs
+#   labels:
+#     epc-mode: iperf
+# spec:
+#   selector:
+#     matchLabels:
+#       epc-mode: iperf
+#   endpoints:
+#   - interval: 10s
+#     port: o5g-iperf-9100

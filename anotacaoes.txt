@@ -1,0 +1,9 @@
+Pensar em um modelo e rede Privada de 5G usando poucos recursos.
+Criar slices para diferentes aplicações
+
+
+Sugestão 1
+- Universidade 
+
+Sugestão 2
+- Industria 

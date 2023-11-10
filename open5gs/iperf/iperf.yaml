@@ -18,14 +18,24 @@ spec:
       protocol: UDP
       port: 5201
       targetPort: 5201
+
     - name: o5g-iperf-5001
       protocol: TCP
       port: 5001
       targetPort: 5001
-    - name: o5g-iperf-udp-5001
+    - name: o5g-ipf-u-5001
       protocol: UDP
       port: 5001
       targetPort: 5001
+
+    - name: o5g-rperf-5199
+      protocol: TCP
+      port: 5199
+      targetPort: 5199
+    - name: o5g-rpf-u-5199
+      protocol: UDP
+      port: 5199
+      targetPort: 5199
     # - name: o5g-iperf-9100
     #   protocol: TCP
     #   port: 9100
@@ -33,7 +43,7 @@ spec:
 
 ---    
 apiVersion: apps/v1 # for versions before 1.9.0 use apps/v1beta2
-kind: Deployment
+kind: StatefulSet
 metadata:
   name: open5gs-iperf
   namespace: open5gs
@@ -41,7 +51,7 @@ metadata:
     epc-mode: pcf
     promotheus: open5gs-monitor
 spec:
-  replicas: 1
+  replicas: 0
   selector:
     matchLabels:
       epc-mode: iperf
@@ -54,12 +64,12 @@ spec:
         kubernetes.io/arch: amd64
         #kubernetes.io/hostname: molejo
       containers:       
-        - name: tcpdump-iperf
-          image: maikovisky/open5gs:ubuntu-latest    
-          command: ["/bin/tcpdump", "-i", "eth0", "-s", "65535", "-G", "3600", "-w", "/var/tcpdump/iperf-%F_%H%M.pcap"]
-          volumeMounts:
-            - name: tcpdump-persistent-storage
-              mountPath: /var/tcpdump
+        # - name: tcpdump-iperf
+        #   image: maikovisky/open5gs:ubuntu-latest    
+        #   command: ["/bin/tcpdump", "-i", "eth0", "-s", "65535", "-G", "3600", "-w", "/var/tcpdump/iperf-%F_%H%M.pcap"]
+        #   volumeMounts:
+        #     - name: tcpdump-persistent-storage
+        #       mountPath: /var/tcpdump
 
         - name: iperf3
           image: maikovisky/iperf:latest  
@@ -80,11 +90,26 @@ spec:
           ports:
             - containerPort: 5001
               name: o5g-iperf-5001
+            - containerPort: 5001
+              name: o5g-ipf-u-5001
           securityContext:
             privileged: true
             capabilities:
               add: ["NET_ADMIN", "SYS_MODULE"]  
           command: ["/bin/iperf", "-s", "--histograms"]
+
+        # - name: rperf
+        #   image: maikovisky/iperf:latest  
+        #   ports:
+        #     - containerPort: 5199
+        #       name: o5g-rperf-5199
+        #     - containerPort: 5199
+        #       name: o5g-rpf-u-5199
+        #   securityContext:
+        #     privileged: true
+        #     capabilities:
+        #       add: ["NET_ADMIN", "SYS_MODULE"]  
+        #   command: ["/bin/rperf", "-s"]
         
         # - name: metrics-iperf
         #   image: maikovisky/iperf:latest  

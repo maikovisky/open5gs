@@ -1,0 +1,91 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: open5gs-amf2-config
+  namespace: open5gs
+  labels:
+    epc-mode: amf2
+    app.kubernetes.io/name: open5gs
+    app.kubernetes.io/component: amf2
+data:
+  amf.yaml: |
+    logger:
+        # level: debug
+        file: /var/log/open5gs/amf.log
+
+    sbi:
+      server:
+        no_tls: true
+        cacert: /etc/open5gs/tls/ca.crt
+        key: /etc/open5gs/tls/amf.key
+        cert: /etc/open5gs/tls/amf.crt
+      client:
+        no_tls: true
+        cacert: /etc/open5gs/tls/ca.crt
+        key: /etc/open5gs/tls/amf.key
+        cert: /etc/open5gs/tls/amf.crt
+
+    amf:
+        sbi:
+          - dev: eth0
+            advertise: open5gs-amf2
+
+        ngap: 
+          - dev: eth0
+
+        guami:
+          - plmn_id:
+              mcc: 999
+              mnc: 70
+            amf_id:
+              region: 2
+              set: 2
+        tai:
+          - plmn_id:
+              mcc: 999
+              mnc: 70
+            tac: 1
+
+        plmn_support:
+          - plmn_id:
+              mcc: 999
+              mnc: 70
+            s_nssai:
+              - sst: 1
+              - sst: 5
+                sd: 000005
+              - sst: 6
+                sd: 000006
+              - sst: 7
+                sd: 000007
+              - sst: 8
+                sd: 000008
+        security:
+            integrity_order : [ NIA2, NIA1, NIA0 ]
+            ciphering_order : [ NEA0, NEA1, NEA2 ]
+        network_name:
+            full: Open5GS
+        amf_name: open5gs-amf2
+
+        metrics:
+          addr: 0.0.0.0
+          port: 9090
+
+    nrf:
+      sbi:
+        - name: open5gs-nrf
+
+    # scp:
+    #   sbi:
+    #     - name: open5gs-scp
+        
+    usrsctp:
+    time:
+      t3512:
+        value: 540     # 9 mintues * 60 = 540 seconds
+      nf_instance:
+        heartbeat: 20
+      message:
+        duration: 3000
+      handover:
+        duration: 500

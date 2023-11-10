@@ -36,7 +36,7 @@ metadata:
   labels:
     epc-mode: ue
 spec:
-  replicas: 1
+  replicas: 0
   selector:
     matchLabels:
       epc-mode: ue
@@ -47,7 +47,7 @@ spec:
         app: ueransim-ue
     spec:  
       nodeSelector:
-        nodetype: server
+        #nodetype: server
         kubernetes.io/arch: amd64
         #kubernetes.io/hostname: molejo
       initContainers:
@@ -60,6 +60,9 @@ spec:
               value: mongodb://open5gs-mongodb-svc:27017
             - name: IMSI
               value: "999700000000000"
+            - name: RANDOM_SLICE
+              value: "True"
+
           volumeMounts:
             - name: open5gs-ue-init
               mountPath: /bin/ueinit
@@ -249,10 +252,10 @@ data:
 
     # Initial PDU sessions to be established
     sessions:
-      - type: 'IPv4'
-        apn: 'internet'
-        slice:
-          sst: 1
+      # - type: 'IPv4'
+      #   apn: 'internet'
+      #   slice:
+      #     sst: 1
       - type: 'IPv4'
         apn: 'slice01'
         slice:

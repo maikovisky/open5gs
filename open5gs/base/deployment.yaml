@@ -1,0 +1,59 @@
+apiVersion: apps/v1 
+kind: Deployment
+metadata:
+  namespace: open5gs
+  labels:
+    version: 2.6.4
+spec:
+  replicas: 1
+  template:
+    metadata: 
+      labels:
+        version: 2.6.4
+    spec:  
+      nodeSelector:
+        nodetype: server
+        kubernetes.io/arch: amd64
+        #kubernetes.io/hostname: molejo
+      containers:
+        - name: nrf
+          image: maikovisky/open5gs:ubuntu-latest 
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80
+          securityContext:
+            privileged: true
+            capabilities:
+              add: ["NET_ADMIN", "SYS_MODULE"]
+
+          volumeMounts:
+            - name: open5gs-nrf-config
+              mountPath: /open5gs/config-map/nrf.yaml
+              subPath: "nrf.yaml"
+            - name: "dev-net-tun"
+              mountPath: "/dev/net/tun" # Needed for VPN
+
+          command: ["open5gs-nrfd", "-c", "/open5gs/config-map/nrf.yaml"]
+
+
+        # - name: metrics-nrf
+        #   image: maikovisky/open5gs:ubuntu-latest    
+        #   command: ["/bin/prometheus-node-exporter"]
+        #   volumeMounts:
+        #     - name: "dev-net-tun"
+        #       mountPath: "/dev/net/tun" # Needed for VPN
+
+          
+
+      volumes:
+        - name: open5gs-nrf-config
+          configMap:
+            name: open5gs-nrf-config
+
+        - name: dev-net-tun
+          hostPath:
+            path: /dev/net/tun
+
+        - name: tcpdump-persistent-storage
+          persistentVolumeClaim:
+            claimName: open5gs-tcpdump-pv-claim

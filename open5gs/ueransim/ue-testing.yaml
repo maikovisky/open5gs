@@ -10,23 +10,40 @@ data:
   testing: |
     #!/bin/bash 
     set -e
+
+    sleep "15s"
+
+    COUNTER=0
+    while [ -z  $(ifconfig | awk  '/uesimtun/{print $1; exit}') ] 
+    do
+      let COUNTER=COUNTER+1
+      #echo -ne "Waiting create tunnel interface. Attempt $COUNTER"\\r
+      echo "Waiting create tunnel interface. Attempt $COUNTER"
+      sleep "5s"
+    done
+
     uesimtun0=$(ifconfig uesimtun0 | awk '/inet / {print $6}')
     uesimtun1=$(ifconfig uesimtun1 | awk '/inet / {print $6}')
-    if (expr "$uesimtun0" : "10\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*$")
+    if [ $(expr "$uesimtun0" : "10\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*$") ]
     then
+      echo "Using interface uesimtun0 with IP $uesimtun0"
       uesimtun=$uesimtun0
     else
+      echo "Using interface uesimtun1 with IP $uesimtun1"
       uesimtun=$uesimtun1
     fi
 
     while :
     do
-      t=$(($RANDOM % 600))
-      iperf -B $uesimtun -c open5gs-iperf -t $t
+      #t=$(($RANDOM % 600))
+      t=300
+      iperf -B $uesimtun -c open5gs-iperf0$SLICE -f A -i 30 -t $t --trip-times 
       # iperf -B $uesimtun -c open5gs-iperf -w 500k
-      sleep 30s
+      
       # iperf -B $uesimtun -c open5gs-iperf -w 500k -u
       # iperf -B $uesimtun -c open5gs-iperf -w 500k -r
       # iperf -B $uesimtun -c open5gs-iperf -w 500k -r -u
+      echo "Waiting 180s for new testing"
+      sleep "180s"
     done
     #nr-cli imsi-999700000000001 -e ps-release-all

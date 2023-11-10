@@ -52,8 +52,9 @@ spec:
         # version: v2.6.1-26
     spec:  
       nodeSelector:
-        kubernetes.io/arch: amd64
-        kubernetes.io/hostname: erasure
+        #kubernetes.io/arch: amd64
+        #kubernetes.io/hostname: erasure
+        kubernetes.io/hostname: mac-porvir-01
       containers:
         # - name: tcpdump-upf3
         #   image: maikovisky/open5gs:ubuntu-latest  
@@ -75,10 +76,10 @@ spec:
           resources:
             requests:
               memory: "250Mi"
-              cpu: "2000m"
+              cpu: "1200m"
             limits:
               memory: "250Mi"
-              cpu: "2000m"
+              cpu: "1200m"
           volumeMounts:
             - name: open5gs-upf3-config
               mountPath: /open5gs/config-map/upf.yaml

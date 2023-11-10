@@ -52,8 +52,9 @@ spec:
         # version: v2.6.1-26
     spec:  
       nodeSelector:
-        kubernetes.io/arch: amd64
-        kubernetes.io/hostname: erasure
+        #kubernetes.io/arch: amd64
+        #kubernetes.io/hostname: erasure
+        kubernetes.io/hostname: mac-porvir-01
       containers:
         # - name: tcpdump-upf2
         #   image: maikovisky/open5gs:ubuntu-latest  
@@ -73,12 +74,12 @@ spec:
             capabilities:
               add: ["NET_ADMIN", "SYS_MODULE"]
           resources:
-            limits:
-              memory: "350Mi"
-              cpu: "100m"
             requests:
               memory: "250Mi"
-              cpu: "50m"
+              cpu: "1200m"
+            limits:
+              memory: "250Mi"
+              cpu: "1200m"
 
           volumeMounts:
             - name: open5gs-upf2-config
@@ -165,7 +166,7 @@ data:
           dev: ogstun
         - addr: 10.42.0.1/16
           dnn: slice02
-          dev: ogstun1       
+          dev: slice02       
     smf:
       pfcp:
         addr: open5gs-smf
@@ -188,15 +189,15 @@ data:
     fi
 
 
-    if grep "ogstun1" /proc/net/dev > /dev/null; then
-      echo "[WARNING] Net device ogstun1 already exists!"
-      ip addr add 10.42.0.1/16 dev ogstun1 || true
-      ip link set ogstun1 up
+    if grep "slice02" /proc/net/dev > /dev/null; then
+      echo "[WARNING] Net device slice02 already exists!"
+      ip addr add 10.42.0.1/16 dev slice02 || true
+      ip link set slice02 up
     else 
-      echo "[INFO] Create device ogstun1 !"
-      ip tuntap add name ogstun1 mode tun
-      ip addr add 10.42.0.1/16 dev ogstun1 || true
-      ip link set ogstun1 up
+      echo "[INFO] Create device slice02 !"
+      ip tuntap add name slice02 mode tun
+      ip addr add 10.42.0.1/16 dev slice02 || true
+      ip link set slice02 up
     fi
 
     echo "[INFO] Config sysctl"

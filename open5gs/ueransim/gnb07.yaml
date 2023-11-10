@@ -1,0 +1,152 @@
+apiVersion: apps/v1 # for versions before 1.9.0 use apps/v1beta2
+kind: Deployment
+metadata:
+  name: open5gs-ueransim07
+  namespace: open5gs
+  labels:
+    epc-mode: ueransim07
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      epc-mode: ueransim07
+  template:
+    metadata:    
+      labels:
+        epc-mode: ueransim07
+        app: ueransim07
+    spec:  
+      nodeSelector:
+        #nodetype: server
+        #kubernetes.io/arch: amd64
+        #kubernetes.io/hostname: erasure
+        #kubernetes.io/hostname: petshopboys
+        kubernetes.io/hostname: mac-porvir-04
+      initContainers:
+        - name: init-gnb
+          image: maikovisky/ueransim:3.2.6
+          imagePullPolicy: Always
+          command: ["/bin/gnbinit"]
+          volumeMounts:
+            - name: open5gs-ueransim-gnbinit
+              mountPath: /bin/gnbinit
+              subPath: "gnbinit"
+
+            - name: open5gs-ueransim-gnb-config2
+              mountPath: /etc/ueransim/open5gs-gnb-base.yaml
+              subPath: "open5gs-gnb-base.yaml"
+
+            - name: etc-tmp
+              mountPath: /etc/ueransim/tmp
+
+      containers:
+        # - name: tcpdump-ueransim
+        #   image: maikovisky/open5gs:ubuntu-latest    
+        #   command: ["/bin/tcpdump", "-i", "eth0", "-s", "65535", "-G", "3600", "-w", "/var/tcpdump/ueransim-%F_%H%M.pcap"]
+        #   volumeMounts:
+        #     - name: "dev-net-tun"
+        #       mountPath: "/dev/net/tun" # Needed for VPN
+        #     - name: tcpdump-persistent-storage
+        #       mountPath: /var/tcpdump
+        
+        - name: ueransim-gnb
+          image: maikovisky/ueransim:3.2.6  
+          securityContext:
+            privileged: true
+            capabilities:
+              add: ["NET_ADMIN", "SYS_MODULE"]
+                      
+          volumeMounts:
+            - name: "dev-net-tun"
+              mountPath: "/dev/net/tun" # Needed for VPN
+
+            - name: open5gs-ueransim-gnb-config2
+              mountPath: /etc/ueransim/open5gs-gnb-base.yaml
+              subPath: "open5gs-gnb-base.yaml"
+
+            - name: etc-tmp
+              mountPath: /etc/ueransim/tmp
+
+          command: ["nr-gnb", "-c", "/etc/ueransim/tmp/open5gs-gnb-01.yaml"]
+
+        
+        # - name: metrics-ueransim
+        #   image: maikovisky/ueransim:3.2.6
+        #   command: ["/bin/prometheus-node-exporter"]
+        #   volumeMounts:
+        #     - name: "dev-net-tun"
+        #       mountPath: "/dev/net/tun" # Needed for VPN
+
+        # - name: tcpdump-ueramsim
+        #   image: maikovisky/open5gs:ubuntu-latest    
+        #   command: ["/bin/tcpdump", "-i", "eth0", "-s", "65535", "-G", "3600", "-w", "/var/tcpdump/ueramsim-%F_%H%M.pcap"]
+        #   volumeMounts:
+        #     - name: "dev-net-tun"
+        #       mountPath: "/dev/net/tun" # Needed for VPN
+        #     - name: tcpdump-persistent-storage
+        #       mountPath: /var/tcpdump
+      volumes:
+        - name: open5gs-ueransim-gnb-config2
+          configMap:
+            name: open5gs-ueransim-gnb-config2
+
+        - name: open5gs-ueransim-gnbinit
+          configMap:
+            name: open5gs-ueransim-gnbinit
+            defaultMode: 0777
+
+        - name: dev-net-tun
+          hostPath:
+            path: /dev/net/tun
+
+        - name: tcpdump-persistent-storage
+          persistentVolumeClaim:
+            claimName: open5gs-tcpdump-pv-claim
+
+        - name: etc-tmp
+          emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: open5gs-ueransim07
+  namespace: open5gs
+  labels:
+    epc-mode: ueransim07
+spec:
+  selector:
+    epc-mode: ueransim07
+  ports:
+    - name: http2-open5gs-ueransim07-80
+      protocol: TCP
+      port: 80
+    - name: open5gs-ueransim07-tcp-3000
+      protocol: TCP
+      port: 3000
+    # - name: http2-open5gs-ueransim07-9100
+    #   protocol: TCP
+    #   port: 9100
+    - name: open5gs-ueransim07-udp-2152
+      protocol: UDP
+      port: 2152
+    - name: open5gs-ueransim07-udp-36743
+      protocol: UDP
+      port: 36743
+    - name: open5gs-ueransim07-udp-4997
+      protocol: UDP
+      port: 4997
+# ---
+# apiVersion: monitoring.coreos.com/v1
+# kind: ServiceMonitor
+# metadata:
+#   name: open5gs-ueransim07
+#   namespace: open5gs
+#   labels:
+#     epc-mode: ueransim07
+# spec:
+#   selector:
+#     matchLabels:
+#       epc-mode: ueransim07
+#   endpoints:
+#   - interval: 5s
+#     port: open5gs-ueransim07-tcp-9100

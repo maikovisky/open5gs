@@ -1,0 +1,44 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: open5gs-ue-video-hd
+  namespace: open5gs
+  labels:
+    epc-mode: ueransim
+  defaultMode: 0777
+data:
+  testing: |
+    #!/bin/bash 
+    set -e
+
+    sleep "15s"
+
+    COUNTER=0
+    while [ -z  $(ifconfig | awk  '/uesimtun/{print $1; exit}') ] 
+    do
+      let COUNTER=COUNTER+1
+      #echo -ne "Waiting create tunnel interface. Attempt $COUNTER"\\r
+      echo "Waiting create tunnel interface. Attempt $COUNTER"
+      sleep "5s"
+    done
+
+    uesimtun0=$(ifconfig uesimtun0 | awk '/inet / {print $6}')
+    uesimtun1=$(ifconfig uesimtun1 | awk '/inet / {print $6}')
+    if [ $(expr "$uesimtun0" : "10\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*$") ]
+    then
+      echo "Using interface uesimtun0 with IP $uesimtun0"
+      uesimtun=$uesimtun0
+    else
+      echo "Using interface uesimtun1 with IP $uesimtun1"
+      uesimtun=$uesimtun1
+    fi
+
+    while :
+    do
+      #t=$(($RANDOM % 600))
+      t=300
+      #iperf -B $uesimtun -c open5gs-iperf0$SLICE -i 30 -b 3Mb -t $t -u -y -R --trip-times
+      iperf -B $uesimtun -c open5gs-iperf08 -f A -i 15 -t $t --trip-times -u --isochronous=30:3m,1 -e
+      #echo "Waiting 180s for new testing"
+      #sleep "180s"
+    done

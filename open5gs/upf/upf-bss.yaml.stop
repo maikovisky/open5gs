@@ -1,0 +1,31 @@
+apiVersion: apps/v1 # for versions before 1.9.0 use apps/v1beta2
+kind: Deployment
+metadata:
+  name: open5gs-upf-epc-bess
+  namespace: open5gs
+  labels:
+    epc-mode: upf-epc-bess
+    #promotheus: open5gs-monitor
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      epc-mode: upf-epc-bess
+  template:
+    metadata:  
+      labels:
+        epc-mode: upf-epc-bess
+    spec:  
+      nodeSelector:
+        kubernetes.io/arch: amd64
+        kubernetes.io/hostname: molejo
+      containers:
+        - name: upf-epc-bess
+          image: omecproject/upf-epc-bess:master-latest
+          securityContext:
+            privileged: true
+            capabilities:
+              add: ["NET_ADMIN", "SYS_MODULE"]
+          command: ["sleep", "1d"]
+
+          

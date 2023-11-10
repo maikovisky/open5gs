@@ -43,6 +43,7 @@ metadata:
     version: 2.6.4
     app: open5gs-bsf
 spec:
+  replicas: 1
   selector:
     matchLabels:
       epc-mode: bsf

@@ -41,6 +41,22 @@ data:
           dnn: slice03
         - addr: 10.44.0.1/16
           dnn: slice04
+        - addr: 10.45.0.1/16
+          dnn: slice05
+        - addr: 10.46.0.1/16
+          dnn: slice06
+        - addr: 10.47.0.1/16
+          dnn: slice07
+        - addr: 10.48.0.1/16
+          dnn: slice08
+        - addr: 10.49.0.1/16
+          dnn: slice09
+        - addr: 10.50.0.1/16
+          dnn: slice10
+        - addr: 10.51.0.1/16
+          dnn: slice11
+        - addr: 10.52.0.1/16
+          dnn: slice12
       dns:
         - 8.8.8.8
         - 8.8.4.4
@@ -60,7 +76,7 @@ data:
             dnn:
               - slice01
           - sst: 2
-            sd: 000002
+            sd: 2
             dnn:
               - slice02
           - sst: 3
@@ -71,8 +87,40 @@ data:
             sd: 000004
             dnn:
               - slice04
-
-
+        - s_nssai:
+          - sst: 5
+            sd: 000005
+            dnn:
+              - slice05
+          - sst: 6
+            sd: 000006
+            dnn:
+              - slice06
+          - sst: 7
+            sd: 000007
+            dnn:
+              - slice07
+          - sst: 8
+            sd: 000008
+            dnn:
+              - slice08
+        # - s_nssai:
+        #   - sst: 9
+        #     sd: 000009
+        #     dnn:
+        #       - slice09
+        #   - sst: 10
+        #     sd: 000010
+        #     dnn:
+        #       - slice10
+        #   - sst: 11
+        #     sd: 000011
+        #     dnn:
+        #       - slice11
+        #   - sst: 12
+        #     sd: 000012
+        #     dnn:
+        #       - slice12
         
     nrf:
       sbi:
@@ -94,6 +142,22 @@ data:
           dnn: [internet, slice03]
         - addr: open5gs-upf-4
           dnn: [internet, slice04]
+        - addr: open5gs-upf-5
+          dnn: [internet, slice05]
+        - addr: open5gs-upf-6
+          dnn: [internet, slice06]
+        - addr: open5gs-upf-7
+          dnn: [internet, slice07]
+        - addr: open5gs-upf-8
+          dnn: [internet, slice08]
+        - addr: open5gs-upf-9
+          dnn: [internet, slice09]
+        - addr: open5gs-upf-10
+          dnn: [internet, slice10]
+        - addr: open5gs-upf-11
+          dnn: [internet, slice11]
+        - addr: open5gs-upf-12
+          dnn: [internet, slice12]
 
     metrics:
         addr: 0.0.0.0

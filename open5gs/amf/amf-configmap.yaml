@@ -32,6 +32,7 @@ data:
 
         ngap: 
           - dev: eth0
+            port: 38412
 
         guami:
           - plmn_id:
@@ -61,6 +62,32 @@ data:
               - sst: 4
                 sd: 000004
 
+          - plmn_id:
+              mcc: 999
+              mnc: 70
+            s_nssai:
+              - sst: 5
+                sd: 000005
+              - sst: 6
+                sd: 000006
+              - sst: 7
+                sd: 000007
+              - sst: 8
+                sd: 000008
+
+          # - plmn_id:
+          #     mcc: 999
+          #     mnc: 70
+          #   s_nssai:
+          #     - sst: 9
+          #       sd: 000009
+          #     - sst: 10
+          #       sd: 000010
+          #     - sst: 11
+          #       sd: 000011
+          #     - sst: 12
+          #       sd: 000012
+
         security:
             integrity_order : [ NIA2, NIA1, NIA0 ]
             ciphering_order : [ NEA0, NEA1, NEA2 ]
@@ -81,6 +108,7 @@ data:
     #     - name: open5gs-scp
         
     usrsctp:
+
     time:
       t3512:
         value: 540     # 9 mintues * 60 = 540 seconds
