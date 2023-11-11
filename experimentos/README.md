@@ -100,3 +100,29 @@ Este experimento é composto por 4 slices, um UPF para cada slice, sendo que tod
 - [Snapshot raintank](https://snapshots.raintank.io/dashboard/snapshot/0NB01YiXKN5ucm71tFOdiI9pLLmrPI1C)
 - [Snapshot local](http://localhost:3000/dashboard/snapshot/J1H7PIhXANeCujItO6XqTuexcxohXoy6)
 - [Github - Tag  vE02](https://github.com/maikovisky/open5gs/tree/vE02)
+
+
+## Experimento 03 - Limitando recursos 
+
+- Mesmo script do experimento 01, mas com limitação de recursos
+  - **UPF-1**
+    - **Requests**: CPU 1250m, MEM: 250m
+    - **Limits**: CPU 1250m, MEM: 250m
+  - **UPF-2**
+    - **Requests**: not defined
+    - **Limits**: not defined
+  - **UPF-3**
+    - **Requests**: CPU 1200m, MEM: 250m
+    - **Limits**: CPU 1200m, MEM: 250m
+  - **UPF-4**
+    - **Requests**: CPU 1200m, MEM: 250m
+    - **Limits**: CPU 1200m, MEM: 250m
+
+
+### Conclusões
+
+### Links:
+- [Link Graphana](http://localhost:4000/d/9ZtOvTcVz/open-5g?orgId=1&var-datasource=prometheus&var-cluster=&var-namespace=open5gs&var-resolution=1h&var-interval=%24__auto_interval_interval&var-workload=open5gs-upf-1&var-workload=open5gs-upf-2&var-workload=open5gs-upf-3&var-workload=open5gs-upf-4&var-ues=open5gs-ue01&var-ues=open5gs-ue02&var-ues=open5gs-ue03&var-ues=open5gs-ue04&from=1699677338054&to=1699684616033)
+- [Snapshot raintank](https://snapshots.raintank.io/dashboard/snapshot/8cUAUtzoAwCiB5JKI2L5jNJMQUe5yKJi)
+- [Snapshot local](http://localhost:3000/dashboard/snapshot/77nqlMcqNjIkWcJUWnFXInyRFcWTd03y)
+- [Github - Tag  vE03](https://github.com/maikovisky/open5gs/tree/vE3)

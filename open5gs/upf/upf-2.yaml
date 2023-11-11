@@ -73,13 +73,13 @@ spec:
             privileged: true
             capabilities:
               add: ["NET_ADMIN", "SYS_MODULE"]
-          resources:
-            requests:
-              memory: "250Mi"
-              cpu: "1200m"
-            limits:
-              memory: "250Mi"
-              cpu: "1200m"
+          # resources:
+          #   requests:
+          #     memory: "250Mi"
+          #     cpu: "1200m"
+          #   limits:
+          #     memory: "250Mi"
+          #     cpu: "1200m"
 
           volumeMounts:
             - name: open5gs-upf2-config

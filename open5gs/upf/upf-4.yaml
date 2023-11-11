@@ -81,13 +81,13 @@ spec:
             restartPolicy: NotRequired
           - resourceName: memory
             restartPolicy: NotRequired
-          # resources:
-          #   requests:
-          #     memory: "150Mi"
-          #     cpu: "250m"
-          #   limits:
-          #     memory: "150Mi"
-          #     cpu: "250m"
+          resources:
+            requests:
+              memory: "150Mi"
+              cpu: "1200m"
+            limits:
+              memory: "150Mi"
+              cpu: "1200m"
           volumeMounts:
             - name: open5gs-upf4-config
               mountPath: /open5gs/config-map/upf.yaml
