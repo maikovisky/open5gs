@@ -10,12 +10,13 @@ function annotation {
 
 }
 
+upf2=$(kubectl get pod | grep open5gs-upf-2 | awk '{print $1}')
 upf4=$(kubectl get pod | grep open5gs-upf-4 | awk '{print $1}')
 
 # Removendo restrições de banda
 kubectl annotate pod $upf4 kubernetes.io/egress-bandwidth-
 
-varText="Inicio do experimento 02 - Slice,CPU,MEM: [UPF1,1250,250] [UPF2,null,null] [UPF3,1200,250] [UPF4,1200,250] "
+varText="Inicio do experimento 04 - Slice,CPU,MEM: [UPF1,1250,250] [UPF2,null,null] [UPF3,1200,250] [UPF4,1200,250] "
 annotation
 sleep 5s
 
@@ -41,7 +42,7 @@ do
     varText="Change bandwith: $num M"
     annotation
     echo "Bandwith: $num"
-    kubectl annotate pod $upf4 kubernetes.io/egress-bandwidth=${num}M --overwrite
+    kubectl annotate pod $upf2 kubernetes.io/egress-bandwidth=${num}M --overwrite
     sleep 495s 
 done 
 
