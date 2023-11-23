@@ -6,7 +6,7 @@ metadata:
   labels:
     epc-mode: ueransim05
 spec:
-  replicas: 1
+  replicas: 0
   selector:
     matchLabels:
       epc-mode: ueransim05

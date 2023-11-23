@@ -36,5 +36,5 @@ data:
     while :
     do
       cat /proc/cpuinfo | mosquitto_pub -h open5gs-mqtt -t open5gs/testing -A $uesimtun -d -s
-      sleep 0.1
+      sleep 0.05
     done

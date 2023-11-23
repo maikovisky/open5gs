@@ -28,10 +28,10 @@ kubectl scale --replicas=1 deployment open5gs-ueransim01
 kubectl scale --replicas=1 deployment open5gs-ueransim02
 kubectl scale --replicas=1 deployment open5gs-ueransim03
 kubectl scale --replicas=1 deployment open5gs-ueransim04
-kubectl scale --replicas=1 deployment open5gs-ueransim05
-kubectl scale --replicas=1 deployment open5gs-ueransim06
-kubectl scale --replicas=1 deployment open5gs-ueransim07
-kubectl scale --replicas=1 deployment open5gs-ueransim08
+# kubectl scale --replicas=1 deployment open5gs-ueransim05
+# kubectl scale --replicas=1 deployment open5gs-ueransim06
+# kubectl scale --replicas=1 deployment open5gs-ueransim07
+# kubectl scale --replicas=1 deployment open5gs-ueransim08
 
 
 

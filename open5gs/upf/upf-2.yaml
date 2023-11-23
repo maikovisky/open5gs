@@ -76,11 +76,15 @@ spec:
           # resources:
           #   requests:
           #     memory: "250Mi"
-          #     cpu: "1200m"
+          #     cpu: "900m"
           #   limits:
           #     memory: "250Mi"
-          #     cpu: "1200m"
-
+          #     cpu: "900m"
+          resizePolicy:
+          - resourceName: cpu
+            restartPolicy: NotRequired
+          - resourceName: memory
+            restartPolicy: NotRequired
           volumeMounts:
             - name: open5gs-upf2-config
               mountPath: /open5gs/config-map/upf.yaml

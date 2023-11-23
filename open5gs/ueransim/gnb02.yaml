@@ -21,7 +21,7 @@ spec:
         #kubernetes.io/arch: amd64
         #kubernetes.io/hostname: erasure
         #kubernetes.io/hostname: kiss
-        kubernetes.io/hostname: mac-porvir-03
+        kubernetes.io/hostname: mac-porvir-04
       initContainers:
         - name: init-gnb
           image: maikovisky/ueransim:3.2.6

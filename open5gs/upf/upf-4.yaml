@@ -76,18 +76,18 @@ spec:
             privileged: true
             capabilities:
               add: ["NET_ADMIN", "SYS_MODULE"]
+          # resources:
+          #   requests:
+          #     memory: "150Mi"
+          #     cpu: "900m"
+          #   limits:
+          #     memory: "150Mi"
+          #     cpu: "900m"
           resizePolicy:
           - resourceName: cpu
             restartPolicy: NotRequired
           - resourceName: memory
             restartPolicy: NotRequired
-          resources:
-            requests:
-              memory: "150Mi"
-              cpu: "1200m"
-            limits:
-              memory: "150Mi"
-              cpu: "1200m"
           volumeMounts:
             - name: open5gs-upf4-config
               mountPath: /open5gs/config-map/upf.yaml

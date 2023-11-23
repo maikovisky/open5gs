@@ -51,7 +51,7 @@ metadata:
     epc-mode: pcf
     promotheus: open5gs-monitor
 spec:
-  replicas: 1
+  replicas: 0
   selector:
     matchLabels:
       epc-mode: iperf08
