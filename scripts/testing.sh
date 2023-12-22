@@ -16,9 +16,9 @@ upf4=$(kubectl get pod | grep open5gs-upf-4 | awk '{print $1}')
 # Removendo restrições de banda
 kubectl annotate pod $upf4 kubernetes.io/egress-bandwidth-
 
-varText="Inicio do experimento 04 - Slice,CPU,MEM: [UPF1,900,250] [UPF2,900,250] [UPF3,900,250] [UPF4,900,250] "
+varText="Inicio do experimento 04 - Slice,CPU,MEM: [UPF1,nd,nd] [UPF2,nd,nd] [UPF3,nd,nd] [UPF4,nd,nd] "
 annotation
-sleep 5s
+sleep 15s
 
 #for num in {1,2,3,4,5,6,7,8,9,10,15,20,25,30}
 for num in {1,5,10,15,20,25,30}
@@ -26,7 +26,7 @@ do
     varText="Numero de UEs: $num"
     annotation
     echo "UEs: $num"
-    kubectl scale --replicas=1 deployment open5gs-ue01
+    kubectl scale --replicas=4 deployment open5gs-ue01
     kubectl scale --replicas=$num deployment open5gs-ue02
     kubectl scale --replicas=$num deployment open5gs-ue03
     kubectl scale --replicas=$num deployment open5gs-ue04

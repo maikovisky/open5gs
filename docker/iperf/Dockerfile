@@ -12,6 +12,7 @@ RUN apt update && \
         mosquitto \
         iputils-ping \
         dnsutils \
+	netperf \
         vim
 
 WORKDIR /

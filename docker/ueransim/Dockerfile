@@ -14,6 +14,7 @@ RUN apt update && \
 	iproute2 \
 	iptables \
 	iperf \
+	netperf \
         python3-pip \
         mosquitto-clients \
 	iputils-ping \
@@ -21,16 +22,15 @@ RUN apt update && \
         jq \
 	wget \
         vim && \
-    wget -qO - https://www.mongodb.org/static/pgp/server-6.0.asc | apt-key add - && \
-    echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu jammy/mongodb-org/6.0 multiverse" | tee /etc/apt/sources.list.d/mongodb-org-6.0.list && \
-    apt update && \
-    TZ="America/Sao_Paulo" apt -y install mongodb-org && \  
+    #wget -qO - https://www.mongodb.org/static/pgp/server-6.0.asc | apt-key add - && \
+    #echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu jammy/mongodb-org/6.0 multiverse" | tee /etc/apt/sources.list.d/mongodb-org-6.0.list && \
+    #apt update && \
+    #TZ="America/Sao_Paulo" apt -y install mongodb-org && \  
     pip install pymongo psutil pydantic
    
 
 FROM base as builder
 RUN apt install -y  \ 
-        cargo \
         build-essential \
         git \
 	gcc \
@@ -38,15 +38,16 @@ RUN apt install -y  \
 	cmake \
 	libsctp-dev && \
     	git clone https://github.com/aligungr/UERANSIM && \
-    	cd UERANSIM && make && chmod a+x build/nr-binder && \
-        cd .. && \
-        git clone https://github.com/opensource-3d-p/rperf.git && \
-        cd rperf && \
-        cargo build --release && \
-        cd .. && \
-        git clone https://github.com/esnet/iperf.git && \
-        cd iperf && \
-        ./configure -bindir=/bin --enable-static-bin ; make; make install
+	cd UERANSIM && \
+	git checkout v3.1.9 && make && chmod a+x build/nr-binder && \
+        cd .. 
+        #git clone https://github.com/opensource-3d-p/rperf.git && \
+        #cd rperf && \
+        #cargo build --release && \
+        #cd .. && \
+        #git clone https://github.com/esnet/iperf.git && \
+        #cd iperf && \
+        #./configure -bindir=/bin --enable-static-bin ; make; make install
 
 WORKDIR /
 
