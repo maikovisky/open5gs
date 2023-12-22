@@ -16,40 +16,17 @@ spec:
       targetPort: 5201
     - name: o5g-iperf01-udp-5201
       protocol: UDP
-      port: 5201
-      targetPort: 5201
+      port: 5202
+      targetPort: 5202
 
     - name: o5g-iperf01-5001
       protocol: TCP
       port: 5001
       targetPort: 5001
-    - name: o5g-iperf01-udp-5001
+    - name: o5g-iperf01-udp-5002
       protocol: UDP
-      port: 5001
-      targetPort: 5001
-
-    - name: o5g-netiperf01-5301
-      protocol: TCP
-      port: 5301
-      targetPort: 5301
-    - name: o5g-netiperf01-udp-5301
-      protocol: UDP
-      port: 5301
-      targetPort: 5301
-
-    - name: o5g-rperf04-5199
-      protocol: TCP
-      port: 5199
-      targetPort: 5199
-    - name: o5g-rperf-udp-5199
-      protocol: UDP
-      port: 5199
-      targetPort: 5199
-    # - name: o5g-iperf01-9100
-    #   protocol: TCP
-    #   port: 9100
-    #   targetPort: 9100
-
+      port: 5002
+      targetPort: 5002
 ---    
 apiVersion: apps/v1 # for versions before 1.9.0 use apps/v1beta2
 kind: Deployment
@@ -100,39 +77,23 @@ spec:
           ports:
             - containerPort: 5001
               protocol: TCP              
-            - containerPort: 5001
-              protocol: UDP
           securityContext:
             privileged: true
             capabilities:
               add: ["NET_ADMIN", "SYS_MODULE"]  
           command: ["/bin/iperf", "-s", "--histograms"]
 
-        # - name: netperf
-        #   image: maikovisky/iperf:latest  
-        #   ports:
-        #     - containerPort: 5301
-        #       protocol: TCP              
-        #     - containerPort: 5301
-        #       protocol: UDP
-        #   securityContext:
-        #     privileged: true
-        #     capabilities:
-        #       add: ["NET_ADMIN", "SYS_MODULE"]  
-        #   command: ["/usr/bin/netperf", "-p", "5301", "-D"]
+        - name: iperf-udp
+          image: maikovisky/iperf:latest  
+          ports:       
+            - containerPort: 5002
+              protocol: UDP
+          securityContext:
+            privileged: true
+            capabilities:
+              add: ["NET_ADMIN", "SYS_MODULE"]  
+          command: ["/bin/iperf", "-s", "-i", "--udp-histogram", "-u", "-p", "5002"]
 
-        # - name: rperf
-        #   image: maikovisky/iperf:latest  
-        #   ports:
-        #     - containerPort: 5199
-        #       name: o5g-rperf-5199
-        #     - containerPort: 5199
-        #       name: o5g-rpf-u-5199
-        #   securityContext:
-        #     privileged: true
-        #     capabilities:
-        #       add: ["NET_ADMIN", "SYS_MODULE"]  
-        #   command: ["/bin/rperf", "-s"]
         
         # - name: metrics-iperf
         #   image: maikovisky/iperf:latest  

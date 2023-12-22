@@ -23,19 +23,11 @@ spec:
       protocol: TCP
       port: 5001
       targetPort: 5001
-    - name: o5g-iperf02-udp-5001
+    - name: o5g-iperf02-udp-5002
       protocol: UDP
-      port: 5001
-      targetPort: 5001
+      port: 5002
+      targetPort: 5002
 
-    - name: o5g-rperf04-5199
-      protocol: TCP
-      port: 5199
-      targetPort: 5199
-    - name: o5g-rperf-udp-5199
-      protocol: UDP
-      port: 5199
-      targetPort: 5199
     # - name: o5g-iperf02-9100
     #   protocol: TCP
     #   port: 9100
@@ -91,14 +83,22 @@ spec:
           ports:
             - containerPort: 5001
               protocol: TCP              
-            - containerPort: 5001
-              protocol: UDP
           securityContext:
             privileged: true
             capabilities:
               add: ["NET_ADMIN", "SYS_MODULE"]  
           command: ["/bin/iperf", "-s", "--histograms"]
 
+        - name: iperf-udp
+          image: maikovisky/iperf:latest  
+          ports:       
+            - containerPort: 5002
+              protocol: UDP
+          securityContext:
+            privileged: true
+            capabilities:
+              add: ["NET_ADMIN", "SYS_MODULE"]  
+          command: ["/bin/iperf", "-s", "-i", "--udp-histogram", "-u", "-p", "5002"]
         # - name: rperf
         #   image: maikovisky/iperf:latest  
         #   ports:
