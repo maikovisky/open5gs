@@ -49,8 +49,8 @@ spec:
       nodeSelector:
         #nodetype: server
         #kubernetes.io/arch: amd64
-        #kubernetes.io/hostname: molejo
-        kubernetes.io/hostname: mac-porvir-04
+        # kubernetes.io/hostname: mac-porvir-04
+        kubernetes.io/hostname: brix-porvir-04
       initContainers:
         - name: init-ue
           image: maikovisky/ueransim:3.2.6
@@ -206,7 +206,7 @@ data:
 
 
     [[inputs.ping]]
-      urls = ["10.245.24.19", "8.8.8.8"]
+      urls = ["10.245.24.191", "8.8.8.8"]
       interface = "uesimtun0"
 
 

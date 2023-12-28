@@ -50,7 +50,8 @@ spec:
         #nodetype: server
         #kubernetes.io/arch: amd64
         #kubernetes.io/hostname: molejo
-        kubernetes.io/hostname: mac-porvir-05
+        # kubernetes.io/hostname: mac-porvir-05
+        kubernetes.io/hostname: brix-porvir-05
       initContainers:
         - name: init-ue
           image: maikovisky/ueransim:3.2.6
@@ -204,7 +205,7 @@ data:
 
 
     [[inputs.ping]]
-      urls = ["10.245.25.92", "8.8.8.8"]
+      urls = ["10.245.25.134", "8.8.8.8"]
       interface = "uesimtun0"
 
 

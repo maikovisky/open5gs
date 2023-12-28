@@ -54,7 +54,8 @@ spec:
       nodeSelector:
         #kubernetes.io/arch: amd64
         #kubernetes.io/hostname: erasure
-        kubernetes.io/hostname: mac-porvir-01
+        # kubernetes.io/hostname: mac-porvir-01
+        kubernetes.io/hostname: brix-porvir-01
       containers:
         # - name: tcpdump-upf2
         #   image: maikovisky/open5gs:ubuntu-latest  
@@ -73,18 +74,13 @@ spec:
             privileged: true
             capabilities:
               add: ["NET_ADMIN", "SYS_MODULE"]
-          # resources:
-          #   requests:
-          #     memory: "250Mi"
-          #     cpu: "900m"
-          #   limits:
-          #     memory: "250Mi"
-          #     cpu: "900m"
-          resizePolicy:
-          - resourceName: cpu
-            restartPolicy: NotRequired
-          - resourceName: memory
-            restartPolicy: NotRequired
+          resources:
+            requests:
+              memory: "0Mi"
+              cpu: "0m"
+            limits:
+              memory: "0Mi"
+              cpu: "0m"
           volumeMounts:
             - name: open5gs-upf2-config
               mountPath: /open5gs/config-map/upf.yaml
