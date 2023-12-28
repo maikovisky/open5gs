@@ -53,9 +53,10 @@ spec:
         epc-mode: iperf04
     spec:  
       nodeSelector:
+        nodetype: server      
         #kubernetes.io/arch: amd64
         #kubernetes.io/hostname: acdc
-        kubernetes.io/hostname: mac-porvir-05
+        #kubernetes.io/hostname: mac-porvir-05
         #kubernetes.io/hostname: erasure
       containers:       
         # - name: tcpdump-iperf

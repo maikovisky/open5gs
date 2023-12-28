@@ -53,9 +53,10 @@ spec:
         epc-mode: iperf03
     spec:  
       nodeSelector:
+        nodetype: server
         #kubernetes.io/arch: amd64
         #kubernetes.io/hostname: whitesnake
-        kubernetes.io/hostname: mac-porvir-04
+        #kubernetes.io/hostname: mac-porvir-04
         #kubernetes.io/hostname: erasure
       containers:       
         # - name: tcpdump-iperf
