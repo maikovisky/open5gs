@@ -153,6 +153,7 @@ spec:
             capabilities:
               add: ["NET_ADMIN", "SYS_MODULE"]
           command: ["/bin/testing"]
+
           env:  
             - name: SLICE
               value: "1"

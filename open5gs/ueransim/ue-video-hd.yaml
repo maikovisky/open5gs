@@ -38,7 +38,8 @@ data:
       #t=$(($RANDOM % 600))
       t=300
       #iperf -B $uesimtun -c open5gs-iperf0$SLICE -i 30 -b 3Mb -t $t -u -y -R --trip-times
-      iperf -B $uesimtun -c open5gs-iperf08 -f A -i 15 -t $t --trip-times -u --isochronous=30:3m,1 -e
+      iperf -B $uesimtun -c open5gs-iperf0$SLICE -f A -i 15 -t $t --len 1370 --trip-times -u --isochronous=30:3m,1 -e -p 5002
+
       #echo "Waiting 180s for new testing"
       #sleep "180s"
     done
