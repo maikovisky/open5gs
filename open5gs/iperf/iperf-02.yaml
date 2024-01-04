@@ -51,9 +51,30 @@ spec:
     metadata:   
       labels:
         epc-mode: iperf02
+        app: iperf
     spec:  
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: prometheus
+                operator: In
+                values:
+                - k8s
+            topologyKey: kubernetes.io/hostname
+            namespaceSelector: {monitoring}
+          - labelSelector:
+              matchExpressions:
+              - key: app
+                operator: In
+                values:
+                - iperf
+            topologyKey: kubernetes.io/hostname
+             
       nodeSelector:
-        nodetype: server
+          kubernetes.io/arch: amd64
+          nodetype: server
         #kubernetes.io/arch: amd64
         #kubernetes.io/hostname: metallica
         #kubernetes.io/hostname: mac-porvir-04

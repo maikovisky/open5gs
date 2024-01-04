@@ -40,8 +40,9 @@ metadata:
   name: open5gs-iperf04
   namespace: open5gs
   labels:
-    epc-mode: pcf
+    epc-mode: iperf04
     promotheus: open5gs-monitor
+    app: iperf
 spec:
   replicas: 1
   selector:
@@ -51,9 +52,30 @@ spec:
     metadata:   
       labels:
         epc-mode: iperf04
+        app: iperf
     spec:  
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: prometheus
+                operator: In
+                values:
+                - k8s
+            topologyKey: kubernetes.io/hostname
+            namespaceSelector: {monitoring}
+          - labelSelector:
+              matchExpressions:
+              - key: app
+                operator: In
+                values:
+                - iperf
+            topologyKey: kubernetes.io/hostname
+             
       nodeSelector:
-        nodetype: server      
+          kubernetes.io/arch: amd64
+          nodetype: server     
         #kubernetes.io/arch: amd64
         #kubernetes.io/hostname: acdc
         #kubernetes.io/hostname: mac-porvir-05
