@@ -99,7 +99,32 @@
           },
           "unit": "ms"
         },
-        "overrides": []
+        "overrides": [
+          {
+            "__systemRef": "hideSeriesFrom",
+            "matcher": {
+              "id": "byNames",
+              "options": {
+                "mode": "exclude",
+                "names": [
+                  "open5gs-ue01 (10.245.2.232)"
+                ],
+                "prefix": "All except:",
+                "readOnly": true
+              }
+            },
+            "properties": [
+              {
+                "id": "custom.hideFrom",
+                "value": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": true
+                }
+              }
+            ]
+          }
+        ]
       },
       "gridPos": {
         "h": 9,
@@ -429,7 +454,7 @@
             "axisPlacement": "auto",
             "barAlignment": 0,
             "drawStyle": "line",
-            "fillOpacity": 3,
+            "fillOpacity": 10,
             "gradientMode": "none",
             "hideFrom": {
               "legend": false,
@@ -441,15 +466,15 @@
               "fill": "solid"
             },
             "lineWidth": 1,
-            "pointSize": 5,
+            "pointSize": 1,
             "scaleDistribution": {
               "type": "linear"
             },
-            "showPoints": "never",
+            "showPoints": "auto",
             "spanNulls": false,
             "stacking": {
               "group": "A",
-              "mode": "none"
+              "mode": "normal"
             },
             "thresholdsStyle": {
               "mode": "off"
@@ -457,7 +482,7 @@
           },
           "mappings": [],
           "thresholds": {
-            "mode": "absolute",
+            "mode": "percentage",
             "steps": [
               {
                 "color": "green",
@@ -471,7 +496,32 @@
           },
           "unit": "Bps"
         },
-        "overrides": []
+        "overrides": [
+          {
+            "__systemRef": "hideSeriesFrom",
+            "matcher": {
+              "id": "byNames",
+              "options": {
+                "mode": "exclude",
+                "names": [
+                  "open5gs-upf-1-67b984f4f6-wm9fb"
+                ],
+                "prefix": "All except:",
+                "readOnly": true
+              }
+            },
+            "properties": [
+              {
+                "id": "custom.hideFrom",
+                "value": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": true
+                }
+              }
+            ]
+          }
+        ]
       },
       "gridPos": {
         "h": 8,
@@ -480,6 +530,7 @@
         "y": 9
       },
       "id": 54,
+      "interval": "1m",
       "options": {
         "legend": {
           "calcs": [],
@@ -499,8 +550,12 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "(sum(irate(container_network_receive_bytes_total{cluster=\"$cluster\", namespace=\"$namespace\"}[$__rate_interval])\r\n* on (namespace,pod)\r\ngroup_left(workload,workload_type) namespace_workload_pod:kube_pod_owner:relabel{cluster=\"$cluster\", namespace=\"$namespace\", workload=~\"$workload\"}) by (pod))",
-          "legendFormat": "__auto",
+          "exemplar": false,
+          "expr": "(sum(irate(container_network_receive_bytes_total{job=\"kubelet\", metrics_path=\"/metrics/cadvisor\", cluster=\"$cluster\", namespace=\"$namespace\"}[$__rate_interval])\r\n* on (namespace,pod)\r\ngroup_left(workload,workload_type) namespace_workload_pod:kube_pod_owner:relabel{cluster=\"$cluster\", namespace=\"$namespace\", workload=~\"$workload\"}) by (pod))",
+          "format": "time_series",
+          "instant": false,
+          "interval": "",
+          "legendFormat": "{{pod}}",
           "range": true,
           "refId": "A"
         }
@@ -525,7 +580,7 @@
             "axisPlacement": "auto",
             "barAlignment": 0,
             "drawStyle": "line",
-            "fillOpacity": 2,
+            "fillOpacity": 10,
             "gradientMode": "none",
             "hideFrom": {
               "legend": false,
@@ -572,7 +627,7 @@
               "options": {
                 "mode": "exclude",
                 "names": [
-                  "open5gs-upf-1-8587fb6994-bmj9k"
+                  "open5gs-upf-1-67b984f4f6-wm9fb"
                 ],
                 "prefix": "All except:",
                 "readOnly": true
@@ -598,6 +653,7 @@
         "y": 9
       },
       "id": 55,
+      "interval": "1m",
       "options": {
         "legend": {
           "calcs": [],
@@ -617,7 +673,7 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "(sum(irate(container_network_transmit_bytes_total{cluster=\"$cluster\", namespace=\"$namespace\"}[$__rate_interval])\r\n* on (namespace,pod)\r\ngroup_left(workload) namespace_workload_pod:kube_pod_owner:relabel{cluster=\"$cluster\", namespace=\"$namespace\", workload=~\"$workload\"}) by (pod))",
+          "expr": "(sum(irate(container_network_transmit_bytes_total{job=\"kubelet\", metrics_path=\"/metrics/cadvisor\", cluster=\"$cluster\", namespace=\"$namespace\"}[$__rate_interval])\r\n* on (namespace,pod)\r\ngroup_left(workload) namespace_workload_pod:kube_pod_owner:relabel{cluster=\"$cluster\", namespace=\"$namespace\", workload=~\"$workload\"}) by (pod))",
           "legendFormat": "__auto",
           "range": true,
           "refId": "A"
@@ -806,7 +862,32 @@
           },
           "unit": "decbytes"
         },
-        "overrides": []
+        "overrides": [
+          {
+            "__systemRef": "hideSeriesFrom",
+            "matcher": {
+              "id": "byNames",
+              "options": {
+                "mode": "exclude",
+                "names": [
+                  "open5gs-upf-1"
+                ],
+                "prefix": "All except:",
+                "readOnly": true
+              }
+            },
+            "properties": [
+              {
+                "id": "custom.hideFrom",
+                "value": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": true
+                }
+              }
+            ]
+          }
+        ]
       },
       "gridPos": {
         "h": 8,
@@ -2863,10 +2944,9 @@
       },
       {
         "current": {
-          "isNone": true,
           "selected": false,
-          "text": "None",
-          "value": ""
+          "text": "open5gs",
+          "value": "open5gs"
         },
         "datasource": {
           "type": "prometheus",
@@ -2894,14 +2974,14 @@
         "auto_min": "10s",
         "current": {
           "selected": false,
-          "text": "1h",
-          "value": "1h"
+          "text": "30s",
+          "value": "30s"
         },
         "hide": 0,
         "name": "resolution",
         "options": [
           {
-            "selected": false,
+            "selected": true,
             "text": "30s",
             "value": "30s"
           },
@@ -2911,7 +2991,7 @@
             "value": "5m"
           },
           {
-            "selected": true,
+            "selected": false,
             "text": "1h",
             "value": "1h"
           }
@@ -2923,23 +3003,18 @@
         "type": "interval"
       },
       {
-        "auto": true,
+        "auto": false,
         "auto_count": 30,
         "auto_min": "10s",
         "current": {
           "selected": false,
-          "text": "auto",
-          "value": "$__auto_interval_interval"
+          "text": "5m",
+          "value": "5m"
         },
-        "hide": 0,
+        "hide": 1,
         "label": "Intervalo",
-        "name": "interval",
+        "name": "intervalo",
         "options": [
-          {
-            "selected": true,
-            "text": "auto",
-            "value": "$__auto_interval_interval"
-          },
           {
             "selected": false,
             "text": "1m",
@@ -2947,8 +3022,23 @@
           },
           {
             "selected": false,
+            "text": "2m",
+            "value": "2m"
+          },
+          {
+            "selected": true,
+            "text": "5m",
+            "value": "5m"
+          },
+          {
+            "selected": false,
             "text": "10m",
             "value": "10m"
+          },
+          {
+            "selected": false,
+            "text": "30m",
+            "value": "30m"
           },
           {
             "selected": false,
@@ -2962,18 +3052,8 @@
           },
           {
             "selected": false,
-            "text": "8h",
-            "value": "8h"
-          },
-          {
-            "selected": false,
             "text": "12h",
             "value": "12h"
-          },
-          {
-            "selected": false,
-            "text": "24h",
-            "value": "24h"
           },
           {
             "selected": false,
@@ -2982,11 +3062,21 @@
           },
           {
             "selected": false,
-            "text": "7f",
-            "value": "7f"
+            "text": "7d",
+            "value": "7d"
+          },
+          {
+            "selected": false,
+            "text": "14d",
+            "value": "14d"
+          },
+          {
+            "selected": false,
+            "text": "30d",
+            "value": "30d"
           }
         ],
-        "query": "1m,10m,1h,6h,8h,12h,24h,1d, 7f",
+        "query": "1m,2m,5m,10m,30m,1h,6h,12h,1d,7d,14d,30d",
         "queryValue": "",
         "refresh": 2,
         "skipUrlSync": false,
@@ -2994,10 +3084,9 @@
       },
       {
         "current": {
-          "isNone": true,
           "selected": false,
-          "text": "None",
-          "value": ""
+          "text": "open5gs-amf",
+          "value": "open5gs-amf"
         },
         "datasource": {
           "type": "prometheus",
@@ -3021,10 +3110,13 @@
       },
       {
         "current": {
-          "isNone": true,
-          "selected": false,
-          "text": "None",
-          "value": ""
+          "selected": true,
+          "text": [
+            "None"
+          ],
+          "value": [
+            ""
+          ]
         },
         "datasource": {
           "type": "prometheus",
@@ -3049,13 +3141,13 @@
     ]
   },
   "time": {
-    "from": "now-30m",
+    "from": "now-1h",
     "to": "now"
   },
   "timepicker": {},
-  "timezone": "browser",
+  "timezone": "",
   "title": "Open 5G",
   "uid": "9ZtOvTcVz",
-  "version": 98,
+  "version": 110,
   "weekStart": ""
 }
