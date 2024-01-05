@@ -88,9 +88,6 @@ spec:
         #   volumeMounts:
         #     - name: "dev-net-tun"
         #       mountPath: "/dev/net/tun" # Needed for VPN
-        #     - name: tcpdump-persistent-storage
-        #       mountPath: /var/tcpdump
-
 
         - name: main-ue
           image: maikovisky/ueransim:3.2.6  
@@ -192,10 +189,6 @@ spec:
         - name: etc-ue-tmp
           emptyDir: {}
 
-        - name: tcpdump-persistent-storage
-          persistentVolumeClaim:
-            claimName: open5gs-tcpdump-pv-claim
-
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -208,10 +201,10 @@ data:
       ## Address to listen on.
       listen = ":9100"
 
-
     [[inputs.ping]]
-      urls = ["10.245.21.240", "8.8.8.8"]
+      urls = ["10.245.0.160", "8.8.8.8"]
       interface = "uesimtun0"
+      percentiles = [25, 50, 95, 99]
 
 ---
 apiVersion: monitoring.coreos.com/v1
@@ -226,7 +219,7 @@ spec:
     matchLabels:
       epc-mode: ue01
   endpoints:
-  - interval: 10s
+  - interval: 15s
     port: http2-open5gs-ue01-9100
 
       

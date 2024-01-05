@@ -39,10 +39,21 @@ spec:
         # version: v2.6.1-26
 
     spec:  
+      affinity:
+        podAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 75
+              podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                  - key: app
+                    operator: In
+                    values:
+                    - open5gs-nrf
+                topologyKey: kubernetes.io/hostname
       nodeSelector:
         nodetype: server
         kubernetes.io/arch: amd64
-        #kubernetes.io/hostname: molejo
       containers:
         # - name: tcpdump-udr
         #   image: maikovisky/open5gs:ubuntu-latest    

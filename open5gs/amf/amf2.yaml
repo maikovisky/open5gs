@@ -58,8 +58,8 @@ spec:
               subPath: "amf.yaml"
             - name: "dev-net-tun"
               mountPath: "/dev/net/tun" # Needed for VPN
-            - name: tcpdump-persistent-storage
-              mountPath: /var/tcpdump
+            # - name: tcpdump-persistent-storage
+            #   mountPath: /var/tcpdump
 
           command: ["open5gs-amfd",  "-c", "/open5gs/config-map/amf.yaml"]
           #command: ["sleep", "1d"]

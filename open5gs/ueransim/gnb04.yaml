@@ -14,7 +14,7 @@ spec:
     metadata:    
       labels:
         epc-mode: ueransim04
-        app: ueransim04
+        app: ueransim
     spec:  
       nodeSelector:
         #nodetype: server

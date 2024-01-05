@@ -5,6 +5,7 @@ metadata:
   namespace: open5gs
   labels:
     epc-mode: ueransim02
+    app: ueransim
 spec:
   replicas: 1
   selector:

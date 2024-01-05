@@ -26,10 +26,23 @@ spec:
         app: open5gs-amf
         version:  2.6.4
     spec:   
+      affinity:
+        podAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 75
+              podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                  - key: app
+                    operator: In
+                    values:
+                    - open5gs-nrf
+                topologyKey: kubernetes.io/hostname
+            
       nodeSelector:
         nodetype: server
         kubernetes.io/arch: amd64
-        kubernetes.io/hostname: erasure
+        #kubernetes.io/hostname: erasure
 
       containers:             
         - name: amf
@@ -59,8 +72,8 @@ spec:
               subPath: "amf.yaml"
             - name: "dev-net-tun"
               mountPath: "/dev/net/tun" # Needed for VPN
-            - name: tcpdump-persistent-storage
-              mountPath: /var/tcpdump
+            # - name: tcpdump-persistent-storage
+            #   mountPath: /var/tcpdump
 
           command: ["open5gs-amfd",  "-c", "/open5gs/config-map/amf.yaml"]
           #command: ["sleep", "1d"]
@@ -102,9 +115,9 @@ spec:
           hostPath:
             path: /dev/net/tun
 
-        - name: tcpdump-persistent-storage
-          persistentVolumeClaim:
-            claimName: open5gs-tcpdump-pv-claim
+        # - name: tcpdump-persistent-storage
+        #   persistentVolumeClaim:
+        #     claimName: open5gs-tcpdump-pv-claim
 
         # - name: tcpdump-persistent-storage
         #   persistentVolumeClaim:
@@ -147,9 +160,9 @@ spec:
       port: 9090 
     # - name: sctp-open5gs-amf-38412
     #   protocol: SCTP
-    #   port: 30412
-    #   targetPort: 30412
-    #   nodePort: 30412
+    #   port: 38412
+    #   targetPort: 38412
+    #   nodePort: 38412
 
 ---
 apiVersion: v1
