@@ -49,8 +49,8 @@ spec:
       nodeSelector:
         #nodetype: server
         #kubernetes.io/arch: amd64
-        #kubernetes.io/hostname: molejo
-        kubernetes.io/hostname: mac-porvir-04
+        # kubernetes.io/hostname: mac-porvir-04
+        kubernetes.io/hostname: brix-porvir-04
       initContainers:
         - name: init-ue
           image: maikovisky/ueransim:3.2.6
@@ -95,6 +95,10 @@ spec:
             privileged: true
             capabilities:
               add: ["NET_ADMIN", "SYS_MODULE"]
+          lifecycle:
+            preStop:
+              exec:
+                command: ["/bin/sh", "-c", "nr-cli --dump | xargs -i nr-cli {} -e 'deregister remove-sim'"]
           env:            
             - name: MY_NODE_NAME
               valueFrom:
@@ -202,7 +206,7 @@ data:
 
 
     [[inputs.ping]]
-      urls = ["10.245.24.19", "8.8.8.8"]
+      urls = ["10.245.3.168", "8.8.8.8"]
       interface = "uesimtun0"
 
 

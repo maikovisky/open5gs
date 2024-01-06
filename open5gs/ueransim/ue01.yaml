@@ -27,9 +27,9 @@ spec:
     - name: open5gs-ue01-udp-4997
       protocol: UDP
       port: 4997
-    - name: open5gs-ue01-udp-5001
+    - name: open5gs-ue01-udp-5002
       protocol: UDP
-      port: 5001
+      port: 5002
 ---    
 apiVersion: apps/v1 # for versions before 1.9.0 use apps/v1beta2
 kind: Deployment
@@ -53,7 +53,8 @@ spec:
         #nodetype: server
         #kubernetes.io/arch: amd64
         #kubernetes.io/hostname: molejo
-        kubernetes.io/hostname: mac-porvir-02
+        # kubernetes.io/hostname: mac-porvir-02
+        kubernetes.io/hostname: brix-porvir-02
       initContainers:
         - name: init-ue
           image: maikovisky/ueransim:3.2.6
@@ -87,9 +88,6 @@ spec:
         #   volumeMounts:
         #     - name: "dev-net-tun"
         #       mountPath: "/dev/net/tun" # Needed for VPN
-        #     - name: tcpdump-persistent-storage
-        #       mountPath: /var/tcpdump
-
 
         - name: main-ue
           image: maikovisky/ueransim:3.2.6  
@@ -98,6 +96,10 @@ spec:
             privileged: true
             capabilities:
               add: ["NET_ADMIN", "SYS_MODULE"]
+          lifecycle:
+            preStop:
+              exec:
+                command: ["/bin/sh", "-c", "nr-cli --dump | xargs -i nr-cli {} -e 'deregister remove-sim'"]
           env:            
             - name: MY_NODE_NAME
               valueFrom:
@@ -148,6 +150,7 @@ spec:
             capabilities:
               add: ["NET_ADMIN", "SYS_MODULE"]
           command: ["/bin/testing"]
+
           env:  
             - name: SLICE
               value: "1"
@@ -186,10 +189,6 @@ spec:
         - name: etc-ue-tmp
           emptyDir: {}
 
-        - name: tcpdump-persistent-storage
-          persistentVolumeClaim:
-            claimName: open5gs-tcpdump-pv-claim
-
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -202,10 +201,10 @@ data:
       ## Address to listen on.
       listen = ":9100"
 
-
     [[inputs.ping]]
-      urls = ["10.245.21.55", "8.8.8.8"]
+      urls = ["10.245.1.226", "8.8.8.8"]
       interface = "uesimtun0"
+      percentiles = [25, 50, 95, 99]
 
 ---
 apiVersion: monitoring.coreos.com/v1
@@ -220,7 +219,7 @@ spec:
     matchLabels:
       epc-mode: ue01
   endpoints:
-  - interval: 10s
+  - interval: 15s
     port: http2-open5gs-ue01-9100
 
       

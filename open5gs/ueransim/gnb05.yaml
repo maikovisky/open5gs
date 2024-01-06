@@ -5,6 +5,7 @@ metadata:
   namespace: open5gs
   labels:
     epc-mode: ueransim05
+    app: ueransim
 spec:
   replicas: 0
   selector:
@@ -14,7 +15,7 @@ spec:
     metadata:    
       labels:
         epc-mode: ueransim05
-        app: ueransim05
+        app: ueransim
     spec:  
       nodeSelector:
         #nodetype: server

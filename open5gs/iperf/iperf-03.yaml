@@ -14,28 +14,20 @@ spec:
       protocol: TCP
       port: 5201
       targetPort: 5201
-    - name: o5g-iperf03-udp-5201
+    - name: o5g-iperf03-udp-5202
       protocol: UDP
-      port: 5201
-      targetPort: 5201
+      port: 5202
+      targetPort: 5202
 
     - name: o5g-iperf03-5001
       protocol: TCP
       port: 5001
       targetPort: 5001
-    - name: o5g-iperf03-udp-5001
+    - name: o5g-iperf03-udp-5002
       protocol: UDP
-      port: 5001
-      targetPort: 5001
+      port: 5002
+      targetPort: 5002
 
-    - name: o5g-rperf04-5199
-      protocol: TCP
-      port: 5199
-      targetPort: 5199
-    - name: o5g-rperf-udp-5199
-      protocol: UDP
-      port: 5199
-      targetPort: 5199
     # - name: o5g-iperf03-9100
     #   protocol: TCP
     #   port: 9100
@@ -48,7 +40,8 @@ metadata:
   name: open5gs-iperf03
   namespace: open5gs
   labels:
-    epc-mode: pcf
+    epc-mode: iperf03
+    app: iperf
     promotheus: open5gs-monitor
 spec:
   replicas: 1
@@ -59,11 +52,33 @@ spec:
     metadata:   
       labels:
         epc-mode: iperf03
+        app: iperf
     spec:  
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: prometheus
+                operator: In
+                values:
+                - k8s
+            topologyKey: kubernetes.io/hostname
+            namespaceSelector: {monitoring}
+          - labelSelector:
+              matchExpressions:
+              - key: app
+                operator: In
+                values:
+                - iperf
+            topologyKey: kubernetes.io/hostname
+             
       nodeSelector:
+          kubernetes.io/arch: amd64
+          nodetype: server
         #kubernetes.io/arch: amd64
         #kubernetes.io/hostname: whitesnake
-        kubernetes.io/hostname: mac-porvir-04
+        #kubernetes.io/hostname: mac-porvir-04
         #kubernetes.io/hostname: erasure
       containers:       
         # - name: tcpdump-iperf
@@ -91,26 +106,22 @@ spec:
           ports:
             - containerPort: 5001
               protocol: TCP              
-            - containerPort: 5001
-              protocol: UDP
           securityContext:
             privileged: true
             capabilities:
               add: ["NET_ADMIN", "SYS_MODULE"]  
           command: ["/bin/iperf", "-s", "--histograms"]
 
-        # - name: rperf
-        #   image: maikovisky/iperf:latest  
-        #   ports:
-        #     - containerPort: 5199
-        #       name: o5g-rperf-5199
-        #     - containerPort: 5199
-        #       name: o5g-rpf-u-5199
-        #   securityContext:
-        #     privileged: true
-        #     capabilities:
-        #       add: ["NET_ADMIN", "SYS_MODULE"]  
-        #   command: ["/bin/rperf", "-s"]
+        - name: iperf-udp
+          image: maikovisky/iperf:latest  
+          ports:       
+            - containerPort: 5002
+              protocol: UDP
+          securityContext:
+            privileged: true
+            capabilities:
+              add: ["NET_ADMIN", "SYS_MODULE"]  
+          command: ["/bin/iperf", "-s", "--sum-dstip", "--udp-histograms", "-u", "-p", "5002"]
         
         # - name: metrics-iperf
         #   image: maikovisky/iperf:latest  

@@ -40,3 +40,12 @@ Files used to deploy the UE in a Kubernetes cluster.
   - [ueinit]: Script init UE                
   - [initUE.py]: Script for get IMSI for UE
 - [ue-testing.yaml](ue-testing.yaml): Scripts for testing slices.
+
+
+## Iperf
+
+Simula transmissão de video em 4K via UDP usando a porta 5002. E o len com 1370 para não ocorrer fragmentação
+
+```
+$ iperf -B <ip_tunnel> -c <iperf_address> -f A -i 15 -t <time> --len 1370 --trip-times -u --isochronous=60:32m,5 -e -p 5002
+```

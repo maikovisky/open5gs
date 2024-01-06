@@ -38,7 +38,19 @@ spec:
         epc-mode: ausf
         version: 2.6.4
         app: open5gs-ausf
-    spec:  
+    spec:        
+      affinity:
+        podAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 75
+              podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                  - key: app
+                    operator: In
+                    values:
+                    - open5gs-nrf
+                topologyKey: kubernetes.io/hostname
       nodeSelector:
         nodetype: server
         kubernetes.io/arch: amd64

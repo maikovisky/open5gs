@@ -5,6 +5,7 @@ metadata:
   namespace: open5gs
   labels:
     epc-mode: ueransim01
+    app: ueransim
 spec:
   replicas: 1
   selector:
@@ -14,14 +15,15 @@ spec:
     metadata:    
       labels:
         epc-mode: ueransim01
-        app: ueransim01
+        app: ueransim
     spec:  
       nodeSelector:
         #nodetype: server
         #kubernetes.io/arch: amd64
         #kubernetes.io/hostname: erasure
         #kubernetes.io/hostname: deeppurple
-        kubernetes.io/hostname: mac-porvir-02
+        # kubernetes.io/hostname: mac-porvir-02
+        kubernetes.io/hostname: brix-porvir-02
       initContainers:
         - name: init-gnb
           image: maikovisky/ueransim:3.2.6
@@ -55,6 +57,13 @@ spec:
             privileged: true
             capabilities:
               add: ["NET_ADMIN", "SYS_MODULE"]
+          resources:
+            requests:
+              memory: "500Mi"
+              cpu: "1200m"
+            limits:
+              memory: "500Mi"
+              cpu: "1200m"
                       
           volumeMounts:
             - name: "dev-net-tun"

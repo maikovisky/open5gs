@@ -11,7 +11,7 @@ data:
     #!/bin/bash 
     set -e
 
-    sleep "15s"
+    sleep "10s"
 
     COUNTER=0
     while [ -z  $(ifconfig | awk  '/uesimtun/{print $1; exit}') ] 
@@ -32,13 +32,8 @@ data:
       echo "Using interface uesimtun1 with IP $uesimtun1"
       uesimtun=$uesimtun1
     fi
-
     while :
     do
-      #t=$(($RANDOM % 600))
-      t=300
-      #iperf -B $uesimtun -c open5gs-iperf0$SLICE -i 15 -b 32Mb -t $t -u -y -R --trip-times
-      iperf -B $uesimtun -c open5gs-iperf08 -f A -i 15 -t $t --trip-times -u --isochronous=60:32m,5 -e
-      #echo "Waiting 180s for new testing"
-      #sleep "180s"
+      t=1200
+      /bin/iperf -c open5gs-iperf0$SLICE -B $uesimtun -u -p 5002 --len 1370 -f A -i 15 -t $t --isochronous=60:32m,5 --trip-times -e -z 
     done

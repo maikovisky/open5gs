@@ -7,8 +7,8 @@ metadata:
     epc-mode: nssf
 data:
   nssf.yaml: |
-    logger:
-        file: /var/log/open5gs/nssf.log
+    # logger:
+    #     file: /var/log/open5gs/nssf.log
     
     sbi:
       server:

@@ -36,6 +36,18 @@ spec:
         app: open5gs-scp
 
     spec:  
+      affinity:
+        podAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 75
+              podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                  - key: app
+                    operator: In
+                    values:
+                    - open5gs-nrf
+                topologyKey: kubernetes.io/hostname
       nodeSelector:
         nodetype: server
         kubernetes.io/arch: amd64

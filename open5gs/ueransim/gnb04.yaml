@@ -14,14 +14,15 @@ spec:
     metadata:    
       labels:
         epc-mode: ueransim04
-        app: ueransim04
+        app: ueransim
     spec:  
       nodeSelector:
         #nodetype: server
         #kubernetes.io/arch: amd64
         #kubernetes.io/hostname: erasure
         #kubernetes.io/hostname: petshopboys
-        kubernetes.io/hostname: mac-porvir-05
+        # kubernetes.io/hostname: mac-porvir-05
+        kubernetes.io/hostname: brix-porvir-05
       initContainers:
         - name: init-gnb
           image: maikovisky/ueransim:3.2.6

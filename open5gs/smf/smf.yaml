@@ -56,10 +56,21 @@ spec:
         app: open5gs-smf
         prometheus: open5gs-monitor
     spec:  
+      affinity:
+        podAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 75
+              podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                  - key: app
+                    operator: In
+                    values:
+                    - open5gs-nrf
+                topologyKey: kubernetes.io/hostname
       nodeSelector:
         nodetype: server
         kubernetes.io/arch: amd64
-        #kubernetes.io/hostname: molejo
       containers:
         # - name: tcpdump-smf
         #   image: maikovisky/open5gs:ubuntu-latest    
