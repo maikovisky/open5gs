@@ -61,6 +61,7 @@ start() {
        kubectl scale --replicas=$num deployment open5gs-ue02
        kubectl scale --replicas=$num deployment open5gs-ue03
        kubectl scale --replicas=$num deployment open5gs-ue04
+       kubectl scale --replicas=$num deployment open5gs-ue05
        sleep 495s 
     done 
 
@@ -76,6 +77,7 @@ start() {
     kubectl scale --replicas=0 deployment open5gs-ue02
     kubectl scale --replicas=0 deployment open5gs-ue03
     kubectl scale --replicas=0 deployment open5gs-ue04
+    kubectl scale --replicas=0 deployment open5gs-ue05
 
     annotation "Fim do experimento"
 }

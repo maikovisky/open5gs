@@ -43,7 +43,7 @@ start() {
     do
        echo "Fase: $num"
        annotation "Fase: $num"
-       kubectl scale --replicas=$num deployment open5gs-ue02
+       #kubectl scale --replicas=$num deployment open5gs-ue02
        #kubectl scale --replicas=$num deployment open5gs-ue03
        #kubectl scale --replicas=$num deployment open5gs-ue04
        sleep 300s 
