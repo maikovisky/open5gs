@@ -71,10 +71,10 @@ spec:
           resources:
             requests:
               memory: "0Mi"
-              cpu: "900m"
+              cpu: "600m"
             limits:
               memory: "0Mi"
-              cpu: "900m"
+              cpu: "600m"
           volumeMounts:
             - name: open5gs-upf4-config
               mountPath: /open5gs/config-map/upf.yaml
