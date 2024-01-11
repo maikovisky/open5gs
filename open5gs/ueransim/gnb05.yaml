@@ -22,7 +22,7 @@ spec:
         #kubernetes.io/arch: amd64
         #kubernetes.io/hostname: erasure
         #kubernetes.io/hostname: petshopboys
-        kubernetes.io/hostname: mac-porvir-02
+        kubernetes.io/hostname: brix-porvir-03
       initContainers:
         - name: init-gnb
           image: maikovisky/ueransim:3.2.6
@@ -33,23 +33,14 @@ spec:
               mountPath: /bin/gnbinit
               subPath: "gnbinit"
 
-            - name: open5gs-ueransim-gnb-config2
+            - name: open5gs-ueransim-gnb-config
               mountPath: /etc/ueransim/open5gs-gnb-base.yaml
               subPath: "open5gs-gnb-base.yaml"
 
             - name: etc-tmp
               mountPath: /etc/ueransim/tmp
 
-      containers:
-        # - name: tcpdump-ueransim
-        #   image: maikovisky/open5gs:ubuntu-latest    
-        #   command: ["/bin/tcpdump", "-i", "eth0", "-s", "65535", "-G", "3600", "-w", "/var/tcpdump/ueransim-%F_%H%M.pcap"]
-        #   volumeMounts:
-        #     - name: "dev-net-tun"
-        #       mountPath: "/dev/net/tun" # Needed for VPN
-        #     - name: tcpdump-persistent-storage
-        #       mountPath: /var/tcpdump
-        
+      containers:       
         - name: ueransim-gnb
           image: maikovisky/ueransim:3.2.6  
           securityContext:
@@ -61,7 +52,7 @@ spec:
             - name: "dev-net-tun"
               mountPath: "/dev/net/tun" # Needed for VPN
 
-            - name: open5gs-ueransim-gnb-config2
+            - name: open5gs-ueransim-gnb-config
               mountPath: /etc/ueransim/open5gs-gnb-base.yaml
               subPath: "open5gs-gnb-base.yaml"
 
@@ -70,26 +61,10 @@ spec:
 
           command: ["nr-gnb", "-c", "/etc/ueransim/tmp/open5gs-gnb-01.yaml"]
 
-        
-        # - name: metrics-ueransim
-        #   image: maikovisky/ueransim:3.2.6
-        #   command: ["/bin/prometheus-node-exporter"]
-        #   volumeMounts:
-        #     - name: "dev-net-tun"
-        #       mountPath: "/dev/net/tun" # Needed for VPN
-
-        # - name: tcpdump-ueramsim
-        #   image: maikovisky/open5gs:ubuntu-latest    
-        #   command: ["/bin/tcpdump", "-i", "eth0", "-s", "65535", "-G", "3600", "-w", "/var/tcpdump/ueramsim-%F_%H%M.pcap"]
-        #   volumeMounts:
-        #     - name: "dev-net-tun"
-        #       mountPath: "/dev/net/tun" # Needed for VPN
-        #     - name: tcpdump-persistent-storage
-        #       mountPath: /var/tcpdump
       volumes:
-        - name: open5gs-ueransim-gnb-config2
+        - name: open5gs-ueransim-gnb-config
           configMap:
-            name: open5gs-ueransim-gnb-config2
+            name: open5gs-ueransim-gnb-config
 
         - name: open5gs-ueransim-gnbinit
           configMap:
@@ -100,9 +75,6 @@ spec:
           hostPath:
             path: /dev/net/tun
 
-        - name: tcpdump-persistent-storage
-          persistentVolumeClaim:
-            claimName: open5gs-tcpdump-pv-claim
 
         - name: etc-tmp
           emptyDir: {}

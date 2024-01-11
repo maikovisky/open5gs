@@ -205,9 +205,9 @@ data:
 
 
     [[inputs.ping]]
-      urls = ["10.245.17.77, "8.8.8.8"]
+      urls = ["10.245.0.79", "8.8.8.8"]
       interface = "uesimtun0"
-
+      percentiles = [25, 50, 95, 99]
 
 ---
 apiVersion: monitoring.coreos.com/v1

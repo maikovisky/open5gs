@@ -1,0 +1,200 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: open5gs-eupf-1
+  namespace: open5gs
+  labels:
+    epc-mode: eupf1
+    promotheus: open5gs-monitor
+spec:
+  selector:
+    epc-mode: eupf1
+  ports:
+    - name: http2-open5gs-eupf1-80
+      protocol: TCP
+      port: 80
+      targetPort: 80
+    - name: http-open5gs-eupf1-9090
+      protocol: TCP
+      port: 9090
+      targetPort: 9090
+    - name: open5gs-eupf1-udp-2152
+      protocol: UDP
+      port: 2152
+      targetPort: 2152
+    - name: open5gs-eupf1-udp-8805
+      protocol: UDP
+      port: 8805
+      targetPort: 8805
+    # - name: http-open5gs-eupf1-9100
+    #   protocol: TCP
+    #   port: 9100
+    #   targetPort: 9100
+---    
+apiVersion: apps/v1 # for versions before 1.9.0 use apps/v1beta2
+kind: Deployment
+metadata:
+  name: open5gs-eupf-1
+  namespace: open5gs
+  labels:
+    epc-mode: eupf1
+    promotheus: open5gs-monitor
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      epc-mode: eupf1
+  template:
+    metadata:  
+      labels:
+        epc-mode: eupf1
+        app: open5gs-eupf
+        prometheus: open5gs-monitor
+    spec:  
+      nodeSelector:
+        #kubernetes.io/arch: amd64
+        #kubernetes.io/hostname: erasure
+        #kubernetes.io/hostname: mac-porvir-01
+        kubernetes.io/hostname: brix-porvir-01
+
+      containers:
+        - name: eupf1
+          image: maikovisky/eupf:latest    
+          imagePullPolicy: Always
+          securityContext:
+            privileged: true
+            capabilities:
+              add: ["NET_ADMIN", "SYS_MODULE"]
+          resources:
+            requests:
+              memory: "0Mi"
+              cpu: "0m"
+            limits:
+              memory: "0Mi"
+              cpu: "0m"
+          volumeMounts:
+            - name: "dev-net-tun"
+              mountPath: "/dev/net/tun" # Needed for VPN
+          #command: ["/app/bin/entrypoint.sh"]
+          command: ["sleep", "1d"]
+
+      volumes:
+
+        - name: dev-net-tun
+          hostPath:
+            path: /dev/net/tun
+
+
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: open5gs-eupf-1
+  namespace: open5gs
+  labels:
+    epc-mode: eupf1
+    prometheus: open5gs-monitor
+spec:
+  selector:
+    matchLabels:
+      epc-mode: eupf1
+  endpoints:
+  # - interval: 5s
+  #   port: http-open5gs-eupf1-9100
+  - interval: 5s
+    port: http-open5gs-eupf1-9090
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: open5gs-eupf1-config
+  namespace: open5gs
+  labels:
+    epc-mode: eupf1
+data:
+  config.yml: |-
+    interface_name: [eth0]
+    xdp_attach_mode: native
+    api_address: :80
+    pfcp_address: 0.0.0.0:8805
+    pfcp_node_id: open5gs-smf
+    metrics_address: :9090
+    n3_address: 127.0.0.1
+    qer_map_size: 1024
+    far_map_size: 1024
+    pdr_map_size: 1024
+    feature_ueip: true
+    feature_ftup: true
+    ip_pool: 10.41.0.0/16
+    teid_pool: 65536
+    logging_level: info
+
+  eupf.yaml: |-
+    logger:
+        file: /var/log/open5gs/eupf.log
+    
+    #  <PFCP Server>
+    sbi:
+      server:
+        no_tls: true
+      client:
+        no_tls: true
+    eupf:
+      pfcp:
+        - dev eth0
+      gtpu:
+        - dev eth0
+      metrics:
+        - addr: 0.0.0.0
+          port: 9090
+      subnet:
+        - addr: 192.168.0.1/16
+          dnn: internet
+          dev: ogstun
+        - addr: 10.41.0.1/16
+          dnn: slice01
+          dev: slice01       
+    smf:
+      pfcp:
+        addr: open5gs-smf
+  entrypoint.sh: |-
+    #!/bin/bash
+    set -e
+
+    echo "Executing k8s customized entrypoint.sh"
+    #echo "Creating net device {{ .dev }}"
+    if grep "ogstun" /proc/net/dev > /dev/null; then
+      echo "[WARNING] Net device ogstun already exists!"
+      ip addr add 192.168.0.1/16 dev ogstun || true
+      ip link set ogstun up
+    else 
+      echo "[INFO] Create device ogstun!"
+      ip tuntap add name ogstun mode tun
+      ip addr add 192.168.0.1/16 dev ogstun || true
+      ip link set ogstun up
+    fi
+
+    # echo "Config tun"
+    # ip tuntap add name ogstun mode tun
+    # ip addr add 192.168.0.1/16 dev ogstun 
+    # ip link set ogstun up
+
+    if grep "slice01" /proc/net/dev > /dev/null; then
+      echo "[WARNING] Net device slice01 already exists!"
+      ip addr add 10.41.0.1/16 dev slice01 || true
+      ip link set slice01 up
+    else 
+      echo "[INFO] Create device slice01 !"
+      ip tuntap add name slice01 mode tun
+      ip addr add 10.41.0.1/16 dev slice01 || true
+      ip link set slice01 up
+    fi
+
+    echo "[INFO] Config sysctl"
+    sysctl -w net.ipv4.ip_forward=1
+    sysctl -w net.ipv6.conf.all.forwarding=1
+
+    echo "Enable NAT"
+    iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
+
+    open5gs-eupfd -c /open5gs/config-map/eupf.yaml

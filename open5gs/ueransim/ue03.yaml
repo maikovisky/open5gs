@@ -206,7 +206,7 @@ data:
 
 
     [[inputs.ping]]
-      urls = ["10.245.3.168", "8.8.8.8"]
+      urls = ["10.245.17.232", "8.8.8.8"]
       interface = "uesimtun0"
 
 

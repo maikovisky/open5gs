@@ -59,16 +59,8 @@ spec:
         #kubernetes.io/arch: amd64
         #kubernetes.io/hostname: erasure
         kubernetes.io/hostname: mac-porvir-01
+        #kubernetes.io/hostname: brix-porvir-06
       containers:
-        # - name: tcpdump-upf4
-        #   image: maikovisky/open5gs:ubuntu-latest   
-        #   imagePullPolicy: Always
-        #   command: ["/bin/tcpdump", "-i", "eth0", "-s", "65535", "-G", "3600", "-w", "/var/tcpdump/upf4-%F_%H%M.pcap"]
-        #   volumeMounts:
-        #     - name: "dev-net-tun"
-        #       mountPath: "/dev/net/tun" # Needed for VPN
-        #     - name: tcpdump-persistent-storage
-        #       mountPath: /var/tcpdump
         - name: upf4
           image: maikovisky/open5gs:ubuntu-latest  
           imagePullPolicy: Always  
@@ -79,10 +71,10 @@ spec:
           resources:
             requests:
               memory: "0Mi"
-              cpu: "0m"
+              cpu: "900m"
             limits:
               memory: "0Mi"
-              cpu: "0m"
+              cpu: "900m"
           volumeMounts:
             - name: open5gs-upf4-config
               mountPath: /open5gs/config-map/upf.yaml
@@ -99,13 +91,6 @@ spec:
           #command: ["open5gs-upfd", "-c", "/open5gs/config-map/upf.yaml"]
           command: ["/bin/entrypoint.sh"]
 
-        # - name: metrics-upf4
-        #   image: maikovisky/open5gs:ubuntu-latest    
-        #   command: ["/bin/prometheus-node-exporter", "--collector.disable-defaults","--collector.arp","--collector.netclass" ,"--collector.netdev" ,"--collector.netstat" ,"--collector.udp_queues","--collector.ipvs","--collector.cpu","--collector.cpufreq","--collector.meminfo"]
-        #   volumeMounts:
-        #     - name: "dev-net-tun"
-        #       mountPath: "/dev/net/tun" # Needed for VPN
-
       volumes:
         - name: open5gs-upf4-config
           configMap:
@@ -114,9 +99,6 @@ spec:
         - name: dev-net-tun
           hostPath:
             path: /dev/net/tun
-        - name: tcpdump-persistent-storage
-          persistentVolumeClaim:
-            claimName: open5gs-tcpdump-pv-claim
 
 ---
 apiVersion: monitoring.coreos.com/v1

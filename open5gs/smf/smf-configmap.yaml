@@ -87,11 +87,12 @@ data:
             sd: 000004
             dnn:
               - slice04
-        - s_nssai:
           - sst: 5
             sd: 000005
             dnn:
               - slice05
+        - s_nssai:
+
           - sst: 6
             sd: 000006
             dnn:

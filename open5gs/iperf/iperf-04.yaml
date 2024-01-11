@@ -27,12 +27,6 @@ spec:
       protocol: UDP
       port: 5002
       targetPort: 5002
-
-    # - name: o5g-iperf04-9100
-    #   protocol: TCP
-    #   port: 9100
-    #   targetPort: 9100
-
 ---    
 apiVersion: apps/v1 # for versions before 1.9.0 use apps/v1beta2
 kind: Deployment
@@ -65,13 +59,7 @@ spec:
                 - k8s
             topologyKey: kubernetes.io/hostname
             namespaceSelector: {monitoring}
-          - labelSelector:
-              matchExpressions:
-              - key: app
-                operator: In
-                values:
-                - iperf
-            topologyKey: kubernetes.io/hostname
+
              
       nodeSelector:
           kubernetes.io/arch: amd64
@@ -81,13 +69,6 @@ spec:
         #kubernetes.io/hostname: mac-porvir-05
         #kubernetes.io/hostname: erasure
       containers:       
-        # - name: tcpdump-iperf
-        #   image: maikovisky/open5gs:ubuntu-latest    
-        #   command: ["/bin/tcpdump", "-i", "eth0", "-s", "65535", "-G", "3600", "-w", "/var/tcpdump/iperf-04-%F_%H%M.pcap"]
-        #   volumeMounts:
-        #     - name: tcpdump-persistent-storage
-        #       mountPath: /var/tcpdump
-
         - name: iperf3
           image: maikovisky/iperf:latest  
           ports:
@@ -123,29 +104,4 @@ spec:
               add: ["NET_ADMIN", "SYS_MODULE"]  
           command: ["/bin/iperf", "-s", "--sum-dstip", "--udp-histograms", "-u", "-p", "5002"]
         
-        # - name: metrics-iperf
-        #   image: maikovisky/iperf:latest  
-        #   command: ["/bin/prometheus-node-exporter", "--collector.disable-defaults","--collector.arp","--collector.netclass" ,"--collector.netdev" ,"--collector.netstat" ,"--collector.udp_queues","--collector.ipvs","--collector.cpu","--collector.cpufreq","--collector.meminfo"]
-        #   ports:
-        #     - containerPort: 9100
-        #       name: o5g-iperf-9100
-      volumes:
-        - name: tcpdump-persistent-storage
-          persistentVolumeClaim:
-            claimName: open5gs-tcpdump-pv-claim
-
-# ---
-# apiVersion: monitoring.coreos.com/v1
-# kind: ServiceMonitor
-# metadata:
-#   name: open5gs-iperf
-#   namespace: open5gs
-#   labels:
-#     epc-mode: iperf
-# spec:
-#   selector:
-#     matchLabels:
-#       epc-mode: iperf
-#   endpoints:
-#   - interval: 10s
-#     port: o5g-iperf-9100
+        
