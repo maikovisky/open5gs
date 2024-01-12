@@ -84,9 +84,9 @@ Este experimento é composto por 4 slices, um UPF para cada slice, sendo que tod
 ### Conclusões
 
 ###  Links: 
-- [Snapshot raintank](https://snapshots.raintank.io/dashboard/snapshot/bBqZSM6IMBazZhx3UyVmMi5ymp6JoJ3P)
-- [Snapshot local](http://localhost:3000/dashboard/snapshot/g5Gqo9ccySpTO70mbS6mODwROzJE1N4E)
-- [Grafana](http://localhost:3000/goto/mLrE1XKIz?orgId=1)
+- [Snapshot raintank](https://snapshots.raintank.io/dashboard/snapshot/To77CbT142VOEXsdaIVovjUh4s3Cu0td)
+- [Snapshot local](http://localhost:3000/dashboard/snapshot/5K1wtHXLnPajudyS3KazBbHWQzdNB4aJ)
+- [Grafana](http://localhost:3000/goto/quxRbm5Ik?orgId=1)
 - [GitHub - Tag vE01](https://github.com/maikovisky/open5gs/tree/vE01)
 
 
@@ -107,9 +107,9 @@ Este experimento é composto por 4 slices, um UPF para cada slice, sendo que tod
     - **Limits**: not defined
 
 ###  Links: 
-- [Snapshot raintank](https://snapshots.raintank.io/dashboard/snapshot/K5l4pTjHprz46f2FrwT9DYRLyuYQJDIA)
-- [Snapshot local](http://localhost:3000/dashboard/snapshot/pCCUitDnKYvbV1sAPqn5zloh9koqT6i7)
-- [Grafana](http://localhost:3000/goto/2PlZbuKSk?orgId=1)
+- [Snapshot raintank](https://snapshots.raintank.io/dashboard/snapshot/cVPGG1HBfu7qPBtT2TUx9eob5ETnKjTQ)
+- [Snapshot local](http://localhost:3000/dashboard/snapshot/zxDVxqVEpn4sO5b4lAhUrfGRvlqfQnDv)
+- [Grafana](http://localhost:3000/goto/Ga95xmcIk?orgId=1)
 
 
 ## Experimento 03 - Concorrento com todos os Slice sem Limitações
@@ -129,8 +129,8 @@ Este experimento é composto por 4 slices, um UPF para cada slice, sendo que tod
     - **Limits**: not defined
 
 ###  Links: 
-- [Snapshot raintank](https://snapshots.raintank.io/dashboard/snapshot/IkpJj6BBfRaceIbRNhzhtyZZByaRCWBP)
-- [Snapshot local](http://localhost:3000/dashboard/snapshot/lS306605i2KmE3T67GDSKr4X7iy9fB9x)
+- [Snapshot raintank](https://snapshots.raintank.io/dashboard/snapshot/KtbJ6iSHEHTfXtrvIM1vrC6uyhnP2ULH)
+- [Snapshot local](http://localhost:3000/dashboard/snapshot/2yCzlGxynWg17dyjoOdk6Umc72JLVc1j)
 - [Grafana](http://localhost:3000/goto/CxEbbXFSk?orgId=1)
 
 ## Experimento 04 - Recurso limitado para Slice 1
@@ -150,9 +150,9 @@ Este experimento é composto por 4 slices, um UPF para cada slice, sendo que tod
     - **Limits**: not defined
 
 ###  Links: 
-- [Snapshot raintank](https://snapshots.raintank.io/dashboard/snapshot/7OK2rSIxu4zwVPzIKvhdFv1D5b34vAkj)
-- [Snapshot local](http://localhost:3000/dashboard/snapshot/QSxpYcVB51711c2oSV5UirsassrbThsH)
-- [Grafana](http://localhost:3000/goto/11FdS3FIk?orgId=1)
+- [Snapshot raintank](https://snapshots.raintank.io/dashboard/snapshot/lHZ2bhVvvnrlyR8ec6Dmx3YzmJyUySRp)
+- [Snapshot local](http://localhost:3000/dashboard/snapshot/8AxY1j4r52CeS5SZlatm34ARQHrxMfvJ)
+- [Grafana](http://localhost:3000/goto/t4_-bm5Ik?orgId=1)
 
 
 ## Experimento 05 - Todos com recurso de CPU limitado
@@ -172,9 +172,9 @@ Este experimento é composto por 4 slices, um UPF para cada slice, sendo que tod
     - **Limits**: CPU 900m
 
 ###  Links: 
-- [Snapshot raintank](https://snapshots.raintank.io/dashboard/snapshot/3zM7EcYldLvVcFQpGp6nOCaLFPcMON1c)
-- [Snapshot local](http://localhost:3000/dashboard/snapshot/dA4124mt2QO9jVtRJOAWAzxL1p4qrs1m)
-- [Grafana](http://localhost:3000/goto/nvY77qFIz?orgId=1)
+- [Snapshot raintank](https://snapshots.raintank.io/dashboard/snapshot/bNgebBcMC4JewDjt7YHOaxo4xfa0zonU)
+- [Snapshot local](http://localhost:3000/dashboard/snapshot/jyWpcNbAtMWRrK1VA7iQqHo26XvUAaUz)
+- [Grafana](http://localhost:3000/goto/ep5PxmcIz?orgId=1)
 
 
 ## Experimento 06 - Todos com recurso de CPU limitado, mas com mais recurso para slice 01
@@ -194,6 +194,29 @@ Este experimento é composto por 4 slices, um UPF para cada slice, sendo que tod
     - **Limits**: CPU 600m
 
 ###  Links: 
-- [Snapshot raintank](https://snapshots.raintank.io/dashboard/snapshot/3zM7EcYldLvVcFQpGp6nOCaLFPcMON1c)
-- [Snapshot local](http://localhost:3000/dashboard/snapshot/dA4124mt2QO9jVtRJOAWAzxL1p4qrs1m)
-- [Grafana](http://localhost:3000/goto/nvY77qFIz?orgId=1)
+- [Snapshot raintank](https://snapshots.raintank.io/dashboard/snapshot/WkqlmEnBsqV3LE663xCtocNYWX0Iz4ks)
+- [Snapshot local](http://localhost:3000/dashboard/snapshot/ty0NvQZQOQzIcB3eIINKq7eICph75VA0)
+- [Grafana](http://localhost:3000/goto/0v531m5Iz?orgId=1)
+
+
+## Experimento 07 - Todos com recurso de CPU limitado, com mais recurso para slice 01 elimitação de banda para UPF-4
+
+- Mesmo script do experimento 01, mas com limitação de recursos
+  - **UPF-1**
+    - **Requests**: CPU 1200m
+    - **Limits**: CPU 1200m
+  - **UPF-2**
+    - **Requests**: CPU 900m
+    - **Limits**: CPU 900m
+  - **UPF-3**
+    - **Requests**: CPU 800m
+    - **Limits**: CPU 800m
+  - **UPF-4**
+    - **Requests**: CPU 600m
+    - **Limits**: CPU 600m
+    - **Limite de banda**: 20M
+
+###  Links: 
+- [Snapshot raintank](https://snapshots.raintank.io/dashboard/snapshot/v7u6c0BKHj3MMNW2nJsMCwiiEqNOCI7R)
+- [Snapshot local](http://localhost:3000/dashboard/snapshot/e8teMitrwD21P6EdufvD6AgikQmcxHsz)
+- [Grafana](http://localhost:3000/goto/ppUNWeKSk?orgId=1)
