@@ -39,7 +39,7 @@ start() {
     sleep 30s
 
     kubectl scale --replicas=4 deployment open5gs-ue01
-    for num in 1 5 10 15 20 
+    for num in 1 5 10 15 20 25 
     do
        echo "Fase: $num"
        annotation "Fase: $num"

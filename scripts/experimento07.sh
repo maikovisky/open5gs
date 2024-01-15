@@ -39,13 +39,14 @@ start() {
     sleep 30s
 
     kubectl scale --replicas=4 deployment open5gs-ue01
-    for num in 1 5 10 15 20 25 
+    for num in 1 5 10 15 20 
     do
        echo "Fase: $num"
        annotation "Fase: $num"
        kubectl scale --replicas=$num deployment open5gs-ue02
        kubectl scale --replicas=$num deployment open5gs-ue03
        kubectl scale --replicas=$num deployment open5gs-ue04
+     #  kubectl scale --replicas=$num deployment open5gs-ue05
        sleep 300s 
     done 
 
@@ -54,8 +55,9 @@ start() {
     kubectl scale --replicas=0 deployment open5gs-ue02
     kubectl scale --replicas=0 deployment open5gs-ue03
     kubectl scale --replicas=0 deployment open5gs-ue04
-    annotation "Fim do experimento 02"
+    #kubectl scale --replicas=0 deployment open5gs-ue05
+    annotation "Fim do experimento 05"
 }
 
-start "Experimento 03 - Slice,CPU,MEM: [UPF1,nd,nd] [UPF2,nd,nd] [UPF3,nd,nd] [UPF4,nd,nd]"
+start "Experimento 07 - Slice,CPU,MEM: [UPF1,1200m,nd] [UPF2,900m,nd] [UPF3,800m,nd] [UPF4,800m,nd] com limitação de banda UPF4"
 
