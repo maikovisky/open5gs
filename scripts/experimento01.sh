@@ -43,19 +43,16 @@ start() {
     do
        echo "Fase: $num"
        annotation "Fase: $num"
-       kubectl scale --replicas=$num deployment open5gs-ue02
-       kubectl scale --replicas=$num deployment open5gs-ue03
-       kubectl scale --replicas=$num deployment open5gs-ue04
+       #kubectl scale --replicas=$num deployment open5gs-ue02
+       #kubectl scale --replicas=$num deployment open5gs-ue03
+       #kubectl scale --replicas=$num deployment open5gs-ue04
        sleep 300s 
     done 
 
     sleep 60s 
     kubectl scale --replicas=0 deployment open5gs-ue01
-    kubectl scale --replicas=0 deployment open5gs-ue02
-    kubectl scale --replicas=0 deployment open5gs-ue03
-    kubectl scale --replicas=0 deployment open5gs-ue04
-    annotation "Fim do experimento 02"
+    annotation "Fim do experimento 01"
 }
 
-start "Experimento 03 - Slice,CPU,MEM: [UPF1,nd,nd] [UPF2,nd,nd] [UPF3,nd,nd] [UPF4,nd,nd]"
+start "Baseline 01 - Slice,CPU,MEM: [UPF1,nd,nd] [UPF2,nd,nd] [UPF3,nd,nd] [UPF4,nd,nd]"
 
