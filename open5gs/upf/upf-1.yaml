@@ -54,7 +54,7 @@ spec:
       nodeSelector:
         #kubernetes.io/arch: amd64
         #kubernetes.io/hostname: erasure
-        kubernetes.io/hostname: mac-porvir-01
+        kubernetes.io/hostname: mac-porvir-05
         #kubernetes.io/hostname: brix-porvir-01
       containers:
         # - name: tcpdump-upf1
@@ -77,10 +77,10 @@ spec:
           resources:
             requests:
               memory: "0Mi"
-              cpu: "1200m"
+              cpu: "1000m"
             limits:
               memory: "0Mi"
-              cpu: "1200m"
+              cpu: "1000m"
           volumeMounts:
             - name: open5gs-upf1-config
               mountPath: /open5gs/config-map/upf.yaml

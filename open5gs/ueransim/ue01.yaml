@@ -202,7 +202,7 @@ data:
       listen = ":9100"
 
     [[inputs.ping]]
-      urls = ["10.245.1.226", "8.8.8.8"]
+      urls = ["10.245.1.210", "8.8.8.8"]
       interface = "uesimtun0"
       percentiles = [25, 50, 95, 99]
 

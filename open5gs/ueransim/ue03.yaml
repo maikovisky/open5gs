@@ -156,7 +156,7 @@ spec:
             - name: "dev-net-tun"
               mountPath: "/dev/net/tun" # Needed for VPN
 
-            - name: open5gs-ue-mqtt
+            - name: open5gs-ue-testing
               mountPath: /bin/testing
               subPath: "testing"
 
@@ -171,9 +171,13 @@ spec:
           configMap:
             name: open5gs-ue3-telegraf-config          
 
-        - name: open5gs-ue-mqtt
+        # - name: open5gs-ue-mqtt
+        #   configMap:
+        #     name: open5gs-ue-mqtt
+        #     defaultMode: 0777
+        - name: open5gs-ue-testing
           configMap:
-            name: open5gs-ue-mqtt
+            name: open5gs-ue-testing
             defaultMode: 0777
 
         - name: open5gs-ue-init
@@ -187,10 +191,6 @@ spec:
 
         - name: etc-ue-tmp
           emptyDir: {}
-
-        - name: tcpdump-persistent-storage
-          persistentVolumeClaim:
-            claimName: open5gs-tcpdump-pv-claim
 
 ---
 apiVersion: v1
@@ -206,7 +206,7 @@ data:
 
 
     [[inputs.ping]]
-      urls = ["10.245.17.232", "8.8.8.8"]
+      urls = ["10.245.17.76", "8.8.8.8"]
       interface = "uesimtun0"
 
 

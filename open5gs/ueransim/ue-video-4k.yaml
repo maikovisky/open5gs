@@ -34,6 +34,6 @@ data:
     fi
     while :
     do
-      t=1200
+      t=1800
       /bin/iperf -c open5gs-iperf0$SLICE -B $uesimtun -u -p 5002 --len 1370 -f A -i 15 -t $t --isochronous=60:32m,5 --trip-times -e -z 
     done

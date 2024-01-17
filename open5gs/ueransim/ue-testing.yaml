@@ -35,15 +35,7 @@ data:
 
     while :
     do
-      #t=$(($RANDOM % 600))
-      t=300
+      t=1800
       iperf -B $uesimtun -c open5gs-iperf0$SLICE -f A -i 30 -t $t --trip-times 
-      # iperf -B $uesimtun -c open5gs-iperf -w 500k
-      
-      # iperf -B $uesimtun -c open5gs-iperf -w 500k -u
-      # iperf -B $uesimtun -c open5gs-iperf -w 500k -r
-      # iperf -B $uesimtun -c open5gs-iperf -w 500k -r -u
-      echo "Waiting 180s for new testing"
-      sleep "180s"
     done
-    #nr-cli imsi-999700000000001 -e ps-release-all
+    
