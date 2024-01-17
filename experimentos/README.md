@@ -181,22 +181,22 @@ Este experimento é composto por 4 slices, um UPF para cada slice, sendo que tod
 
 - Mesmo script do experimento 01, mas com limitação de recursos
   - **UPF-1**
-    - **Requests**: CPU 1200m
-    - **Limits**: CPU 1200m
+    - **Requests**: CPU 1500m
+    - **Limits**: CPU 1500m
   - **UPF-2**
     - **Requests**: CPU 900m
     - **Limits**: CPU 900m
   - **UPF-3**
-    - **Requests**: CPU 800m
-    - **Limits**: CPU 800m
+    - **Requests**: CPU 600m
+    - **Limits**: CPU 600m
   - **UPF-4**
     - **Requests**: CPU 600m
     - **Limits**: CPU 600m
 
 ###  Links: 
-- [Snapshot raintank](https://snapshots.raintank.io/dashboard/snapshot/WkqlmEnBsqV3LE663xCtocNYWX0Iz4ks)
-- [Snapshot local](http://localhost:3000/dashboard/snapshot/ty0NvQZQOQzIcB3eIINKq7eICph75VA0)
-- [Grafana](http://localhost:3000/goto/0v531m5Iz?orgId=1)
+- [Snapshot raintank](https://snapshots.raintank.io/dashboard/snapshot/A14ZnF94isJFGRbP88um0pRPwbM8j4ax)
+- [Snapshot local](http://localhost:3000/dashboard/snapshot/xQccfr3tML9oZrwqpP3sxbrQBAvxqFgT)
+- [Grafana](http://localhost:3000/goto/xwiejp5Sz?orgId=1)
 
 
 ## Experimento 07 - Todos com recurso de CPU limitado, com mais recurso para slice 01 elimitação de banda para UPF-4
