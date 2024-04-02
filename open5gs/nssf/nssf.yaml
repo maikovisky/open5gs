@@ -54,14 +54,7 @@ spec:
       nodeSelector:
         nodetype: server
         kubernetes.io/arch: amd64
-      containers:
-        # - name: tcpdump-nssf
-        #   image: maikovisky/open5gs:ubuntu-latest    
-        #   command: ["/bin/tcpdump", "-i", "eth0", "-s", "65535", "-G", "3600", "-w", "/var/tcpdump/nssf-%F_%H%M.pcap"]
-        #   volumeMounts:
-        #     - name: tcpdump-persistent-storage
-        #       mountPath: /var/tcpdump
-        
+      containers:       
         - name: nssf
           image: maikovisky/open5gs:ubuntu-latest 
           imagePullPolicy: Always
@@ -75,18 +68,10 @@ spec:
               subPath: "nssf.yaml"
 
           command: ["open5gs-nssfd", "-c", "/open5gs/config-map/nssf.yaml"]
-
-        # - name: metrics-nssf
-        #   image: maikovisky/open5gs:ubuntu-latest    
-        #   command: ["/bin/prometheus-node-exporter"]
-
-          
+        
       volumes:
         - name: open5gs-nssf-config
           configMap:
             name: open5gs-nssf-config
 
-        - name: tcpdump-persistent-storage
-          persistentVolumeClaim:
-            claimName: open5gs-tcpdump-pv-claim
 

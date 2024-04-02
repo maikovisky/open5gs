@@ -10,5 +10,6 @@ data:
     #!/bin/bash 
     set -e
     echo "Config gNB"
-    sed "s/HOSTNAME/$HOSTNAME/g" /etc/ueransim/open5gs-gnb-base.yaml > /etc/ueransim/tmp/open5gs-gnb-01.yaml
-    echo /etc/ueransim/tmp/open5gs-gnb-01.yaml
+    IPADDRESS=$(hostname -i)
+    sed "s/HOSTNAME/$IPADDRESS/g" /etc/ueransim/open5gs-gnb-base.yaml > /etc/ueransim/tmp/open5gs-gnb-01.yaml
+    cat /etc/ueransim/tmp/open5gs-gnb-01.yaml

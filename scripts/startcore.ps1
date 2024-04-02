@@ -22,7 +22,7 @@ kubectl scale --replicas=1 deployment open5gs-upf-4
 # kubectl scale --replicas=1 deployment open5gs-upf-7
 # kubectl scale --replicas=1 deployment open5gs-upf-8
 
-Start-Sleep -s 15
+Start-Sleep -s 30
 
 kubectl scale --replicas=1 deployment open5gs-ueransim01
 kubectl scale --replicas=1 deployment open5gs-ueransim02

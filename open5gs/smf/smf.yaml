@@ -43,7 +43,6 @@ metadata:
   namespace: open5gs
   labels:
     epc-mode: smf
-
 spec:
   replicas: 1
   selector:
@@ -72,15 +71,6 @@ spec:
         nodetype: server
         kubernetes.io/arch: amd64
       containers:
-        # - name: tcpdump-smf
-        #   image: maikovisky/open5gs:ubuntu-latest    
-        #   command: ["/bin/tcpdump", "-i", "eth0", "-s", "65535", "-G", "3600", "-w", "/var/tcpdump/smf-%F_%H%M.pcap"]
-        #   volumeMounts:
-        #     - name: "dev-net-tun"
-        #       mountPath: "/dev/net/tun" # Needed for VPN
-        #     - name: tcpdump-persistent-storage
-        #       mountPath: /var/tcpdump
-
         - name: smf
           image: maikovisky/open5gs:ubuntu-latest  
           imagePullPolicy: Always  
@@ -123,12 +113,6 @@ spec:
           command: ["open5gs-smfd", "-c", "/open5gs/config-map/smf.yaml"]
           #command: ["sleep", "1d"]
 
-        # - name: metrics-smf
-        #   image: maikovisky/open5gs:ubuntu-latest    
-        #   command: ["/bin/prometheus-node-exporter"]
-        #   volumeMounts:
-        #     - name: "dev-net-tun"
-        #       mountPath: "/dev/net/tun" # Needed for VPN
       volumes:
         - name: open5gs-smf-config
           configMap:
@@ -150,10 +134,6 @@ spec:
           configMap:
             name: freediameter-cacert-config
 
-        - name: tcpdump-persistent-storage
-          persistentVolumeClaim:
-            claimName: open5gs-tcpdump-pv-claim
-
         - name: dev-net-tun
           hostPath:
             path: /dev/net/tun
@@ -166,10 +146,11 @@ metadata:
   namespace: open5gs
   labels:
     epc-mode: smf
+    release: prometheus
 spec:
   selector:
     matchLabels:
       epc-mode: smf
   endpoints:
-  - interval: 5s
+  - interval: 10s
     port: http-open5gs-smf-tcp-9090

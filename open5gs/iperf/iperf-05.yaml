@@ -13,11 +13,11 @@ spec:
     - name: o5g-iperf05-5201
       protocol: TCP
       port: 5201
-      targetPort: 5201
-    - name: o5g-iperf05-udp-5201
+      targetPort: 5202
+    - name: o5g-iperf05-udp-5202
       protocol: UDP
-      port: 5201
-      targetPort: 5201
+      port: 5202
+      targetPort: 5202
 
     - name: o5g-iperf05-5001
       protocol: TCP
@@ -38,7 +38,7 @@ metadata:
     epc-mode: pcf
     promotheus: open5gs-monitor
 spec:
-  replicas: 
+  replicas: 1
   selector:
     matchLabels:
       epc-mode: iperf05
@@ -47,24 +47,23 @@ spec:
       labels:
         epc-mode: iperf05
     spec:  
-      affinity:
-        podAntiAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-          - labelSelector:
-              matchExpressions:
-              - key: prometheus
-                operator: In
-                values:
-                - k8s
-            topologyKey: kubernetes.io/hostname
-            namespaceSelector: {monitoring}
+      # affinity:
+      #   podAntiAffinity:
+      #     requiredDuringSchedulingIgnoredDuringExecution:
+      #     - labelSelector:
+      #         matchExpressions:
+      #         - key: prometheus
+      #           operator: In
+      #           values:
+      #           - k8s
+      #       topologyKey: kubernetes.io/hostname
+      #       namespaceSelector: {monitoring}
 
              
       nodeSelector:
           kubernetes.io/arch: amd64
           nodetype: server 
-        #kubernetes.io/hostname: molejo
-        #kubernetes.io/hostname: mac-porvir-02
+          kubernetes.io/hostname: deeppurple
       containers:       
         - name: iperf
           image: maikovisky/iperf:latest  
@@ -87,4 +86,5 @@ spec:
             capabilities:
               add: ["NET_ADMIN", "SYS_MODULE"]  
           command: ["/bin/iperf", "-s", "-u", "-p", "5002", "-i", "15", "-f", "A"]
+
 

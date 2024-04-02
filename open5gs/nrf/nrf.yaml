@@ -41,40 +41,11 @@ spec:
         version: 2.6.4
         app: open5gs-nrf
     spec:  
-      affinity:
-        podAntiAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-          - labelSelector:
-              matchExpressions:
-              - key: prometheus
-                operator: In
-                values:
-                - k8s
-            topologyKey: kubernetes.io/hostname
-            namespaceSelector: {monitoring}
-          - labelSelector:
-              matchExpressions:
-              - key: app
-                operator: In
-                values:
-                - iperf
-            topologyKey: kubernetes.io/hostname
       nodeSelector:
         nodetype: server
         kubernetes.io/arch: amd64
-        #kubernetes.io/hostname: molejo
 
       containers:
-        # - name: tcpdump-nrf
-        #   image: maikovisky/open5gs:ubuntu-latest  
-        #   imagePullPolicy: Always  
-        #   command: ["/bin/tcpdump", "-i", "eth0", "-s", "65535", "-G", "3600", "-w", "/var/tcpdump/nrf-%F_%H%M.pcap"]
-        #   volumeMounts:
-        #     - name: "dev-net-tun"
-        #       mountPath: "/dev/net/tun" # Needed for VPN
-        #     - name: tcpdump-persistent-storage
-        #       mountPath: /var/tcpdump
-
         - name: nrf
           image: maikovisky/open5gs:ubuntu-latest 
           imagePullPolicy: Always
@@ -93,17 +64,6 @@ spec:
               mountPath: "/dev/net/tun" # Needed for VPN
 
           command: ["open5gs-nrfd", "-c", "/open5gs/config-map/nrf.yaml"]
-
-
-        # - name: metrics-nrf
-        #   image: maikovisky/open5gs:ubuntu-latest    
-        #   command: ["/bin/prometheus-node-exporter"]
-        #   volumeMounts:
-        #     - name: "dev-net-tun"
-        #       mountPath: "/dev/net/tun" # Needed for VPN
-
-          
-
       volumes:
         - name: open5gs-nrf-config
           configMap:
@@ -112,29 +72,6 @@ spec:
         - name: dev-net-tun
           hostPath:
             path: /dev/net/tun
-
-        - name: tcpdump-persistent-storage
-          persistentVolumeClaim:
-            claimName: open5gs-tcpdump-pv-claim
-
-        # - name: logfile-persistent-storage
-        #   persistentVolumeClaim:
-        #     claimName: open5gs-tcpdump-pv-claim
-# ---
-# apiVersion: monitoring.coreos.com/v1
-# kind: ServiceMonitor
-# metadata:
-#   name: open5gs-nrf
-#   namespace: open5gs
-#   labels:
-#     epc-mode: nrf
-# spec:
-#   selector:
-#     matchLabels:
-#       epc-mode: nrf
-#   endpoints:
-#   - interval: 30s
-#     port: http-open5gs-nrf-9100
 ---
 apiVersion: networking.istio.io/v1alpha3
 kind: DestinationRule

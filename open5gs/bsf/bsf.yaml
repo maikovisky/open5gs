@@ -70,16 +70,6 @@ spec:
         nodetype: server
         kubernetes.io/arch: amd64
       containers:
-        # - name: tcpdump-bsf
-        #   imagePullPolicy: Always
-        #   image: maikovisky/open5gs:ubuntu-latest    
-        #   command: ["/bin/tcpdump", "-i", "eth0", "-s", "65535", "-G", "3600", "-w", "/var/tcpdump/bsf-%F_%H%M.pcap"]
-        #   volumeMounts:
-        #     - name: "dev-net-tun"
-        #       mountPath: "/dev/net/tun" # Needed for VPN
-        #     - name: tcpdump-persistent-storage
-        #       mountPath: /var/tcpdump
-
         - name: bsf
           image: maikovisky/open5gs:ubuntu-latest  
           imagePullPolicy: Always  
@@ -98,13 +88,6 @@ spec:
               mountPath: "/dev/net/tun" # Needed for VPN
 
           command: ["open5gs-bsfd", "-c", "/open5gs/config-map/bsf.yaml"]
-
-        # - name: metrics-bsf
-        #   image: maikovisky/open5gs:ubuntu-latest    
-        #   command: ["/bin/prometheus-node-exporter"]
-        #   volumeMounts:
-        #     - name: "dev-net-tun"
-        #       mountPath: "/dev/net/tun" # Needed for VPN
       volumes:
         - name: open5gs-bsf-config
           configMap:
@@ -112,8 +95,3 @@ spec:
         - name: dev-net-tun
           hostPath:
             path: /dev/net/tun
-
-        - name: tcpdump-persistent-storage
-          persistentVolumeClaim:
-            claimName: open5gs-tcpdump-pv-claim
-        

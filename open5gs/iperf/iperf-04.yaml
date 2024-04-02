@@ -48,26 +48,23 @@ spec:
         epc-mode: iperf04
         app: iperf
     spec:  
-      affinity:
-        podAntiAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-          - labelSelector:
-              matchExpressions:
-              - key: prometheus
-                operator: In
-                values:
-                - k8s
-            topologyKey: kubernetes.io/hostname
-            namespaceSelector: {monitoring}
+      # affinity:
+      #   podAntiAffinity:
+      #     requiredDuringSchedulingIgnoredDuringExecution:
+      #     - labelSelector:
+      #         matchExpressions:
+      #         - key: prometheus
+      #           operator: In
+      #           values:
+      #           - k8s
+      #       topologyKey: kubernetes.io/hostname
+      #       namespaceSelector: {monitoring}
 
              
       nodeSelector:
           kubernetes.io/arch: amd64
           nodetype: server     
-        #kubernetes.io/arch: amd64
-        #kubernetes.io/hostname: acdc
-        #kubernetes.io/hostname: mac-porvir-05
-        #kubernetes.io/hostname: erasure
+          kubernetes.io/hostname: petshopboys
       containers:       
         - name: iperf3
           image: maikovisky/iperf:latest  

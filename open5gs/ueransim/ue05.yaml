@@ -47,10 +47,6 @@ spec:
         app: ueransim-ue05
     spec:  
       nodeSelector:
-        #nodetype: server
-        #kubernetes.io/arch: amd64
-        #kubernetes.io/hostname: molejo
-        #kubernetes.io/hostname: mac-porvir-02
         kubernetes.io/hostname: brix-porvir-03
       initContainers:
         - name: init-ue
@@ -79,16 +75,6 @@ spec:
             - name: etc-ue-tmp
               mountPath: /etc/ueransim/tmp
       containers:      
-        # - name: tcpdump-ue
-        #   image: maikovisky/open5gs:ubuntu-latest    
-        #   command: ["/bin/tcpdump", "-i", "eth0", "-s", "65535", "-G", "3600", "-w", "/var/tcpdump/ue-%F_%H%M.pcap"]
-        #   volumeMounts:
-        #     - name: "dev-net-tun"
-        #       mountPath: "/dev/net/tun" # Needed for VPN
-        #     - name: tcpdump-persistent-storage
-        #       mountPath: /var/tcpdump
-
-
         - name: main-ue
           image: maikovisky/ueransim:3.2.6  
           imagePullPolicy: "Always" 
@@ -191,8 +177,12 @@ data:
 
 
     [[inputs.ping]]
-      urls = ["10.245.13.183", "8.8.8.8"]
+      urls = ["10.0.12.186", "8.8.8.8"]
       interface = "uesimtun0"
+      method = "native"
+      percentiles = [25, 50, 95, 99]
+      ping_interval = 1.0
+      count = 5
 
 ---
 apiVersion: monitoring.coreos.com/v1
@@ -206,6 +196,7 @@ spec:
   selector:
     matchLabels:
       epc-mode: ue05
+      release: prometheus
   endpoints:
   - interval: 10s
     port: http2-open5gs-ue05-9100      

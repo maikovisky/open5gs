@@ -47,10 +47,6 @@ spec:
         app: ueransim-ue04
     spec:  
       nodeSelector:
-        #nodetype: server
-        #kubernetes.io/arch: amd64
-        #kubernetes.io/hostname: molejo
-        # kubernetes.io/hostname: mac-porvir-05
         kubernetes.io/hostname: brix-porvir-05
       initContainers:
         - name: init-ue
@@ -79,16 +75,6 @@ spec:
             - name: etc-ue-tmp
               mountPath: /etc/ueransim/tmp
       containers:      
-        # - name: tcpdump-ue
-        #   image: maikovisky/open5gs:ubuntu-latest    
-        #   command: ["/bin/tcpdump", "-i", "eth0", "-s", "65535", "-G", "3600", "-w", "/var/tcpdump/ue-%F_%H%M.pcap"]
-        #   volumeMounts:
-        #     - name: "dev-net-tun"
-        #       mountPath: "/dev/net/tun" # Needed for VPN
-        #     - name: tcpdump-persistent-storage
-        #       mountPath: /var/tcpdump
-
-
         - name: main-ue
           image: maikovisky/ueransim:3.2.6  
           imagePullPolicy: "Always" 
@@ -134,14 +120,6 @@ spec:
               mountPath: "/dev/net/tun" # Needed for VPN
 
           command: ["nr-ue", "-c", "/etc/ueransim/tmp/open5gs-ue-01.yaml"]
-
-        # - name: metrics-ue
-        #   image: maikovisky/ueransim:3.2.6     
-        #   imagePullPolicy: "Always"
-        #   command: ["/bin/prometheus-node-exporter", "--collector.disable-defaults", "--collector.textfile", "--collector.arp","--collector.netclass" ,"--collector.netdev" ,"--collector.netstat" ,"--collector.udp_queues","--collector.ipvs","--collector.cpu","--collector.cpufreq","--collector.meminfo"]
-        #   volumeMounts:
-        #     - name: "dev-net-tun"
-        #       mountPath: "/dev/net/tun" # Needed for VPN
         - name: iperf-ue
           image: maikovisky/ueransim:3.2.6  
           imagePullPolicy: "Always" 
@@ -202,8 +180,12 @@ data:
 
 
     [[inputs.ping]]
-      urls = ["10.245.3.167", "8.8.8.8"]
+      urls = ["10.0.13.56", "143.54.85.1"]
       interface = "uesimtun0"
+      method = "native"
+      percentiles = [25, 50, 95, 99]
+      ping_interval = 1.0
+      count = 5
 
 
 ---
@@ -214,6 +196,7 @@ metadata:
   namespace: open5gs
   labels:
     epc-mode: ue04
+    release: prometheus
 spec:
   selector:
     matchLabels:

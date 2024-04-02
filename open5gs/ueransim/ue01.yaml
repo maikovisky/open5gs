@@ -50,15 +50,11 @@ spec:
         app: ueransim-ue01
     spec:  
       nodeSelector:
-        #nodetype: server
-        #kubernetes.io/arch: amd64
-        #kubernetes.io/hostname: molejo
-        # kubernetes.io/hostname: mac-porvir-02
         kubernetes.io/hostname: brix-porvir-02
       initContainers:
         - name: init-ue
           image: maikovisky/ueransim:3.2.6
-          imagePullPolicy: Always
+          imagePullPolicy: IfNotPresent
           command: ["/bin/ueinit"]
           env:            
             - name: DATABASE_URL
@@ -82,16 +78,9 @@ spec:
             - name: etc-ue-tmp
               mountPath: /etc/ueransim/tmp
       containers:      
-        # - name: tcpdump-ue
-        #   image: maikovisky/open5gs:ubuntu-latest    
-        #   command: ["/bin/tcpdump", "-i", "eth0", "-s", "65535", "-G", "3600", "-w", "/var/tcpdump/ue-%F_%H%M.pcap"]
-        #   volumeMounts:
-        #     - name: "dev-net-tun"
-        #       mountPath: "/dev/net/tun" # Needed for VPN
-
         - name: main-ue
           image: maikovisky/ueransim:3.2.6  
-          imagePullPolicy: "Always" 
+          imagePullPolicy: IfNotPresent  
           securityContext:
             privileged: true
             capabilities:
@@ -135,25 +124,17 @@ spec:
 
           command: ["nr-ue", "-c", "/etc/ueransim/tmp/open5gs-ue-01.yaml"]
 
-        # - name: metrics-ue
-        #   image: maikovisky/ueransim:3.2.6     
-        #   imagePullPolicy: "Always"
-        #   command: ["/bin/prometheus-node-exporter", "--collector.disable-defaults", "--collector.textfile", "--collector.arp","--collector.netclass" ,"--collector.netdev" ,"--collector.netstat" ,"--collector.udp_queues","--collector.ipvs","--collector.cpu","--collector.cpufreq","--collector.meminfo"]
-        #   volumeMounts:
-        #     - name: "dev-net-tun"
-        #       mountPath: "/dev/net/tun" # Needed for VPN
         - name: iperf-ue
           image: maikovisky/ueransim:3.2.6  
-          imagePullPolicy: "Always" 
+          imagePullPolicy: IfNotPresent  
           securityContext:
             privileged: true
             capabilities:
               add: ["NET_ADMIN", "SYS_MODULE"]
-          command: ["/bin/testing"]
-
           env:  
             - name: SLICE
               value: "1"
+          command: ["/bin/testing"]
           volumeMounts:
             - name: "dev-net-tun"
               mountPath: "/dev/net/tun" # Needed for VPN
@@ -163,6 +144,7 @@ spec:
               subPath: "testing"
         - name: "telegraf"
           image: "telegraf:latest"
+          imagePullPolicy: IfNotPresent  
           volumeMounts:
             - name: open5gs-ue1-telegraf-config
               mountPath: /etc/telegraf
@@ -202,9 +184,12 @@ data:
       listen = ":9100"
 
     [[inputs.ping]]
-      urls = ["10.245.1.210", "8.8.8.8"]
+      urls = ["10.0.10.149", "143.54.85.1"]
       interface = "uesimtun0"
+      method = "native"
       percentiles = [25, 50, 95, 99]
+      ping_interval = 1.0
+      count = 5
 
 ---
 apiVersion: monitoring.coreos.com/v1
@@ -214,6 +199,7 @@ metadata:
   namespace: open5gs
   labels:
     epc-mode: ue01
+    release: prometheus
 spec:
   selector:
     matchLabels:

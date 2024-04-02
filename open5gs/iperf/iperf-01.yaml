@@ -70,9 +70,7 @@ spec:
       nodeSelector:
         kubernetes.io/arch: amd64
         nodetype: server
-        # kubernetes.io/hostname: molejo
-      #  kubernetes.io/hostname: mac-porvir-02
-      #  kubernetes.io/hostname: erasure
+        kubernetes.io/hostname: acdc
 
       containers:       
         - name: iperf3

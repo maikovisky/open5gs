@@ -17,11 +17,6 @@ spec:
         app: ueransim
     spec:  
       nodeSelector:
-        #nodetype: server
-        #kubernetes.io/arch: amd64
-        #kubernetes.io/hostname: erasure
-        #kubernetes.io/hostname: petshopboys
-        # kubernetes.io/hostname: mac-porvir-05
         kubernetes.io/hostname: brix-porvir-05
       initContainers:
         - name: init-gnb
@@ -43,6 +38,13 @@ spec:
       containers:      
         - name: ueransim-gnb
           image: maikovisky/ueransim:3.2.6  
+          resources:
+            requests:
+              memory: "0"
+              cpu: "1500m"
+            limits:
+              memory: "0"
+              cpu: "1500m"
           securityContext:
             privileged: true
             capabilities:
@@ -95,9 +97,6 @@ spec:
     - name: open5gs-ueransim04-tcp-3000
       protocol: TCP
       port: 3000
-    # - name: http2-open5gs-ueransim04-9100
-    #   protocol: TCP
-    #   port: 9100
     - name: open5gs-ueransim04-udp-2152
       protocol: UDP
       port: 2152
@@ -107,18 +106,3 @@ spec:
     - name: open5gs-ueransim04-udp-4997
       protocol: UDP
       port: 4997
-# ---
-# apiVersion: monitoring.coreos.com/v1
-# kind: ServiceMonitor
-# metadata:
-#   name: open5gs-ueransim04
-#   namespace: open5gs
-#   labels:
-#     epc-mode: ueransim04
-# spec:
-#   selector:
-#     matchLabels:
-#       epc-mode: ueransim04
-#   endpoints:
-#   - interval: 5s
-#     port: open5gs-ueransim04-tcp-9100

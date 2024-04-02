@@ -52,7 +52,7 @@ metadata:
   name: open5gs-mongodb-pv-claim
   namespace: open5gs
 spec:
-  storageClassName: rook-cephfs
+  storageClassName: rook-ceph-fs-simple
   accessModes:
     - ReadWriteMany
   resources:

@@ -26,10 +26,6 @@ spec:
       protocol: UDP
       port: 8805
       targetPort: 8805
-    # - name: http-open5gs-upf2-9100
-    #   protocol: TCP
-    #   port: 9100
-    #   targetPort: 9100
 ---    
 apiVersion: apps/v1 # for versions before 1.9.0 use apps/v1beta2
 kind: Deployment
@@ -49,24 +45,13 @@ spec:
       labels:
         epc-mode: upf2
         app: open5gs-upf
-        # version: v2.6.1-26
     spec:  
       nodeSelector:
         #kubernetes.io/arch: amd64
         #kubernetes.io/hostname: erasure
-        kubernetes.io/hostname: mac-porvir-05
-        #kubernetes.io/hostname: brix-porvir-06
+        #kubernetes.io/hostname: mac-porvir-05
+        kubernetes.io/hostname: brix-porvir-01
       containers:
-        # - name: tcpdump-upf2
-        #   image: maikovisky/open5gs:ubuntu-latest  
-        #   imagePullPolicy: Always  
-        #   command: ["/bin/tcpdump", "-i", "eth0", "-s", "65535", "-G", "3600", "-w", "/var/tcpdump/upf2-%F_%H%M.pcap"]
-        #   volumeMounts:
-        #     - name: "dev-net-tun"
-        #       mountPath: "/dev/net/tun" # Needed for VPN
-        #     - name: tcpdump-persistent-storage
-        #       mountPath: /var/tcpdump
-
         - name: upf2
           image: maikovisky/open5gs:ubuntu-latest    
           imagePullPolicy: Always
@@ -77,10 +62,10 @@ spec:
           resources:
             requests:
               memory: "0Mi"
-              cpu: "0m"
+              cpu: "900m"
             limits:
               memory: "0Mi"
-              cpu: "0m"
+              cpu: "900m"
           volumeMounts:
             - name: open5gs-upf2-config
               mountPath: /open5gs/config-map/upf.yaml
@@ -96,13 +81,6 @@ spec:
           #command: ["open5gs-upfd", "-c", "/open5gs/config-map/upf.yaml"]
           command: ["/bin/entrypoint.sh"]
 
-        # - name: metrics-upf2
-        #   image: maikovisky/open5gs:ubuntu-latest    
-        #   command: ["/bin/prometheus-node-exporter", "--collector.disable-defaults","--collector.arp","--collector.netclass" ,"--collector.netdev" ,"--collector.netstat" ,"--collector.udp_queues","--collector.ipvs","--collector.cpu","--collector.cpufreq","--collector.meminfo"]
-        #   volumeMounts:
-        #     - name: "dev-net-tun"
-        #       mountPath: "/dev/net/tun" # Needed for VPN
-
       volumes:
         - name: open5gs-upf2-config
           configMap:
@@ -111,9 +89,6 @@ spec:
         - name: dev-net-tun
           hostPath:
             path: /dev/net/tun
-        - name: tcpdump-persistent-storage
-          persistentVolumeClaim:
-            claimName: open5gs-tcpdump-pv-claim
 
 ---
 apiVersion: monitoring.coreos.com/v1
@@ -124,13 +99,12 @@ metadata:
   labels:
     epc-mode: upf2
     prometheus: open5gs-monitor
+    release: prometheus
 spec:
   selector:
     matchLabels:
       epc-mode: upf2
   endpoints:
-  # - interval: 5s
-  #   port: http-open5gs-upf2-9100
   - interval: 5s
     port: http-open5gs-upf2-9090
 ---

@@ -18,11 +18,6 @@ spec:
         app: ueransim
     spec:  
       nodeSelector:
-        #nodetype: server
-        #kubernetes.io/arch: amd64
-        #kubernetes.io/hostname: erasure
-        #kubernetes.io/hostname: kiss
-        # kubernetes.io/hostname: mac-porvir-03
         kubernetes.io/hostname: brix-porvir-03
       initContainers:
         - name: init-gnb
@@ -41,18 +36,16 @@ spec:
             - name: etc-tmp
               mountPath: /etc/ueransim/tmp
 
-      containers:
-        # - name: tcpdump-ueransim
-        #   image: maikovisky/open5gs:ubuntu-latest    
-        #   command: ["/bin/tcpdump", "-i", "eth0", "-s", "65535", "-G", "3600", "-w", "/var/tcpdump/ueransim-%F_%H%M.pcap"]
-        #   volumeMounts:
-        #     - name: "dev-net-tun"
-        #       mountPath: "/dev/net/tun" # Needed for VPN
-        #     - name: tcpdump-persistent-storage
-        #       mountPath: /var/tcpdump
-        
+      containers:       
         - name: ueransim-gnb
           image: maikovisky/ueransim:3.2.6  
+          resources:
+            requests:
+              memory: "0"
+              cpu: "1500m"
+            limits:
+              memory: "0"
+              cpu: "1500m"
           securityContext:
             privileged: true
             capabilities:
@@ -71,22 +64,6 @@ spec:
 
           command: ["nr-gnb", "-c", "/etc/ueransim/tmp/open5gs-gnb-01.yaml"]
 
-        
-        # - name: metrics-ueransim
-        #   image: maikovisky/ueransim:3.2.6
-        #   command: ["/bin/prometheus-node-exporter"]
-        #   volumeMounts:
-        #     - name: "dev-net-tun"
-        #       mountPath: "/dev/net/tun" # Needed for VPN
-
-        # - name: tcpdump-ueramsim
-        #   image: maikovisky/open5gs:ubuntu-latest    
-        #   command: ["/bin/tcpdump", "-i", "eth0", "-s", "65535", "-G", "3600", "-w", "/var/tcpdump/ueramsim-%F_%H%M.pcap"]
-        #   volumeMounts:
-        #     - name: "dev-net-tun"
-        #       mountPath: "/dev/net/tun" # Needed for VPN
-        #     - name: tcpdump-persistent-storage
-        #       mountPath: /var/tcpdump
       volumes:
         - name: open5gs-ueransim-gnb-config
           configMap:
@@ -100,10 +77,6 @@ spec:
         - name: dev-net-tun
           hostPath:
             path: /dev/net/tun
-
-        - name: tcpdump-persistent-storage
-          persistentVolumeClaim:
-            claimName: open5gs-tcpdump-pv-claim
 
         - name: etc-tmp
           emptyDir: {}
@@ -125,9 +98,6 @@ spec:
     - name: open5gs-ueransim02-tcp-3000
       protocol: TCP
       port: 3000
-    # - name: http2-open5gs-ueransim02-9100
-    #   protocol: TCP
-    #   port: 9100
     - name: open5gs-ueransim02-udp-2152
       protocol: UDP
       port: 2152
@@ -137,18 +107,3 @@ spec:
     - name: open5gs-ueransim02-udp-4997
       protocol: UDP
       port: 4997
-# ---
-# apiVersion: monitoring.coreos.com/v1
-# kind: ServiceMonitor
-# metadata:
-#   name: open5gs-ueransim02
-#   namespace: open5gs
-#   labels:
-#     epc-mode: ueransim02
-# spec:
-#   selector:
-#     matchLabels:
-#       epc-mode: ueransim02
-#   endpoints:
-#   - interval: 5s
-#     port: open5gs-ueransim02-tcp-9100

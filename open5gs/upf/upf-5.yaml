@@ -40,7 +40,7 @@ metadata:
     epc-mode: upf5
     promotheus: open5gs-monitor
 spec:
-  replicas: 0
+  replicas: 1
   selector:
     matchLabels:
       epc-mode: upf5
@@ -54,11 +54,11 @@ spec:
       nodeSelector:
         #kubernetes.io/arch: amd64
         #kubernetes.io/hostname: erasure
-        kubernetes.io/hostname: brix-porvir-06
+        kubernetes.io/hostname: brix-porvir-01
       containers:
         - name: upf5
           image: maikovisky/open5gs:ubuntu-latest  
-          imagePullPolicy: Always  
+          imagePullPolicy: IfNotPresent  
           securityContext:
             privileged: true
             capabilities:
@@ -109,8 +109,6 @@ spec:
       epc-mode: upf5
   endpoints:
   - interval: 5s
-    port: http-open5gs-upf5-9100
-  - interval: 5s
     port: http-open5gs-upf5-9090
 ---
 apiVersion: v1
@@ -120,6 +118,7 @@ metadata:
   namespace: open5gs
   labels:
     epc-mode: upf5
+    release: prometheus
 data:
   upf.yaml: |-
     logger:

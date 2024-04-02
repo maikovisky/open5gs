@@ -41,16 +41,7 @@ spec:
             - name: etc-tmp
               mountPath: /etc/ueransim/tmp
 
-      containers:
-        # - name: tcpdump-ueransim
-        #   image: maikovisky/open5gs:ubuntu-latest    
-        #   command: ["/bin/tcpdump", "-i", "eth0", "-s", "65535", "-G", "3600", "-w", "/var/tcpdump/ueransim-%F_%H%M.pcap"]
-        #   volumeMounts:
-        #     - name: "dev-net-tun"
-        #       mountPath: "/dev/net/tun" # Needed for VPN
-        #     - name: tcpdump-persistent-storage
-        #       mountPath: /var/tcpdump
-        
+      containers:       
         - name: ueransim-gnb
           image: maikovisky/ueransim:3.2.6  
           securityContext:
@@ -100,11 +91,6 @@ spec:
         - name: dev-net-tun
           hostPath:
             path: /dev/net/tun
-
-        - name: tcpdump-persistent-storage
-          persistentVolumeClaim:
-            claimName: open5gs-tcpdump-pv-claim
-
         - name: etc-tmp
           emptyDir: {}
 ---

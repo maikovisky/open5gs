@@ -54,13 +54,6 @@ spec:
         #kubernetes.io/hostname: molejo
 
       containers:  
-        # - name: tcpdump-scp
-        #   image: maikovisky/open5gs:ubuntu-latest    
-        #   command: ["/bin/tcpdump", "-i", "eth0", "-s", "65535", "-G", "3600", "-w", "/var/tcpdump/scp-%F_%H%M.pcap"]
-        #   volumeMounts:
-        #     - name: tcpdump-persistent-storage
-        #       mountPath: /var/tcpdump
-
         - name: scp
           image: maikovisky/open5gs:ubuntu-latest    
           imagePullPolicy: Always
@@ -83,12 +76,6 @@ spec:
             - name: "lib-modules"
               mountPath: "/lib/modules" 
           command: ["open5gs-scpd", "-c", "/open5gs/config-map/scp.yaml"]
-
-
-
-        # - name: metrics-scp
-        #   image: maikovisky/open5gs:ubuntu-latest    
-        #   command: ["/bin/prometheus-node-exporter"]
       volumes:
         - name: open5gs-scp-config
           configMap:
@@ -98,21 +85,3 @@ spec:
           hostPath:
             path: /lib/modules
 
-        - name: tcpdump-persistent-storage
-          persistentVolumeClaim:
-            claimName: open5gs-tcpdump-pv-claim
-# ---
-# apiVersion: monitoring.coreos.com/v1
-# kind: ServiceMonitor
-# metadata:
-#   name: open5gs-scp
-#   namespace: open5gs
-#   labels:
-#     epc-mode: scp
-# spec:
-#   selector:
-#     matchLabels:
-#       epc-mode: scp
-#   endpoints:
-#   - interval: 30s
-#     port: http-open5gs-scp-9100
