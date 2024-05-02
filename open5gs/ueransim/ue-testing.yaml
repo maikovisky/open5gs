@@ -36,6 +36,6 @@ data:
     while :
     do
       t=1800
-      iperf -B $uesimtun -c open5gs-iperf0$SLICE -f A -i 30 -t $t --trip-times 
+      nice 10 iperf -B $uesimtun -c open5gs-iperf0$SLICE -f A -i 30 -t $t --trip-times 
     done
     

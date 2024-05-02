@@ -60,7 +60,7 @@ spec:
       containers:
         - name: eupf1
           image: maikovisky/eupf:latest    
-          imagePullPolicy: Always
+          imagePullPolicy: IfNotPresent
           securityContext:
             privileged: true
             capabilities:

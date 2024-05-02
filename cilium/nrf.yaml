@@ -1,0 +1,36 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: allow-egress-to-pod
+  namespace: open5gs
+spec:
+  endpointSelector:
+    matchLabels:
+      app: open5gs-nrf
+  ingress:
+    - fromEndpoints:
+        - matchLabels:
+            app: open5gs-nrf
+          matchExpressions:
+            - key: io.kubernetes.pod.namespace
+              operator: Exists
+    - fromEndpoints:
+        - {}
+  egress:
+    - toEndpoints:
+        - {}
+    - toEntities:
+        - cluster
+    - toEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: kube-system
+            k8s-app: kube-dns
+      toPorts:
+        - ports:
+            - port: "53"
+              protocol: UDP
+          rules:
+            dns:
+              - matchPattern: "*"
+    - toEntities:
+        - world

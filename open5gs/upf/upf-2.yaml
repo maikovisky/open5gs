@@ -54,18 +54,18 @@ spec:
       containers:
         - name: upf2
           image: maikovisky/open5gs:ubuntu-latest    
-          imagePullPolicy: Always
+          imagePullPolicy: IfNotPresent
           securityContext:
             privileged: true
             capabilities:
               add: ["NET_ADMIN", "SYS_MODULE"]
-          resources:
-            requests:
-              memory: "0Mi"
-              cpu: "900m"
-            limits:
-              memory: "0Mi"
-              cpu: "900m"
+          # resources:
+          #   requests:
+          #     memory: "0Mi"
+          #     cpu: "900m"
+          #   limits:
+          #     memory: "0Mi"
+          #     cpu: "900m"
           volumeMounts:
             - name: open5gs-upf2-config
               mountPath: /open5gs/config-map/upf.yaml

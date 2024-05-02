@@ -35,7 +35,7 @@ spec:
       containers:             
         - name: amf2
           image: maikovisky/open5gs:ubuntu-latest  
-          imagePullPolicy: Always
+          imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 80
             - containerPort: 38412

@@ -10,9 +10,6 @@ metadata:
     app.kubernetes.io/version: 2.6.4-25-g93012c4
     app.kubernetes.io/part-of: open5gs
 spec:
-  istio_labels:
-    app_label_name: "app"
-    version_label_name: "version"
   replicas: 1
   selector:
     matchLabels:
@@ -47,7 +44,7 @@ spec:
       containers:             
         - name: amf
           image: maikovisky/open5gs:ubuntu-latest  
-          imagePullPolicy: Always
+          imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 80
             - name: sctp-amf
@@ -148,17 +145,18 @@ spec:
       port: 38412
       #targetPort: 30412
       nodePort: 30412
----
-apiVersion: "cilium.io/v2"
-kind: CiliumNetworkPolicy
-metadata:
-  name: allow-sctp-between-pods
-spec:
-  endpointSelector:
-    matchLabels:
-      epc-mode: amf
-  egress:
-  - toEndpoints:
-    - matchLabels:
-        app: ueransim
-    protocol: SCTP
+# ---
+# apiVersion: "cilium.io/v2"
+# kind: CiliumNetworkPolicy
+# metadata:
+#   name: allow-sctp-between-pods
+#   namespace: open5gs
+# spec:
+#   endpointSelector:
+#     matchLabels:
+#       epc-mode: amf
+#   egress:
+#   - toEndpoints:
+#     - matchLabels:
+#         app: ueransim
+#     protocol: SCTP

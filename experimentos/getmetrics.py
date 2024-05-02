@@ -69,6 +69,10 @@ queries = json.loads("""[
     {"name": "memory", "q": "sum by(service) (process_resident_memory_bytes{namespace='open5gs'})"}
  ]""")
 
+queries = json.loads("""[
+    {"name": "receive2", "q": "(container_network_transmit_bytes_total{namespace='open5gs'} * on (namespace,pod) group_left(workload,workload_type) namespace_workload_pod:kube_pod_owner:relabel{namespace='open5gs'}) "}
+ ]""")
+
     # {"name": "transmit", "q": '(sum(irate(container_network_transmit_bytes_total{job="kubelet", metrics_path="/metrics/cadvisor", namespace='open5gs'}[2m]) * on (namespace,pod) group_left(workload,workload_type) namespace_workload_pod:kube_pod_owner:relabel{namespace='open5gs'}) by (workload, interface))'},
     # {"name": "latency", "q": 'avg by(url, job) (irate(ping_average_response_ms{namespace='open5gs', service=~"open5gs-ue01|open5gs-ue02|open5gs-ue03|open5gs-ue04|open5gs-ue05"}[$_rate_interval]))'},
     # {"name": "cpu", "q": 'sum(irate(node_namespace_pod_container:container_cpu_usage_seconds_total:sum_irate{namespace='open5gs'}[2m]) * on(namespace,pod) group_left(workload, workload_type) namespace_workload_pod:kube_pod_owner:relabel{namespace='open5gs' }) by (workload)'},
@@ -78,15 +82,32 @@ ns = {}
 for q in queries:
     metric = q['name']
     query  = q['q']
-    start = "2024-03-23T15:00:00.000Z"
-    end = "2024-03-23T18:00:00.000Z"
+    start = "2024-04-24T23:00:00.000Z"
+    end = "2024-04-24T23:01:00.000Z"
     prometheus = "http://localhost:9090"
     apiEndpoint = "{}/api/v1/query_range?start={}&end={}&step=5s&query={}".format(prometheus, start, end, q['q'])
-    #txt = requests.get(apiEndpoint).text
-    #print(txt)
+    txt = requests.get(apiEndpoint).text
+    j = json.loads(txt)
+    #print(j)
+    for i in range(len(j["data"]["result"])): 
+        m = j["data"]["result"][i]["metric"]
+        keys_to_keep = set(m.keys()) - set(["workload", "interface"])
+        #print(m)
+
+        new_dict = {k: m[k] for k in ["workload", "interface"]}
+        #print(new_dict)
+        j["data"]["result"][i]["metric"] = new_dict
+        print(j["data"]["result"][i]["metric"] )
+        exit(0)
+        #print(j["data"]["result"][i]["metric"][s.pop(k) for k in list(s.keys()) if k != 'en'])
+        #print(j[i]["values"])
+
+        
+    #print(j['data']['
+    # result'])
     ns[metric] = query
 
-print(ns)
+#print(ns)
     
     
 

@@ -58,7 +58,7 @@ spec:
       containers:
         - name: ausf
           image: maikovisky/open5gs:ubuntu-latest  
-          imagePullPolicy: Always
+          #imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 80
           securityContext:

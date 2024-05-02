@@ -62,7 +62,7 @@ spec:
       containers:
         # - name: tcpdump-upf8
         #   image: maikovisky/open5gs:ubuntu-latest   
-        #   imagePullPolicy: Always
+        #   imagePullPolicy: IfNotPresent
         #   command: ["/bin/tcpdump", "-i", "eth0", "-s", "65535", "-G", "3600", "-w", "/var/tcpdump/upf8-%F_%H%M.pcap"]
         #   volumeMounts:
         #     - name: "dev-net-tun"
@@ -71,7 +71,7 @@ spec:
         #       mountPath: /var/tcpdump
         - name: upf8
           image: maikovisky/open5gs:ubuntu-latest  
-          imagePullPolicy: Always  
+          imagePullPolicy: IfNotPresent  
           securityContext:
             privileged: true
             capabilities:

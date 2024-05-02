@@ -61,7 +61,7 @@ spec:
       containers:
         # - name: tcpdump-upf3
         #   image: maikovisky/open5gs:ubuntu-latest  
-        #   imagePullPolicy: Always  
+        #   imagePullPolicy: IfNotPresent  
         #   command: ["/bin/tcpdump", "-i", "eth0", "-s", "65535", "-G", "3600", "-w", "/var/tcpdump/upf3-%F_%H%M.pcap"]
         #   volumeMounts:
         #     - name: "dev-net-tun"
@@ -71,18 +71,18 @@ spec:
 
         - name: upf3
           image: maikovisky/open5gs:ubuntu-latest   
-          imagePullPolicy: Always
+          imagePullPolicy: IfNotPresent
           securityContext:
             privileged: true
             capabilities:
               add: ["NET_ADMIN", "SYS_MODULE"]
-          resources:
-            requests:
-              memory: "0Mi"
-              cpu: "900m"
-            limits:
-              memory: "0Mi"
-              cpu: "900m"
+          # resources:
+          #   requests:
+          #     memory: "0Mi"
+          #     cpu: "900m"
+          #   limits:
+          #     memory: "0Mi"
+          #     cpu: "900m"
           volumeMounts:
             - name: open5gs-upf3-config
               mountPath: /open5gs/config-map/upf.yaml

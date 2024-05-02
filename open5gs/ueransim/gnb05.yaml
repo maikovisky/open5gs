@@ -22,7 +22,7 @@ spec:
       initContainers:
         - name: init-gnb
           image: maikovisky/ueransim:3.2.6
-          imagePullPolicy: Always
+          imagePullPolicy: IfNotPresent
           command: ["/bin/gnbinit"]
 
           volumeMounts:

@@ -1,0 +1,247 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: experiment-job
+  namespace: open5gs
+spec:
+  template:
+    spec:
+      containers:
+      - name: open5gs-runexp
+        image: python:latest
+        imagePullPolicy: Always
+        volumeMounts:
+          - name: open5gs-runexp
+            mountPath: /runExp.py
+            subPath: "runExp.py"
+          - name: open5gs-runexp-requirement
+            mountPath: /requirement.txt
+            subPath: "requirement.txt"
+          - name: open5gs-kubeconfig
+            readOnly: true
+            mountPath: .kube/config
+            subPath: config
+        command:  ["bash"]  
+        args: 
+          - -c
+          - pip install -r requirement.txt &&
+          - python runExp.py 
+      restartPolicy: Never
+      volumes:
+        - name: open5gs-runexp
+          configMap:
+            name: open5gs-runexp
+        - name: open5gs-runexp-requirement
+          configMap:
+            name: open5gs-runexp-requirement
+        - name: open5gs-kubeconfig
+          secret:
+            secretName: kubeconfig
+  backoffLimit: 4
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: open5gs-runexp-requirement
+  namespace: open5gs
+data:
+  requirement.txt: |
+    requests
+    pymongo
+    kubernetes
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: open5gs-runexp
+  namespace: open5gs
+data:
+  runExp.py: |
+    import json, requests, time
+    from pymongo import MongoClient
+    from datetime import datetime, timezone
+    from kubernetes import client, config
+    import inspect, signal, getopt, sys, os
+    grafanaUrl = "http://admin:admin@prometheus-grafana.monitoring.svc.cluster.local"
+    prometheusUrl = "http://prometheus-operated.monitoring.svc.cluster.local:9090"
+    mongoUrl = "mongodb://open5gs-mongodb-svc.open5gs.svc.cluster.local:27017/open5gs"
+
+    dashboardUID="9ZtOvTcVz"
+    panelId=54
+
+    aExp = "01"
+    argumentList = sys.argv[1:]
+    options = "he:"
+    long_options = ["Help", "experiment"]
+
+    experiments = json.loads("""[
+        {"experiment": "01", "text": "Baseline only priority UE", "priorityPod": "open5gs-ue01", "pods": []},                       
+        {"experiment": "02", "text": "Baseline with priority UE and Slice 02", "priorityPod": "open5gs-ue01", "pods": ["open5gs-ue02"]},
+        {"experiment": "03", "text": "Baseline with priority UE and Slice 02 and 03", "priorityPod": "open5gs-ue01", "pods": ["open5gs-ue02", "open5gs-ue03"]},
+        {"experiment": "04", "text": "Baseline with priority UE and Slice 02, 03 and 04", "priorityPod": "open5gs-ue01", "pods": ["open5gs-ue02", "open5gs-ue03", "open5gs-ue04"]},
+        {"experiment": "05", "text": "Baseline with priority UE and Slice 02, 03, 04, 05", "priorityPod": "open5gs-ue01", "pods": ["open5gs-ue02", "open5gs-ue03", "open5gs-ue04", "open5gs-ue05"]}
+    ]""")
+
+
+    queries = json.loads("""[
+        {"name": "receive", "q": "(sum(irate(container_network_receive_bytes_total{job='kubelet', metrics_path='/metrics/cadvisor', namespace='open5gs'}[2m]) * on (namespace,pod) group_left(workload,workload_type) namespace_workload_pod:kube_pod_owner:relabel{namespace='open5gs'}) by (workload, interface))"},
+        {"name": "transmit", "q": "(sum(irate(container_network_transmit_bytes_total{job='kubelet', metrics_path='/metrics/cadvisor', namespace='open5gs'}[2m]) * on (namespace,pod) group_left(workload,workload_type) namespace_workload_pod:kube_pod_owner:relabel{namespace='open5gs'}) by (workload, interface))"},
+        {"name": "latency", "q": "avg by(url, job) (irate(ping_average_response_ms{namespace='open5gs', service=~'open5gs-ue01|open5gs-ue02|open5gs-ue03|open5gs-ue04|open5gs-ue05'}[$_rate_interval]))"},
+        {"name": "cpu", "q": "sum(irate(node_namespace_pod_container:container_cpu_usage_seconds_total:sum_irate{namespace='open5gs'}[2m]) * on(namespace,pod) group_left(workload, workload_type) namespace_workload_pod:kube_pod_owner:relabel{namespace='open5gs' }) by (workload)"},
+        {"name": "memory", "q": "sum by(service) (process_resident_memory_bytes{namespace='open5gs'})"}
+    ]""")
+
+    try:
+        # Parsing argument
+        arguments, values = getopt.getopt(argumentList, options, long_options)
+            
+        # checking each argument
+        for currentArgument, currentValue in arguments:
+
+            if currentArgument in ("-h", "--Help"):
+                print ("Displaying Help")
+                    
+            elif currentArgument in ("-e", "--experiment"):
+                aExp = currentValue.rjust(2, "0")
+                print (("Run experiment % s") % (aExp))
+                
+                
+    except getopt.error as err:
+        # output error, and return with an error code
+        print (str(err))
+
+
+
+    class Open5gsSliceExperiment:
+        
+        def __init__(self, grafanaUrl, prometheusUrl, mongodb, dashUID, panelId):
+            self.grafanaUrl = grafanaUrl
+            self.dashboardUID = dashUID
+            self.panelId = panelId
+            self.namespace = "open5gs"
+            self.tags = ["open5gs"]
+            self.priorityPod = "open5gs-ue01"
+            self.pods = []
+            self.prometheus = prometheusUrl
+            self.mongo = mongodb
+
+        def getDatabase(self, database):
+            DATABASE_URL = os.environ.get("DATABASE_URL", "mongodb://localhost:27020/open5gs")
+            # Create a connection using MongoClient. You can import MongoClient or use pymongo.MongoClient
+            conn = MongoClient(DATABASE_URL)
+            return conn[database]
+            
+        def addAnnotation(self, text, startAt = False, endAt = False):
+            t = datetime.now(timezone.utc)
+            
+            if(startAt):
+                self.startAt = t
+                #print(self.startAt.strftime("%Y-%m-%dT%H:%M:%S.000Z"))
+
+            if(endAt):
+                self.endAt = t
+                
+            timeStart = int( t.timestamp() * 1000)
+                        
+            header = {'Accept': 'application/json', 'Content-Type': 'application/json'}
+            body = { "dashboardUID": self.dashboardUID, "panelId": self.panelId, "time": timeStart, "text": text, "tags": self.tags }
+
+            r = requests.post(self.grafanaUrl + "/api/annotations", headers=header, data=json.dumps(body))
+            
+            return timeStart   
+        
+        def scale(self, pod, replicas):
+            k8sApi = client.AppsV1Api()
+            k8sApi.patch_namespaced_deployment_scale(name=pod, namespace=self.namespace, body={'spec': {'replicas': replicas}})
+            print("Pod: {} to {} replicas".format(pod, replicas))
+            
+        def setPods(self, priorityPod, pods):
+            self.priorityPod = priorityPod
+            self.pods = pods
+        
+        def start(self, experiment, annotation):
+            print("Start experiment {}. {}".format(experiment, annotation))
+            self.addAnnotation("Start experiment {}. {}".format(experiment, annotation), True)
+            
+            time.sleep(30)
+            
+            self.scale(self.priorityPod, 5)
+            self.startScale = datetime.now(timezone.utc)
+            for fase in [1, 5, 10, 15, 20, 25]:
+                self.addAnnotation("Fase {}".format(fase))
+                print("Fase {}".format(fase))
+                for p  in self.pods:
+                    self.scale(p, fase)
+                    
+                time.sleep(300)
+                #time.sleep(30)
+                
+            self.stopPods()
+            print("Finished experiment {}".format(experiment))
+            self.addAnnotation("Finished experiment {}".format(experiment), False, True)
+            print("StartAt: {}".format(self.startAt.strftime("%Y-%m-%dT%H:%M:%S.000Z")))
+            print("EndAt: {}".format(self.endAt.strftime("%Y-%m-%dT%H:%M:%S.000Z")))
+            self.stop(experiment, annotation)
+            
+        def stop(self, experiment, annotation):
+            global queries
+            base = {"experiment": experiment, "annotation": annotation, "startAt": self.startAt, "endAt": self.endAt, "startScale": self.startScale }
+            start = self.startAt.strftime("%Y-%m-%dT%H:%M:%S.000Z")
+            end   = self.endAt.strftime("%Y-%m-%dT%H:%M:%S.000Z")
+            
+            for q in queries:
+                metric = q['name']
+                query  = q['q']
+                apiEndpoint = "{}/api/v1/query_range?start={}&end={}&step=5s&query={}".format(self.prometheus, start, end, query)
+                txt = requests.get(apiEndpoint).text
+                base[metric] = json.loads(txt)
+            
+            db = self.getDatabase("open5gs")
+            db["experiments"].insert_one(base)
+            
+        def stopPods(self):
+            self.scale(self.priorityPod, 0)
+            for p  in self.pods:
+                    self.scale(p, 0)
+                    
+        def verifyRunning(self):
+            v1 = client.CoreV1Api()
+            pod_list = v1.list_namespaced_pod("open5gs")
+            for pod in pod_list.items:
+                if(pod.metadata.name.startswith("open5gs-ue0") and pod.status.phase == "Running"):
+                    return False
+                        
+            return True
+
+    config.load_kube_config()
+
+    def search_experiments(experiments, exp):
+        for keyval in experiments:
+            if exp.lower() == keyval['experiment'].lower():
+                return keyval
+
+    def runExperiment(osEx,experiments, exp):
+        r = search_experiments(experiments, exp)
+        print(r)
+        osEx.setPods(r["priorityPod"],r["pods"])
+        osEx.start(exp, r["text"])
+
+
+    def main(experiments, exp="01"):
+        osEx = Open5gsSliceExperiment(grafanaUrl, dashboardUID, panelId)
+        if(exp != "00"):
+            runExperiment(osEx, experiments, exp)
+        else:
+            for e in experiments:
+                runExperiment(osEx, experiments, e['experiment'])
+                time.sleep(240)
+        
+
+    if __name__ == '__main__':
+        try:
+            main(experiments, aExp)  
+        except KeyboardInterrupt:
+            osEx = Open5gsSliceExperiment(grafanaUrl, prometheusUrl, mongoUrl, dashboardUID, panelId)
+            osEx.stopPods()
+            sys.stderr.write('\nInterrupted')

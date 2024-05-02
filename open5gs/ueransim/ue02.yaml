@@ -55,7 +55,7 @@ spec:
       initContainers:
         - name: init-ue
           image: maikovisky/ueransim:3.2.6
-          imagePullPolicy: Always
+          imagePullPolicy: IfNotPresent
           command: ["/bin/ueinit"]
           env:            
             - name: DATABASE_URL
@@ -166,7 +166,7 @@ spec:
             - name: open5gs-ue2-ping-config
               mountPath: /config/config.yml
               subPath: "config.yml"
-          command: ["ping","-I", "uesimtun0", "-q", "-i", "0.001", "10.0.11.151"]
+          command: ["nice","0", "ping","-I", "uesimtun0", "-q", "-i", "0.001", "10.0.11.151"]
           
       volumes:
         - name: open5gs-ue2-telegraf-config

@@ -3,3 +3,9 @@ config
 virtual-4g-simulator
 pcap
 imagens/.$topologias.drawio.dtmp
+experimentos/exp*
+experimentos/olds
+experimentos/*.pdf
+**/__pycache__
+
+

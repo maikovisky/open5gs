@@ -51,7 +51,7 @@ spec:
       initContainers:
         - name: init-ue
           image: maikovisky/ueransim:3.2.6
-          imagePullPolicy: Always
+          imagePullPolicy: IfNotPresent
           command: ["/bin/ueinit"]
           env:            
             - name: DATABASE_URL
@@ -181,7 +181,7 @@ data:
 
 
     [[inputs.ping]]
-      urls = ["10.0.14.22", "143.54.85.1"]
+      urls = ["10.0.14.90", "143.54.85.1"]
       interface = "uesimtun0"
       method = "native"
       percentiles = [25, 50, 95, 99]

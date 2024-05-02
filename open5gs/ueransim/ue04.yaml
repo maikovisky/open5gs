@@ -51,7 +51,7 @@ spec:
       initContainers:
         - name: init-ue
           image: maikovisky/ueransim:3.2.6
-          imagePullPolicy: Always
+          imagePullPolicy: IfNotPresent
           command: ["/bin/ueinit"]
           env:            
             - name: DATABASE_URL

@@ -35,7 +35,7 @@ spec:
       containers:
         - name: udm
           image: maikovisky/open5gs:ubuntu-latest    
-          imagePullPolicy: Always
+          imagePullPolicy: IfNotPresent
           securityContext:
             privileged: true
             capabilities:

@@ -6,30 +6,48 @@ import inspect, signal, getopt, sys, os
 from graphs import GraphanaGetRenderImage
 from experiments import Open5gsSliceExperiment
 
-grafanaUrl = "http://admin:prom-operator@localhost:3000"
+grafanaUrl = "http://maikovisky:SuperSenha2024@localhost:3000"
 prometheusUrl = "http://localhost:9090"
-mongodbUrl = "mongodb://localhost:27020/open5gs"
+#mongodbUrl = "mongodb://localhost:27020/open5gs"
+#mongodbUrl = "mongodb+srv://maikovisky:MFIl9m0cgK9UorO9@open5gs.xm3nrzk.mongodb.net/open5gs"
+mongodbUrl = "mongodb://localhost:27017/open5gs"
+
 dashboardUID="9ZtOvTcVz"
 panelId=62
 global osEx
 
 
+gCorePods = [
+    "open5gs-nrf", "open5gs-scp", "open5gs-amf", "open5gs-ausf","open5gs-bsf", "open5gs-nssf", "open5gs-pcf","open5gs-udm","open5gs-udr"]
+
+gUPFPods = ["open5gs-upf-1", "open5gs-upf-2", "open5gs-upf-3", "open5gs-upf-4", "open5gs-upf-5"]
+gURANSIMPods = ["open5gs-ueransim01", "open5gs-ueransim02", "open5gs-ueransim03", "open5gs-ueransim04", "open5gs-ueransim05"]
 
 gExperiments = json.loads("""[
-    {"experiment": "01", "name": "experiment01", "text": "Baseline only priority UE", "priorityPod": "open5gs-ue01", "pods": [], "slices": ["1"]},                       
-    {"experiment": "02", "name": "experiment02", "text": "Baseline with priority UE and Slice 02", "priorityPod": "open5gs-ue01", "pods": ["open5gs-ue02"], "slices": ["1","2"]},
-    {"experiment": "03", "name": "experiment03", "text": "Baseline with priority UE and Slice 02 and 03", "priorityPod": "open5gs-ue01", "pods": ["open5gs-ue02", "open5gs-ue03"], "slices": ["1","2","3"]},
-    {"experiment": "04", "name": "experiment04", "text": "Baseline with priority UE and Slice 02, 03 and 04", "priorityPod": "open5gs-ue01", "pods": ["open5gs-ue02", "open5gs-ue03", "open5gs-ue04"], "slices": ["1","2","3","4"]},
-    {"experiment": "05", "name": "experiment05", "text": "Baseline with priority UE and Slice 02, 03, 04, 05", "priorityPod": "open5gs-ue01", "pods": ["open5gs-ue02", "open5gs-ue03", "open5gs-ue04", "open5gs-ue05"], "slices": ["1","2","3","4","5"]}
+    {"experiment": "01", "name": "experiment01", "text": "Baseline only priority UE", "priorityPod": "open5gs-ue01", "pods": [], "slices": ["1"], "cpu": []},                       
+    {"experiment": "02", "name": "experiment02", "text": "Baseline with priority UE and Slice 02", "priorityPod": "open5gs-ue01", "pods": ["open5gs-ue02"], "slices": ["1","2"], "cpu": []},
+    {"experiment": "03", "name": "experiment03", "text": "Baseline with priority UE and Slice 02 and 03", "priorityPod": "open5gs-ue01", "pods": ["open5gs-ue02", "open5gs-ue03"], "slices": ["1","2","3"], "cpu": []},
+    {"experiment": "04", "name": "experiment04", "text": "Baseline with priority UE and Slice 02, 03 and 04", "priorityPod": "open5gs-ue01", "pods": ["open5gs-ue02", "open5gs-ue03", "open5gs-ue04"], "slices": ["1","2","3","4"], "cpu": []},
+    {"experiment": "05", "name": "experiment05", "text": "Baseline with priority UE and Slice 02, 03, 04, 05", "priorityPod": "open5gs-ue01", "pods": ["open5gs-ue02", "open5gs-ue03", "open5gs-ue04", "open5gs-ue05"], "slices": ["1","2","3","4","5"], "cpu": []},
+    {"experiment": "06", "name": "experiment06", "text": "Limit CPU all UPF", "priorityPod": "open5gs-ue01", "pods": ["open5gs-ue02", "open5gs-ue03", "open5gs-ue04", "open5gs-ue05"], "slices": ["1","2","3","4","5"], "cpu": [750, 750, 750, 750, 750]},
+    {"experiment": "07", "name": "experiment07", "text": "Limit CPU all UPF more Slice 01", "priorityPod": "open5gs-ue01", "pods": ["open5gs-ue02", "open5gs-ue03", "open5gs-ue04", "open5gs-ue05"], "slices": ["1","2","3","4","5"], "cpu": [900, 750, 750, 675, 675]},
+    {"experiment": "08", "name": "experiment08", "text": "Limit CPU all UPF more Slice 02", "priorityPod": "open5gs-ue01", "pods": ["open5gs-ue02", "open5gs-ue03", "open5gs-ue04", "open5gs-ue05"], "slices": ["1","2","3","4","5"], "cpu": [900, 900, 750, 600, 600]},
+    {"experiment": "09", "name": "experiment09", "text": "Limit CPU all UPF more Slice 02", "priorityPod": "open5gs-ue01", "pods": ["open5gs-ue02", "open5gs-ue03", "open5gs-ue04", "open5gs-ue05"], "slices": ["1","2","3","4","5"], "cpu": [900, 900, 900, 525, 525]}
 ]""")
 
 
 gQueries = json.loads("""[
     {"name": "receive", "q": "(sum(irate(container_network_receive_bytes_total{job='kubelet', metrics_path='/metrics/cadvisor', namespace='open5gs'}[2m]) * on (namespace,pod) group_left(workload,workload_type) namespace_workload_pod:kube_pod_owner:relabel{namespace='open5gs'}) by (workload, interface))"},
     {"name": "transmit", "q": "(sum(irate(container_network_transmit_bytes_total{job='kubelet', metrics_path='/metrics/cadvisor', namespace='open5gs'}[2m]) * on (namespace,pod) group_left(workload,workload_type) namespace_workload_pod:kube_pod_owner:relabel{namespace='open5gs'}) by (workload, interface))"},
-    {"name": "latency", "q": "avg by(url, job) (irate(ping_average_response_ms{namespace='open5gs', service=~'open5gs-ue01|open5gs-ue02|open5gs-ue03|open5gs-ue04|open5gs-ue05'}[2m]))"},
-    {"name": "cpu", "q": "sum(irate(node_namespace_pod_container:container_cpu_usage_seconds_total:sum_irate{namespace='open5gs'}[2m]) * on(namespace,pod) group_left(workload, workload_type) namespace_workload_pod:kube_pod_owner:relabel{namespace='open5gs' }) by (workload)"},
-    {"name": "memory", "q": "sum by(service) (process_resident_memory_bytes{namespace='open5gs'})"}
+    {"name": "latency", "q": "sort_desc(avg(irate(ping_average_response_ms{namespace='open5gs', service=~'open5gs-ue01|open5gs-ue02|open5gs-ue03|open5gs-ue04|open5gs-ue05'}[4h:1m])) by(url, job))"},
+    {"name": "cpu", "q": "sort_desc(sum(irate(node_namespace_pod_container:container_cpu_usage_seconds_total:sum_irate{namespace='open5gs'}[4h:1m]) * on(namespace,pod) group_left(workload, workload_type) namespace_workload_pod:kube_pod_owner:relabel{namespace='open5gs' }) by (workload))"},
+    {"name": "memory", "q": "sum by(service) (process_resident_memory_bytes{namespace='open5gs'})"},
+    {"name": "receive2", "q": "sort_desc(sum(irate(container_network_receive_bytes_total{job='kubelet', metrics_path='/metrics/cadvisor', namespace='open5gs'}[4h:1m]) * on (namespace, pod) group_left(workload, workload_type) namespace_workload_pod:kube_pod_owner:relabel{namespace='open5gs'}) by (workload, interface))"},
+    {"name": "transmit2", "q": "sort_desc(sum(irate(container_network_transmit_bytes_total{job='kubelet', metrics_path='/metrics/cadvisor', namespace='open5gs'}[4h:1m]) * on (namespace, pod) group_left(workload, workload_type) namespace_workload_pod:kube_pod_owner:relabel{namespace='open5gs'}) by (workload, interface))"},
+    {"name": "receive_packets","q": "sort_desc(sum(irate(container_network_receive_packets_total{job='kubelet', metrics_path='/metrics/cadvisor', namespace='open5gs'}[4h:1m]) * on (namespace,pod) group_left(workload,workload_type) namespace_workload_pod:kube_pod_owner:relabel{namespace='open5gs'}) by (pod))"},
+    {"name": "transmit_packets","q": "sort_desc(sum(irate(container_network_transmit_packets_total{job='kubelet', metrics_path='/metrics/cadvisor', namespace='open5gs'}[4h:1m]) * on (namespace,pod) group_left(workload,workload_type) namespace_workload_pod:kube_pod_owner:relabel{namespace='open5gs'}) by (pod))"},
+    {"name": "received_packets_drop", "q": "sort_desc(sum(irate(container_network_receive_packets_dropped_total{job='kubelet', metrics_path='/metrics/cadvisor', namespace='open5gs'}[4h:1m]) * on (namespace,pod) group_left(workload,workload_type) namespace_workload_pod:kube_pod_owner:relabel{namespace='open5gs'}) by (workload, interface))"},
+    {"name": "transmit_packets_drop", "q": "sort_desc(sum(irate(container_network_transmit_packets_dropped_total{job='kubelet', metrics_path='/metrics/cadvisor', namespace='open5gs'}[4h:1m]) * on (namespace,pod) group_left(workload,workload_type) namespace_workload_pod:kube_pod_owner:relabel{namespace='open5gs'}) by (workload, interface))"}
  ]""")
 
 
@@ -39,6 +57,7 @@ long_options = ["Help", "experiment", "repeat", "time"]
 aRepeat = 1
 aExp = None
 aTime = 300
+aTimeBetweenExperience = 180
 
 def usage():
     print("python runExp.py <options>")
@@ -58,9 +77,12 @@ def search_experiments(experiments, exp):
 def run(osEx, r):
     global queries
     print(r)
+    osEx.setValues(r)
+    osEx.resetCore(wait=True)
     osEx.setPods(r["priorityPod"],r["pods"])
     osEx.start(r)
     osEx.saveInfos(gQueries)
+    
 
 
 try:
@@ -97,6 +119,7 @@ config.load_kube_config()
 
 try:
     osEx = Open5gsSliceExperiment(grafanaUrl, prometheusUrl,  mongodbUrl, dashboardUID)
+    osEx.setCorePods(gCorePods, gUPFPods, gURANSIMPods)
     osEx.setTime(aTime)
 
     
@@ -107,12 +130,14 @@ try:
             for e in aExp:            
                 r = search_experiments(gExperiments, e.rjust(2, "0"))
                 run(osEx, r)
-                time.sleep(240)
+                time.sleep(aTimeBetweenExperience)
         else:
             for r in gExperiments:
                 run(osEx, r)
-                time.sleep(240)
-            
+                time.sleep(aTimeBetweenExperience)
+except ConnectionError:
+    osEx.stopPods()
+    
 except KeyboardInterrupt:
     osEx.stopPods()
     sys.stderr.write('\nInterrupted')

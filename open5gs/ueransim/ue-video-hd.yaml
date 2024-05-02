@@ -36,5 +36,5 @@ data:
     while :
     do
       t=1800
-      /bin/iperf -c open5gs-iperf0$SLICE -B $uesimtun -u -p 5002 --len 1370 -f A -i 15 -t $t --isochronous=30:3m,1 --trip-times -e -z
+      nice -5 /bin/iperf -c open5gs-iperf0$SLICE -B $uesimtun -u -p 5002 --len 1370 -f A -i 15 -t $t --isochronous=30:3m,1 --trip-times -e -z
     done
