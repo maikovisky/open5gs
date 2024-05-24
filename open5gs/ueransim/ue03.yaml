@@ -36,7 +36,7 @@ metadata:
   labels:
     epc-mode: ue03
 spec:
-  replicas: 0
+  replicas: 1
   selector:
     matchLabels:
       epc-mode: ue03
@@ -141,6 +141,10 @@ spec:
 
         - name: "telegraf"
           image: "telegraf:latest"
+          securityContext:
+            privileged: true
+            capabilities:
+              add: ["NET_ADMIN", "SYS_MODULE", "NET_RAW"]
           volumeMounts:
             - name: open5gs-ue3-telegraf-config
               mountPath: /etc/telegraf
@@ -181,10 +185,11 @@ data:
 
 
     [[inputs.ping]]
-      urls = ["10.0.14.90", "143.54.85.1"]
+      urls = ["10.0.14.235"]
+      #urls = ["10.0.14.22", "143.54.85.1"]
       interface = "uesimtun0"
       method = "native"
-      percentiles = [25, 50, 95, 99]
+      #percentiles = [25, 50, 95, 99]
       ping_interval = 1.0
       count = 5
 

@@ -8,29 +8,20 @@ metadata:
 data:
   scp.yaml: |
     logger:
-        file: /var/log/open5gs/scp.log
-
-    sbi:
-      server:
-        no_tls: true
-      client:
-        no_tls: true
+      file: 
+        path: /var/log/open5gs/scp.log
+    global:
+      max:
+        ue: 1024  # The number of UE can be increased depending on memory size.
+        peer: 64
 
     scp:
-        sbi:
+      sbi:
+        server:
           - dev: eth0
             advertise: open5gs-scp
-            delegated: yes
+        client:
+          nrf:
+            - uri: http://open5gs-nrf
 
-    nrf:
-        sbi:
-          - name: open5gs-nrf
-
-    parameter:
-    max:
-    time:
-      nf_instance:
-        heartbeat: 20
-      message:
-        duration: 3000
 

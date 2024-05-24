@@ -8,63 +8,113 @@ metadata:
 data:
   smf.yaml: |
     logger:
-        file: /var/log/open5gs/smf.log
+      file: 
+        path: /var/log/open5gs/smf.log
 
-    sbi:
-      server:
-        no_tls: true
-      client:
-        no_tls: true
+    global:
+      max:
+        ue: 1024  # The number of UE can be increased depending on memory size.
+        peer: 64
 
     smf:
       sbi:
-        - dev: eth0
-          port: 80
-          advertise: open5gs-smf
+        server:
+          - address: 0.0.0.0
+            advertise: open5gs-smf
+        client:
+          nrf:
+            - uri: http://open5gs-nrf
       metrics:
-        addr: 0.0.0.0
-        port: 9090
+        server:
+          - address: 0.0.0.0
+            port: 9090
       pfcp:
-        - dev: eth0
+        server:
+          - address: 0.0.0.0
+            advertise: open5gs-smf
+        client:
+          upf:
+            # - address: open5gs-upf
+            #   dnn: [internet]
+            - address: open5gs-upf-1
+              dnn: [internet, slice01]
+            - address: open5gs-upf-2
+              dnn: [internet, slice02]
+            - address: open5gs-upf-3
+              dnn: [internet, slice03]
+            - address: open5gs-upf-4
+              dnn: [internet, slice04]
+            - address: open5gs-upf-5
+              dnn: [internet, slice05]
+            # - address: open5gs-upf-6
+            #   dnn: [internet, slice06]
+            # - address: open5gs-upf-7
+            #   dnn: [internet, slice07]
+            # - address: open5gs-upf-8
+            #   dnn: [internet, slice08]
+            # - address: open5gs-upf-9
+            #   dnn: [internet, slice09]
+            # - address: open5gs-upf-10
+            #   dnn: [internet, slice10]
+            # - address: open5gs-upf-11
+            #   dnn: [internet, slice11]
+            # - address: open5gs-upf-12
+            #   dnn: [internet, slice12]
+
       gtpc:
-        - dev: eth0
+        server:
+          - address: 0.0.0.0
       gtpu:
-        - dev: eth0
-      subnet:
-        - addr: 192.168.0.1/16
+        server:
+          - address: 0.0.0.0
+      session:
+        - subnet: 192.168.0.0/16
+          gateway: 192.168.0.1
           dnn: internet
-        - addr: 10.41.0.1/16
+        - subnet: 10.41.0.1/16
+          gateway: 10.41.0.1
           dnn: slice01
-        - addr: 10.42.0.1/16
+        - subnet: 10.42.0.0/16
+          gateway: 10.42.0.1
           dnn: slice02
-        - addr: 10.43.0.1/16
+        - subnet: 10.43.0.0/16
+          gateway: 10.43.0.1
           dnn: slice03
-        - addr: 10.44.0.1/16
+        - subnet: 10.44.0.0/16
+          gateway: 10.44.0.1
           dnn: slice04
-        - addr: 10.45.0.1/16
+        - subnet: 10.45.0.0/16
+          gateway: 10.45.0.1
           dnn: slice05
-        - addr: 10.46.0.1/16
-          dnn: slice06
-        - addr: 10.47.0.1/16
-          dnn: slice07
-        - addr: 10.48.0.1/16
-          dnn: slice08
-        - addr: 10.49.0.1/16
-          dnn: slice09
-        - addr: 10.50.0.1/16
-          dnn: slice10
-        - addr: 10.51.0.1/16
-          dnn: slice11
-        - addr: 10.52.0.1/16
-          dnn: slice12
+        # - subnet: 10.46.0.0/16
+        #   gateway: 10.46.0.1
+        #   dnn: slice06
+        # - subnet: 10.47.0.0/16
+        #   gateway: 10.47.0.1
+        #   dnn: slice07
+        # - subnet: 10.48.0.0/16
+        #   gateway: 10.48.0.1
+        #   dnn: slice08
+        # - subnet: 10.49.0.0/16
+        #   gateway: 10.49.0.1
+        #   dnn: slice09
+        # - subnet: 10.50.0.0/16
+        #   gateway: 10.50.0.1
+        #   dnn: slice10
+        # - subnet: 10.51.0.0/16
+        #   gateway: 10.51.0.1
+        #   dnn: slice11
+        # - subnet: 10.52.0.0/16
+        #   gateway: 10.52.0.1
+        #   dnn: slice12
       dns:
         - 8.8.8.8
         - 8.8.4.4
         - 2001:4860:4860::8888
         - 2001:4860:4860::8844
       mtu: 1370
-      ctf:
-        enabled: auto
+      #ctf:
+      # enabled: auto
       freeDiameter: /etc/freeDiameter/smf.conf
       info:
         - s_nssai:
@@ -76,7 +126,7 @@ data:
             dnn:
               - slice01
           - sst: 2
-            sd: 2
+            sd: 000002
             dnn:
               - slice02
           - sst: 3
@@ -91,20 +141,20 @@ data:
             sd: 000005
             dnn:
               - slice05
-        - s_nssai:
+        # - s_nssai:
 
-          - sst: 6
-            sd: 000006
-            dnn:
-              - slice06
-          - sst: 7
-            sd: 000007
-            dnn:
-              - slice07
-          - sst: 8
-            sd: 000008
-            dnn:
-              - slice08
+        #   - sst: 6
+        #     sd: 000006
+        #     dnn:
+        #       - slice06
+        #   - sst: 7
+        #     sd: 000007
+        #     dnn:
+        #       - slice07
+        #   - sst: 8
+        #     sd: 000008
+        #     dnn:
+        #       - slice08
         # - s_nssai:
         #   - sst: 9
         #     sd: 000009
@@ -123,51 +173,10 @@ data:
         #     dnn:
         #       - slice12
         
-    nrf:
-      sbi:
-        - name: open5gs-nrf
-    
-    # scp:
-    #   sbi:
-    #     - name: open5gs-scp
 
-    upf:
-      pfcp:
-        # - addr: open5gs-upf
-        #   dnn: [internet]
-        - addr: open5gs-upf-1
-          dnn: [internet, slice01]
-        - addr: open5gs-upf-2
-          dnn: [internet, slice02]
-        - addr: open5gs-upf-3
-          dnn: [internet, slice03]
-        - addr: open5gs-upf-4
-          dnn: [internet, slice04]
-        - addr: open5gs-upf-5
-          dnn: [internet, slice05]
-        - addr: open5gs-upf-6
-          dnn: [internet, slice06]
-        - addr: open5gs-upf-7
-          dnn: [internet, slice07]
-        - addr: open5gs-upf-8
-          dnn: [internet, slice08]
-        - addr: open5gs-upf-9
-          dnn: [internet, slice09]
-        - addr: open5gs-upf-10
-          dnn: [internet, slice10]
-        - addr: open5gs-upf-11
-          dnn: [internet, slice11]
-        - addr: open5gs-upf-12
-          dnn: [internet, slice12]
-
-    metrics:
-        addr: 0.0.0.0
-        port: 9090
-
-    time:
-      nf_instance:
-        heartbeat: 20
-      message:
-        duration: 3000
-      handover:
-        duration: 500
+    #  o Security Indication(5G Core only)
+    #  security_indication:
+    #    integrity_protection_indication: required|preferred|not-needed
+    #    confidentiality_protection_indication: required|preferred|not-needed
+    #    maximum_integrity_protected_data_rate_uplink: bitrate64kbs|maximum-UE-rate
+    #    maximum_integrity_protected_data_rate_downlink: bitrate64kbs|maximum-UE-rate

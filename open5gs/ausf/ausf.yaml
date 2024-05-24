@@ -36,7 +36,7 @@ spec:
     metadata:    
       labels:
         epc-mode: ausf
-        version: 2.6.4
+        version: 2.7.1
         app: open5gs-ausf
     spec:        
       affinity:
@@ -57,7 +57,7 @@ spec:
         #kubernetes.io/hostname: molejo
       containers:
         - name: ausf
-          image: maikovisky/open5gs:ubuntu-latest  
+          image: maikovisky/open5gs:latest  
           #imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 80

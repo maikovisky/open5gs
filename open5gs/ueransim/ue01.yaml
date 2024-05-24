@@ -123,6 +123,7 @@ spec:
               mountPath: "/dev/net/tun" # Needed for VPN
 
           command: ["nr-ue", "-c", "/etc/ueransim/tmp/open5gs-ue-01.yaml"]
+          #command: ["sleep", "1d"]
 
         - name: iperf-ue
           image: maikovisky/ueransim:3.2.6  
@@ -135,6 +136,7 @@ spec:
             - name: SLICE
               value: "1"
           command: ["/bin/testing"]
+          #command: ["sleep", "1d"]
           volumeMounts:
             - name: "dev-net-tun"
               mountPath: "/dev/net/tun" # Needed for VPN
@@ -142,9 +144,14 @@ spec:
             - name: open5gs-ue-video-4k
               mountPath: /bin/testing
               subPath: "testing"
+
         - name: "telegraf"
           image: "telegraf:latest"
           imagePullPolicy: IfNotPresent  
+          securityContext:
+            privileged: true
+            capabilities:
+              add: ["NET_ADMIN", "SYS_MODULE", "NET_RAW"]
           volumeMounts:
             - name: open5gs-ue1-telegraf-config
               mountPath: /etc/telegraf
@@ -184,11 +191,12 @@ data:
       listen = ":9100"
 
     [[inputs.ping]]
-      urls = ["10.0.10.149", "143.54.85.1"]
+      urls = ["10.0.9.102"]
+      #urls = ["10.0.9.156", "143.54.85.1"]
       interface = "uesimtun0"
       method = "native"
-      percentiles = [25, 50, 95, 99]
-      ping_interval = 1.0
+      #percentiles = [25, 50, 95, 99]
+      ping_interval = 2.5
       count = 5
 
 ---

@@ -72,7 +72,7 @@ spec:
         kubernetes.io/arch: amd64
       containers:
         - name: smf
-          image: maikovisky/open5gs:ubuntu-latest  
+          image: maikovisky/open5gs:latest  
           imagePullPolicy: IfNotPresent
           securityContext:
             privileged: true

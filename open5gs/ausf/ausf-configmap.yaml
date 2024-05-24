@@ -8,28 +8,21 @@ metadata:
 data:
   ausf.yaml: |
     logger:
-        file: /var/log/open5gs/ausf.log
+        file: 
+          path: /var/log/open5gs/ausf.log
 
-    sbi:
-      server:
-        no_tls: true
-        cacert: /etc/open5gs/tls/ca.crt
-        key: /etc/open5gs/tls/ausf.key
-        cert: /etc/open5gs/tls/ausf.crt
-      client:
-        no_tls: true
-        cacert: /etc/open5gs/tls/ca.crt
-        key: /etc/open5gs/tls/ausf.key
-        cert: /etc/open5gs/tls/ausf.crt
+    global:
+      max:
+        ue: 1024  # The number of UE can be increased depending on memory size.
+        peer: 64
 
     ausf:
-        sbi:
-          - dev: eth0
+      sbi:
+        server:
+          - address: 0.0.0.0
             advertise: open5gs-ausf
-    nrf:
-        sbi:
-          - name: open5gs-nrf
+        client:
+          nrf:
+            - uri: http://open5gs-nrf
 
-    # scp:
-    #   sbi:
-    #     - name: open5gs-scp
+

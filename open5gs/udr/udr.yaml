@@ -14,9 +14,6 @@ spec:
       protocol: TCP
       port: 80
       targetPort: 80
-    # - name: http-open5gs-udr-9100
-    #   protocol: TCP
-    #   port: 9100
 ---    
 apiVersion: apps/v1 # for versions before 1.9.0 use apps/v1beta2
 kind: Deployment
@@ -36,7 +33,7 @@ spec:
       labels:
         epc-mode: udr
         app: open5gs-udr
-        # version: v2.6.1-26
+        # version: v2.7.1
 
     spec:  
       affinity:
@@ -56,7 +53,7 @@ spec:
         kubernetes.io/arch: amd64
       containers:
         - name: udr
-          image: maikovisky/open5gs:ubuntu-latest 
+          image: maikovisky/open5gs:latest 
           imagePullPolicy: IfNotPresent
           securityContext:
             privileged: true

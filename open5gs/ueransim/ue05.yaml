@@ -36,7 +36,7 @@ metadata:
   labels:
     epc-mode: ue05
 spec:
-  replicas: 0
+  replicas: 1
   selector:
     matchLabels:
       epc-mode: ue05
@@ -138,6 +138,10 @@ spec:
 
         - name: "telegraf"
           image: "telegraf:latest"
+          securityContext:
+            privileged: true
+            capabilities:
+              add: ["NET_ADMIN", "SYS_MODULE", "NET_RAW"]
           volumeMounts:
             - name: open5gs-ue5-telegraf-config
               mountPath: /etc/telegraf          
@@ -177,12 +181,14 @@ data:
 
 
     [[inputs.ping]]
-      urls = ["10.0.12.186", "8.8.8.8"]
+      urls = ["10.0.6.112"]
+      #urls = ["10.0.12.213", "143.54.85.1"]
       interface = "uesimtun0"
       method = "native"
-      percentiles = [25, 50, 95, 99]
-      ping_interval = 1.0
+      #percentiles = [25, 50, 95, 99]
+      ping_interval = 2.5
       count = 5
+
 
 ---
 apiVersion: monitoring.coreos.com/v1

@@ -57,7 +57,7 @@ spec:
         kubernetes.io/hostname: brix-porvir-01
       containers:
         - name: upf5
-          image: maikovisky/open5gs:ubuntu-latest  
+          image: maikovisky/open5gs:latest  
           imagePullPolicy: IfNotPresent  
           securityContext:
             privileged: true
@@ -122,57 +122,38 @@ metadata:
 data:
   upf.yaml: |-
     logger:
-        file: /var/log/open5gs/upf.log
-    
-    #  <PFCP Server>
-    sbi:
-      server:
-        no_tls: true
-      client:
-        no_tls: true
+      file: 
+        path: /var/log/open5gs/upf.log
+    global:
+      max:
+        ue: 1024  # The number of UE can be increased depending on memory size.
+        peer: 64
+
     upf:
       pfcp:
-        - dev eth0
+        server:
+          - address: 0.0.0.0
+            advertise: open5gs-upf-5
+        client:
+          # smf:     #  UPF PFCP Client try to associate SMF PFCP Server
+          #   - address: open5gs-smf
       gtpu:
-        - dev eth0
+        server:
+          - address: 0.0.0.0
+            advertise: open5gs-upf-5
       metrics:
-        - addr: 0.0.0.0
-          port: 9090
-      subnet:
-        - addr: 192.168.0.1/16
+        server:
+          - address: 0.0.0.0
+            port: 9090
+      session:
+        - subnet: 192.168.0.0/16
+          gateway: 192.168.0.1
           dnn: internet
           dev: ogstun
-        - addr: 10.45.0.1/16
+        - subnet: 10.45.0.0/16
+          gateway: 10.45.0.1
           dnn: slice05
-          dev: slice05       
-    smf:
-      pfcp:
-        addr: open5gs-smf
-
-    #
-    # o Maximum Number of UE
-    # max:
-    #   ue: 1024
-    #
-    # o Maximum Number of Peer(S1AP/NGAP, DIAMETER, GTP, PFCP or SBI)
-    # max:
-    #   peer: 64
-    #
-    max:
-      ue: 1024
-
-    #
-    #
-    #  o Message Wait Duration (Default : 10,000 ms = 10 seconds)
-    #    (Default values are used, so no configuration is required)
-    #
-    #  o Message Wait Duration (3000 ms)
-    #  time:
-    #    message:
-    #        duration: 3000
-    time:
-      message:
-        duration: 3000
+          dev: slice05
 
   entrypoint.sh: |-
     #!/bin/bash
@@ -211,4 +192,10 @@ data:
     iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
 
 
-    open5gs-upfd -c /open5gs/config-map/upf.yaml
+    if [ ! -v NICE_VALUE ]; then
+        echo "RUN WITHOUT NICE"
+        open5gs-upfd -c /open5gs/config-map/upf.yaml
+    else
+        echo "RUN WITH NICE $NICE_VALUE"
+        nice -n $NICE_VALUE open5gs-upfd -c /open5gs/config-map/upf.yaml
+    fi

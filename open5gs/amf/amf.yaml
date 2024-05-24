@@ -21,7 +21,7 @@ spec:
       labels:
         epc-mode: amf
         app: open5gs-amf
-        version:  2.6.4
+        version:  2.7.1
     spec:   
       affinity:
         podAffinity:
@@ -43,7 +43,8 @@ spec:
 
       containers:             
         - name: amf
-          image: maikovisky/open5gs:ubuntu-latest  
+          #image: maikovisky/open5gs:ubuntu-latest  
+          image: maikovisky/open5gs:latest  
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 80

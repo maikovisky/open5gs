@@ -26,7 +26,7 @@ metadata:
   namespace: open5gs
   labels:
     epc-mode: nrf
-    version: 2.6.4
+    version: 2.7.1
     app: open5gs-nrf
 
 spec:
@@ -47,7 +47,7 @@ spec:
 
       containers:
         - name: nrf
-          image: maikovisky/open5gs:ubuntu-latest 
+          image: maikovisky/open5gs:latest 
           #imagePullPolicy: IfNotPresent
           imagePullPolicy: IfNotPresent
           ports:
@@ -65,6 +65,7 @@ spec:
               mountPath: "/dev/net/tun" # Needed for VPN
 
           command: ["open5gs-nrfd", "-c", "/open5gs/config-map/nrf.yaml"]
+          #command: ["sleep", "1d"]
       volumes:
         - name: open5gs-nrf-config
           configMap:

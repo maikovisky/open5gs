@@ -77,18 +77,18 @@ spec:
           nodetype: server
           kubernetes.io/hostname: blacksabbath
       containers:       
-        - name: iperf3
-          image: maikovisky/iperf:latest  
-          ports:
-            - containerPort: 5201
-              protocol: TCP
-            - containerPort: 5201
-              protocol: UDP
-          securityContext:
-            privileged: true
-            capabilities:
-              add: ["NET_ADMIN", "SYS_MODULE"]  
-          command: ["/bin/iperf3", "-s", "-B", "0.0.0.0", "-V", "--forceflush"]
+        # - name: iperf3
+        #   image: maikovisky/iperf:latest  
+        #   ports:
+        #     - containerPort: 5201
+        #       protocol: TCP
+        #     - containerPort: 5201
+        #       protocol: UDP
+        #   securityContext:
+        #     privileged: true
+        #     capabilities:
+        #       add: ["NET_ADMIN", "SYS_MODULE"]  
+        #   command: ["/bin/iperf3", "-s", "-B", "0.0.0.0", "-V", "--forceflush"]
      
         - name: iperf
           image: maikovisky/iperf:latest  

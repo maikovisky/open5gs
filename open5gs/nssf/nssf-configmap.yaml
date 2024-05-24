@@ -7,77 +7,75 @@ metadata:
     epc-mode: nssf
 data:
   nssf.yaml: |
-    # logger:
-    #     file: /var/log/open5gs/nssf.log
-    
-    sbi:
-      server:
-        no_tls: true
-      client:
-        no_tls: true
+    logger:
+      file: 
+        path: /var/log/open5gs/nssf.log
+
+    global:
+      max:
+        ue: 1024  # The number of UE can be increased depending on memory size.
+        peer: 64
 
     nssf:
-        sbi:
-          - addr: 0.0.0.0
+      sbi:
+        server:
+          - dev: eth0
             advertise: open5gs-nssf
-        nsi:
-          - name: open5gs-nrf
-            s_nssai:
-              sst: 1
-          - name: open5gs-nrf
-            s_nssai:
-              sst: 1
-              sd: 1
-          - name: open5gs-nrf
-            s_nssai:
-              sst: 2
-              sd: 2
-          - name: open5gs-nrf
-            s_nssai:
-              sst: 3
-              sd: 3
-          - name: open5gs-nrf
-            s_nssai:
-              sst: 4
-              sd: 4
-          - name: open5gs-nrf
-            s_nssai:
-              sst: 5
-              sd: 5
-          - name: open5gs-nrf
-            s_nssai:
-              sst: 6
-              sd: 6
-          - name: open5gs-nrf
-            s_nssai:
-              sst: 7
-              sd: 7
-          - name: open5gs-nrf
-            s_nssai:
-              sst: 8
-              sd: 8
-          # - name: open5gs-nrf
-          #   s_nssai:
-          #     sst: 9
-          #     sd: 9
-          # - name: open5gs-nrf
-          #   s_nssai:
-          #     sst: 10
-          #     sd: 10
-          # - name: open5gs-nrf
-          #   s_nssai:
-          #     sst: 11
-          #     sd: 11
-          # - name: open5gs-nrf
-          #   s_nssai:
-          #     sst: 12
-          #     sd: 12
+        client:
+          nrf:
+            - uri: http://open5gs-nrf
+
+          nsi:
+            - uri: http://open5gs-nrf
+              s_nssai:
+                sst: 1
+            - uri: http://open5gs-nrf
+              s_nssai:
+                sst: 1
+                sd: 000001
+            - uri: http://open5gs-nrf
+              s_nssai:
+                sst: 2
+                sd: 000002
+            - uri: http://open5gs-nrf
+              s_nssai:
+                sst: 3
+                sd: 000003
+            - uri: http://open5gs-nrf
+              s_nssai:
+                sst: 4
+                sd: 000004
+            - uri: http://open5gs-nrf
+              s_nssai:
+                sst: 5
+                sd: 000005
+            - uri: http://open5gs-nrf
+              s_nssai:
+                sst: 6
+                sd: 000006
+          #   - uri: http://open5gs-nrf
+          #     s_nssai:
+          #       sst: 7
+          #       sd: 000007
+          #  - uri: http://open5gs-nrf
+          #     s_nssai:
+          #       sst: 8
+          #       sd: 000008
+            # - uri: http://open5gs-nrf
+            #   s_nssai:
+            #     sst: 9
+            #     sd: 9
+            # - uri: http://open5gs-nrf
+            #   s_nssai:
+            #     sst: 10
+            #     sd: 10
+            # - uri: http://open5gs-nrf
+            #   s_nssai:
+            #     sst: 11
+            #     sd: 11
+            # - uri: http://open5gs-nrf
+            #   s_nssai:
+            #     sst: 12
+            #     sd: 12
 
               
-    nrf:
-        sbi:
-          - name: open5gs-nrf
-    
-    # scp:
-    #     sbi:
-    #       - name: open5gs-scp

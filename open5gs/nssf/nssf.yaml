@@ -37,7 +37,7 @@ spec:
       labels:
         epc-mode: nssf
         app: open5gs-nssf
-        # version: v2.6.1-26
+        version: 2.7.1
     spec:  
       affinity:
         podAffinity:
@@ -56,7 +56,7 @@ spec:
         kubernetes.io/arch: amd64
       containers:       
         - name: nssf
-          image: maikovisky/open5gs:ubuntu-latest 
+          image: maikovisky/open5gs:latest 
           imagePullPolicy: IfNotPresent
           securityContext:
             privileged: true

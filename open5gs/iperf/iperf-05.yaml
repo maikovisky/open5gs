@@ -63,7 +63,7 @@ spec:
       nodeSelector:
           kubernetes.io/arch: amd64
           nodetype: server 
-          kubernetes.io/hostname: deeppurple
+          kubernetes.io/hostname: molejo
       containers:       
         - name: iperf
           image: maikovisky/iperf:latest  

@@ -40,7 +40,7 @@ metadata:
   namespace: open5gs
   labels:
     epc-mode: bsf
-    version: 2.6.4
+    version: 2.7.1
     app: open5gs-bsf
 spec:
   replicas: 1
@@ -51,7 +51,7 @@ spec:
     metadata: 
       labels:
         epc-mode: bsf
-        version: 2.6.4
+        version: 2.7.1
         app: open5gs-bsf
     spec:  
       affinity:
@@ -71,7 +71,7 @@ spec:
         kubernetes.io/arch: amd64
       containers:
         - name: bsf
-          image: maikovisky/open5gs:ubuntu-latest  
+          image: maikovisky/open5gs:latest  
           #imagePullPolicy: IfNotPresent  
           ports:
             - containerPort: 80
