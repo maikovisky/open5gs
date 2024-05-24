@@ -22,15 +22,16 @@ class Open5gsSliceExperiment:
         self.UPFPods = []
         self.URANSIMPods = []  
         self.pods = []
-        self.time = 300
+        self.time = 240
 
-        self.gri = GraphanaGetRenderImage(grafanaUrl, dashUID, "expnice")
+        self.gri = GraphanaGetRenderImage(grafanaUrl, dashUID)
         
     def setCorePods(self, corePods, UPFPods, URANSIMPods):
         self.corePods = corePods
         self.UPFPods = UPFPods
         self.URANSIMPods = URANSIMPods
         self.cpu = [0] * len(self.UPFPods)
+        self.nice = [None] * len(self.UPFPods)
         
   
     def setDebug(self, debug=True):
@@ -60,8 +61,11 @@ class Open5gsSliceExperiment:
         header = {'Accept': 'application/json', 'Content-Type': 'application/json'}
         body = { "dashboardUID": self.dashboardUID, "time": timeStart, "text": text, "tags": self.tags }
 
+        print(self.grafanaUrl + "/api/annotations")
         r = requests.post(self.grafanaUrl + "/api/annotations", headers=header, data=json.dumps(body))
-        print(text)
+        if(r.status_code >= 300):
+            print("{} Can't add anotation. {}".format(r.status_code, r.text))
+        
         return int( t.timestamp() )   
     
     # def scale(self, pod, replicas):
@@ -83,6 +87,10 @@ class Open5gsSliceExperiment:
         
         for i, v in enumerate(r["cpu"]):        
             self.cpu[i] = v
+            
+        if "nice" in r:
+            for i, v in enumerate(r["nice"]):        
+                self.nice[i] = v
     
     def start(self, r):
         self.setValues(r)
@@ -94,7 +102,7 @@ class Open5gsSliceExperiment:
             time.sleep(5)
             lFases = [1, 5]            
         else:
-            lFases = [1, 5, 10, 15, 20, 25]
+            lFases = [1, 5, 10, 15, 20]
             time.sleep(30)
         
         k8stools.scale(self.priorityPod, self.namespace, 4)
@@ -120,7 +128,7 @@ class Open5gsSliceExperiment:
         
     def saveInfos(self, queries):
         
-        aText = "(Experiment {} - {}".format(self.experiment, self.gri.getLatest())
+        aText = "Experiment {} - {}".format(self.experiment, self.gri.getLatest())
         self.gri.getImages(self.tStart, self.tFinish, self.name, aText, self.slices)
         
         base = {"experiment": self.experiment, "number": self.gri.getLatest(),"annotation": self.annotations, "startAt": self.startAt, "endAt": self.endAt, "fases": self.fase }
@@ -134,7 +142,8 @@ class Open5gsSliceExperiment:
             txt  = requests.get(apiEndpoint).text
             data = json.loads(txt)
             base[metric] = {"status": data["status"], "result": data["data"]["result"]}
-        
+
+                
         db = self.getDatabase("open5gsNice")
         db["experiments"].insert_one(base)
         
@@ -167,9 +176,13 @@ class Open5gsSliceExperiment:
         self.stopOpen5gsCore()
         time.sleep(10)
         
+
         print(self.cpu)
         for i, p in enumerate(self.UPFPods):
+            k8stools.setEnv(self.namespace, p, "NICE_VALUE", self.nice[i])
             k8stools.update_resource(self.namespace, p, self.cpu[i], self.cpu[i])
+
+            
         
         self.startOpen5gsCore()
         print("Esperando core subir")

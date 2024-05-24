@@ -84,6 +84,6 @@ class ETL:
         
 
 #etl = ETL("mongodb://127.0.0.1:27020", "open5gs")
-etl = ETL("mongodb+srv://maikovisky:MFIl9m0cgK9UorO9@open5gs.xm3nrzk.mongodb.net", "open5gs")
-etl.etl()
+#etl = ETL("mongodb+srv://maikovisky:MFIl9m0cgK9UorO9@open5gs.xm3nrzk.mongodb.net", "open5gs")
+#etl.etl()
 

@@ -18,7 +18,7 @@ global osEx
 
 
 gCorePods = [
-    "open5gs-nrf", "open5gs-scp", "open5gs-amf", "open5gs-ausf","open5gs-bsf", "open5gs-nssf", "open5gs-pcf","open5gs-udm","open5gs-udr"]
+    "open5gs-nrf", "open5gs-scp", "open5gs-amf", "open5gs-ausf","open5gs-bsf", "open5gs-nssf", "open5gs-pcf","open5gs-udm","open5gs-udr", "open5gs-smf"]
 
 gUPFPods = ["open5gs-upf-1", "open5gs-upf-2", "open5gs-upf-3", "open5gs-upf-4", "open5gs-upf-5"]
 gURANSIMPods = ["open5gs-ueransim01", "open5gs-ueransim02", "open5gs-ueransim03", "open5gs-ueransim04", "open5gs-ueransim05"]
@@ -29,10 +29,11 @@ gExperiments = json.loads("""[
     {"experiment": "03", "name": "experiment03", "text": "Baseline with priority UE and Slice 02 and 03", "priorityPod": "open5gs-ue01", "pods": ["open5gs-ue02", "open5gs-ue03"], "slices": ["1","2","3"], "cpu": []},
     {"experiment": "04", "name": "experiment04", "text": "Baseline with priority UE and Slice 02, 03 and 04", "priorityPod": "open5gs-ue01", "pods": ["open5gs-ue02", "open5gs-ue03", "open5gs-ue04"], "slices": ["1","2","3","4"], "cpu": []},
     {"experiment": "05", "name": "experiment05", "text": "Baseline with priority UE and Slice 02, 03, 04, 05", "priorityPod": "open5gs-ue01", "pods": ["open5gs-ue02", "open5gs-ue03", "open5gs-ue04", "open5gs-ue05"], "slices": ["1","2","3","4","5"], "cpu": []},
-    {"experiment": "06", "name": "experiment06", "text": "Limit CPU all UPF", "priorityPod": "open5gs-ue01", "pods": ["open5gs-ue02", "open5gs-ue03", "open5gs-ue04", "open5gs-ue05"], "slices": ["1","2","3","4","5"], "cpu": [750, 750, 750, 750, 750]},
-    {"experiment": "07", "name": "experiment07", "text": "Limit CPU all UPF more Slice 01", "priorityPod": "open5gs-ue01", "pods": ["open5gs-ue02", "open5gs-ue03", "open5gs-ue04", "open5gs-ue05"], "slices": ["1","2","3","4","5"], "cpu": [900, 750, 750, 675, 675]},
-    {"experiment": "08", "name": "experiment08", "text": "Limit CPU all UPF more Slice 02", "priorityPod": "open5gs-ue01", "pods": ["open5gs-ue02", "open5gs-ue03", "open5gs-ue04", "open5gs-ue05"], "slices": ["1","2","3","4","5"], "cpu": [900, 900, 750, 600, 600]},
-    {"experiment": "09", "name": "experiment09", "text": "Limit CPU all UPF more Slice 02", "priorityPod": "open5gs-ue01", "pods": ["open5gs-ue02", "open5gs-ue03", "open5gs-ue04", "open5gs-ue05"], "slices": ["1","2","3","4","5"], "cpu": [900, 900, 900, 525, 525]}
+    {"experiment": "06", "name": "experiment06", "text": "Baseline with priority UE and Slice 02, 03, 04, 05 with nc", "priorityPod": "open5gs-ue01", "pods": ["open5gs-ue02", "open5gs-ue03", "open5gs-ue04", "open5gs-ue05"], "slices": ["1","2","3","4","5"], "cpu": [], "nice": [-5, 0, 2, 5, 10]},
+    {"experiment": "07", "name": "experiment07", "text": "Limit CPU all UPF", "priorityPod": "open5gs-ue01", "pods": ["open5gs-ue02", "open5gs-ue03", "open5gs-ue04", "open5gs-ue05"], "slices": ["1","2","3","4","5"], "cpu": [750, 750, 750, 750, 750]},
+    {"experiment": "08", "name": "experiment08", "text": "Limit CPU all UPF more Slice 01", "priorityPod": "open5gs-ue01", "pods": ["open5gs-ue02", "open5gs-ue03", "open5gs-ue04", "open5gs-ue05"], "slices": ["1","2","3","4","5"], "cpu": [900, 750, 750, 675, 675]},
+    {"experiment": "09", "name": "experiment09", "text": "Limit CPU all UPF more Slice 02", "priorityPod": "open5gs-ue01", "pods": ["open5gs-ue02", "open5gs-ue03", "open5gs-ue04", "open5gs-ue05"], "slices": ["1","2","3","4","5"], "cpu": [900, 900, 750, 600, 600]},
+    {"experiment": "10", "name": "experiment10", "text": "Limit CPU all UPF more Slice 02", "priorityPod": "open5gs-ue01", "pods": ["open5gs-ue02", "open5gs-ue03", "open5gs-ue04", "open5gs-ue05"], "slices": ["1","2","3","4","5"], "cpu": [900, 900, 900, 525, 525]}
 ]""")
 
 
@@ -56,8 +57,8 @@ options = "he:r:t:"
 long_options = ["Help", "experiment", "repeat", "time"]
 aRepeat = 1
 aExp = None
-aTime = 300
-aTimeBetweenExperience = 180
+aTime = 240
+aTimeBetweenExperience = 120
 
 def usage():
     print("python runExp.py <options>")
@@ -121,6 +122,7 @@ try:
     osEx = Open5gsSliceExperiment(grafanaUrl, prometheusUrl,  mongodbUrl, dashboardUID)
     osEx.setCorePods(gCorePods, gUPFPods, gURANSIMPods)
     osEx.setTime(aTime)
+    #osEx.setDebug(True)
 
     
     for i in range(0, aRepeat):

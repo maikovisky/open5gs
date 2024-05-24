@@ -44,7 +44,7 @@ class GraphanaGetRenderImage:
         return url
     
     def getUrlConfig(self, slices):
-        interface = "var-interface=eth0"
+        #interface = "var-interface=eth0"
         dp = []
         for s in slices:
             sPad =  s.rjust(2, "0")
@@ -56,7 +56,7 @@ class GraphanaGetRenderImage:
         vars = '&'.join(dp)
         
         #url = "var-datasource=prometheus&var-cluster=&var-namespace=open5gs&var-data_plane=open5gs-upf-1&var-ues=open5gs-ue01&var-workload=open5gs-iperf01&var-interface=eth0&var-interface=slice01&from=1711543859370&to=1711545539107&var-data_control=open5gs-amf&var-data_control=open5gs-ausf&var-data_control=open5gs-bsf&var-data_control=open5gs-nrf&var-data_control=open5gs-nssf&var-data_control=open5gs-pcf&var-data_control=open5gs-scp&var-data_control=open5gs-smf&var-data_control=open5gs-udm&var-data_control=open5gs-udr"
-        url = "{}&var-data_control=All&{}".format(interface, vars)
+        url = "var-data_control=All&{}".format(vars)
         return url
     
     def createPath(self, path, name, subpath="exp"):
@@ -85,6 +85,7 @@ class GraphanaGetRenderImage:
         url = self.getUrl(slices)
         basePath = self.createPath(self.path, name, self.subpath)
         text = "({})".format(aText)
+        txtFilename = "{}\\{}-grafana.txt".format(basePath, name)
         for p in panels:
             finalUrl = "{}&from={}&to={}&panelId={}&var-experience={}".format(url, start, end, p["panelId"], text)
             #print(finalUrl)
@@ -93,6 +94,9 @@ class GraphanaGetRenderImage:
             response = requests.get(finalUrl, stream=True)
             with open(filename, 'wb') as file:
                 shutil.copyfileobj(response.raw, file)
+            with open(txtFilename, 'a+') as f:
+                f.write(finalUrl)
+                f.write("\n")
     
     def downloadImages(self, start, end, name, text, slices, sequence):
         global panels
