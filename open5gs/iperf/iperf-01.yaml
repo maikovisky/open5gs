@@ -37,6 +37,8 @@ metadata:
     epc-mode: iperf01
     app: iperf
     promotheus: open5gs-monitor
+  annotations:
+    cni.cilium.io/mac-address: e2:9c:30:38:52:61
 spec:
   replicas: 1
   selector:
@@ -70,8 +72,7 @@ spec:
       nodeSelector:
         kubernetes.io/arch: amd64
         nodetype: server
-        kubernetes.io/hostname: kiss
-
+        kubernetes.io/hostname: blacksabbath
       containers:       
         # - name: iperf3
         #   image: maikovisky/iperf:latest  
@@ -94,7 +95,7 @@ spec:
           securityContext:
             privileged: true
             capabilities:
-              add: ["NET_ADMIN", "SYS_MODULE"]  
+              add: ["NET_ADMIN", "SYS_MODULE"]
           command: ["/bin/iperf", "-s",  "-i", "15", "--histograms"]
 
         - name: iperf-udp
@@ -105,7 +106,7 @@ spec:
           securityContext:
             privileged: true
             capabilities:
-              add: ["NET_ADMIN", "SYS_MODULE"]  
+              add: ["NET_ADMIN", "SYS_MODULE"]
           command: ["/bin/iperf", "-s", "-u", "-p", "5002", "-i", "15", "-f", "A"]
 
 

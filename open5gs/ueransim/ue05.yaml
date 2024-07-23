@@ -36,7 +36,7 @@ metadata:
   labels:
     epc-mode: ue05
 spec:
-  replicas: 1
+  replicas: 0
   selector:
     matchLabels:
       epc-mode: ue05
@@ -47,7 +47,7 @@ spec:
         app: ueransim-ue05
     spec:  
       nodeSelector:
-        kubernetes.io/hostname: brix-porvir-03
+        kubernetes.io/hostname: brix-porvir-06
       initContainers:
         - name: init-ue
           image: maikovisky/ueransim:3.2.6
@@ -128,6 +128,7 @@ spec:
             - name: SLICE
               value: "5"
           command: ["/bin/testing"]
+
           volumeMounts:
             - name: "dev-net-tun"
               mountPath: "/dev/net/tun" # Needed for VPN
@@ -141,10 +142,11 @@ spec:
           securityContext:
             privileged: true
             capabilities:
-              add: ["NET_ADMIN", "SYS_MODULE", "NET_RAW"]
+              add: ["NET_ADMIN", "SYS_MODULE"]
           volumeMounts:
             - name: open5gs-ue5-telegraf-config
-              mountPath: /etc/telegraf          
+              mountPath: /etc/telegraf
+
       volumes:
         - name: open5gs-ue5-telegraf-config
           configMap:
@@ -179,15 +181,15 @@ data:
       ## Address to listen on.
       listen = ":9100"
 
-
     [[inputs.ping]]
-      urls = ["10.0.6.112"]
-      #urls = ["10.0.12.213", "143.54.85.1"]
+      urls = ["10.0.8.197"]
+      #urls = ["10.0.13.167", "143.54.85.1"]
       interface = "uesimtun0"
       method = "native"
       #percentiles = [25, 50, 95, 99]
-      ping_interval = 2.5
+      ping_interval = 2.0
       count = 5
+      timeout = 2.0
 
 
 ---
@@ -198,12 +200,11 @@ metadata:
   namespace: open5gs
   labels:
     epc-mode: ue05
+    release: prometheus
 spec:
   selector:
     matchLabels:
       epc-mode: ue05
-      release: prometheus
   endpoints:
   - interval: 10s
-    port: http2-open5gs-ue05-9100      
-
+    port: http2-open5gs-ue05-9100

@@ -43,8 +43,6 @@ metadata:
   labels:
     epc-mode: upf4
     promotheus: open5gs-monitor
-  annotations:
-    kubernetes.io/egress-bandwidth: 120M
 spec:
   replicas: 1
   selector:

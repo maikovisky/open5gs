@@ -64,9 +64,11 @@ data:
       gtpc:
         server:
           - address: 0.0.0.0
+            advertise: open5gs-smf
       gtpu:
         server:
           - address: 0.0.0.0
+            advertise: open5gs-smf
       session:
         - subnet: 192.168.0.0/16
           gateway: 192.168.0.1

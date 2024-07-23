@@ -9,13 +9,9 @@ spec:
   selector:
     epc-mode: webui
   ports:
-    - name: http2-open5gs-webui-80
-      protocol: TCP
-      port: 80
-      targetPort: 3000
     - name: http2-open5gs-webui-3000
       protocol: TCP
-      port: 3000
+      port: 4000
 ---    
 apiVersion: apps/v1 # for versions before 1.9.0 use apps/v1beta2
 kind: Deployment
@@ -62,6 +58,8 @@ spec:
               value: mongodb://open5gs-mongodb-svc/open5gs
             - name: HOSTNAME
               value: 0.0.0.0
+            - name: PORT
+              value: "4000"
           command: ["npm", "run", "dev"]
       volumes:
         - name: dev-net-tun

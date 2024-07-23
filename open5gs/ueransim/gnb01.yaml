@@ -18,7 +18,7 @@ spec:
         app: ueransim
     spec:  
       nodeSelector:
-        kubernetes.io/hostname: brix-porvir-02
+        kubernetes.io/hostname: brix-porvir-03
       initContainers:
         - name: init-gnb
           image: maikovisky/ueransim:3.2.6

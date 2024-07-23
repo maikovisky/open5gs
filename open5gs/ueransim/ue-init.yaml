@@ -76,11 +76,14 @@ data:
         addSubscribers(lastIMSI)
         return lastIMSI
 
-    def addSlice(name, sst, sd):
+    def addSlice(name, sst, sd, addr=None):
         global SLICE, SLICENAME
         slice = {"sst" : sst, "sd" : sd, "default_indicator" : True, "session" : [
-                    {"name" : name, "type" : 3,"pcc_rule" : [],  "ambr" : { "uplink" : {"value" : 1,"unit" : 4}, "downlink" : { "value" : 1,"unit" : 4}},
-                        "qos" : {"index" : 9, "arp" : { "priority_level" : 8,"pre_emption_capability" : 1, "pre_emption_vulnerability" : 1} }}
+                    {"name" : name, "type" : 3,"pcc_rule" : [],  
+                        "ambr" : { "uplink" : {"value" : 1,"unit" : 4}, "downlink" : { "value" : 1,"unit" : 4}},
+                        "qos" : {"index" : 9, "arp" : { "priority_level" : 8,"pre_emption_capability" : 1, "pre_emption_vulnerability" : 1} },
+                        "ue": { "addr": addr}
+                    }
                 ]}
         SLICENAME=name
         return slice
@@ -108,7 +111,7 @@ data:
         return valueSlice(SLICE)
 
 
-    def addSubscribers(IMSI):
+    def addSubscribers(IMSI, addr=None):
 
         db = getDatabase("open5gs")
         base = {"imsi" : IMSI,  "subscribed_rau_tau_timer" : 12, "network_access_mode" : 0, "subscriber_status" : 0, "access_restriction_data" : 32}
@@ -123,7 +126,7 @@ data:
         slice = []
         
         name, sst, sd = getSlice()
-        s = addSlice(name, sst, sd)
+        s = addSlice(name, sst, sd, addr)
         slice.append(s)
         
         ns = {**base, "slice": slice, "ambr": ambr, "security": security, **values }
@@ -142,9 +145,11 @@ data:
     if(USE_IMSI_NETWORK):
       addr = get_ipv4_from_nic("eth0")
       IMSI = str(int(IMSI) + ip2int(addr))
+      lastOctect = addr.split(".")[-1]
+      UEAddr = "10.{}.0.{}".format(40 + int(SLICE), lastOctect)
 
     if(not verifyIMSI(IMSI) and CREATE_IMSI):
-        addSubscribers(IMSI)
+        addSubscribers(IMSI, UEAddr)
     elif (CREATE_NEW_IMSI):
         IMSI = addIMSI(IMSI)
         

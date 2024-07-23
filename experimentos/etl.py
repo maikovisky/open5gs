@@ -66,7 +66,7 @@ class ETL:
     def etl(self):
         collection = self.db["experiments"] 
         dbEtl = self.db["etl"]
-        cursor = collection.find({"experiment": "01"})
+        cursor = collection.find({"experiment": "05"})
         for c in cursor:     
            metadata = self.createBaseMetadata(c)    
            firstFase = self.getFirstFase(c)
@@ -83,7 +83,7 @@ class ETL:
         
         
 
-#etl = ETL("mongodb://127.0.0.1:27020", "open5gs")
+etl = ETL("mongodb://127.0.0.1:27017", "open5gs01")
 #etl = ETL("mongodb+srv://maikovisky:MFIl9m0cgK9UorO9@open5gs.xm3nrzk.mongodb.net", "open5gs")
-#etl.etl()
+etl.etl()
 

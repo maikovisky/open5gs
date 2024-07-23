@@ -5,6 +5,9 @@ from kubernetes import client, config
 import os
 from graphs import GraphanaGetRenderImage
 import k8stools
+from requests.exceptions import ConnectionError
+from urllib3.exceptions import ProtocolError
+
 
 class Open5gsSliceExperiment:
     
@@ -32,6 +35,7 @@ class Open5gsSliceExperiment:
         self.URANSIMPods = URANSIMPods
         self.cpu = [0] * len(self.UPFPods)
         self.nice = [None] * len(self.UPFPods)
+        self.bandwith = [None] * len(self.UPFPods)
         
   
     def setDebug(self, debug=True):
@@ -62,9 +66,18 @@ class Open5gsSliceExperiment:
         body = { "dashboardUID": self.dashboardUID, "time": timeStart, "text": text, "tags": self.tags }
 
         print(self.grafanaUrl + "/api/annotations")
-        r = requests.post(self.grafanaUrl + "/api/annotations", headers=header, data=json.dumps(body))
-        if(r.status_code >= 300):
-            print("{} Can't add anotation. {}".format(r.status_code, r.text))
+        print("Annotation {}".format(text))
+        try:
+            r = requests.post(self.grafanaUrl + "/api/annotations", headers=header, data=json.dumps(body))
+            if(r.status_code >= 300):
+                print("{} Can't add anotation. {}".format(r.status_code, r.text))
+        except ConnectionError as e:
+            print("Can't request.post({}{})".format(self.grafanaUrl,"/api/annotations"))
+            print(e.strerror) 
+        except ProtocolError as e:
+            print("Can't request.post({}{})".format(self.grafanaUrl,"/api/annotations"))
+            print(e.strerror) 
+
         
         return int( t.timestamp() )   
     
@@ -102,7 +115,8 @@ class Open5gsSliceExperiment:
             time.sleep(5)
             lFases = [1, 5]            
         else:
-            lFases = [1, 5, 10, 15, 20]
+            #lFases = [1, 5, 10, 15, 20]
+            lFases = [5, 10, 15, 20, 20]
             time.sleep(30)
         
         k8stools.scale(self.priorityPod, self.namespace, 4)
@@ -113,7 +127,10 @@ class Open5gsSliceExperiment:
             text = "{} - Fase {}".format(self.name, fase)
             self.fase.append(self.addAnnotation(text))
             for p  in self.pods:
-                k8stools.scale(p, self.namespace, fase)
+                if(p == "open5gs-ue02" or p == "open5gs-ue03"):
+                    k8stools.scale(p, self.namespace, fase)
+                else:
+                    k8stools.scale(p, self.namespace, 20)
                 
             if(self.debug):
                 time.sleep(30)
@@ -144,7 +161,7 @@ class Open5gsSliceExperiment:
             base[metric] = {"status": data["status"], "result": data["data"]["result"]}
 
                 
-        db = self.getDatabase("open5gsNice")
+        db = self.getDatabase("open5gsunique")
         db["experiments"].insert_one(base)
         
     
@@ -181,6 +198,7 @@ class Open5gsSliceExperiment:
         for i, p in enumerate(self.UPFPods):
             k8stools.setEnv(self.namespace, p, "NICE_VALUE", self.nice[i])
             k8stools.update_resource(self.namespace, p, self.cpu[i], self.cpu[i])
+            k8stools.bandwith(self.namespace, p, self.bandwith[i])
 
             
         

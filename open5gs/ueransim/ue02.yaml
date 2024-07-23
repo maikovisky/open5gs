@@ -40,7 +40,7 @@ metadata:
     epc-mode: ue02
     monitoring: prometheus
 spec:
-  replicas: 1
+  replicas: 0
   selector:
     matchLabels:
       epc-mode: ue02
@@ -125,32 +125,13 @@ spec:
 
           command: ["nr-ue", "-c", "/etc/ueransim/tmp/open5gs-ue-01.yaml"]
 
-        # - name: iperf-ue
-        #   image: maikovisky/ueransim:3.2.6  
-        #   imagePullPolicy: "Always" 
-        #   securityContext:
-        #     privileged: true
-        #     capabilities:
-        #       add: ["NET_ADMIN", "SYS_MODULE"]
-        #   env:  
-        #     - name: SLICE
-        #       value: "2"
-        #   command: ["/bin/testing"]
-        #   volumeMounts:
-        #     - name: "dev-net-tun"
-        #       mountPath: "/dev/net/tun" # Needed for VPN
-
-        #     - name: open5gs-ue-video-hd
-        #       mountPath: /bin/testing
-        #       subPath: "testing"
-
         - name: "telegraf"
           image: "telegraf:latest"
           imagePullPolicy: IfNotPresent  
           securityContext:
             privileged: true
             capabilities:
-              add: ["NET_ADMIN", "SYS_MODULE", "NET_RAW"]
+              add: ["NET_ADMIN", "SYS_MODULE"]
           volumeMounts:
             - name: open5gs-ue2-telegraf-config
               mountPath: /etc/telegraf
@@ -161,12 +142,12 @@ spec:
           securityContext:
             privileged: true
             capabilities:
-              add: ["CAP_NET_RAW", "NET_ADMIN", "SYS_MODULE"]
+              add: ["NET_ADMIN", "SYS_MODULE"]
           volumeMounts:
             - name: open5gs-ue2-ping-config
               mountPath: /config/config.yml
               subPath: "config.yml"
-          command: [ "ping","-I", "uesimtun0", "-q", "-i", "0.001", "10.0.11.75"]
+          command: [ "ping","-I", "uesimtun0", "-q", "-i", "0.01", "10.0.6.26"]
           
       volumes:
         - name: open5gs-ue2-telegraf-config
@@ -211,13 +192,13 @@ data:
     #   files = ["stdout"]
 
     [[inputs.ping]]
-      urls = ["10.0.11.75"]
-      #urls = ["10.0.11.84", "143.54.85.1"]
+      urls = ["10.0.6.26"]
       interface = "uesimtun0"
       method = "native"
       #percentiles = [25, 50, 95, 99]
-      ping_interval = 2.5
+      ping_interval = 2.0
       count = 5
+      timeout = 2.0
 
 ---
 apiVersion: monitoring.coreos.com/v1

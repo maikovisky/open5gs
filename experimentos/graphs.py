@@ -1,6 +1,7 @@
 
 import json, requests, os
 import shutil
+from requests.exceptions import ConnectionError
 
 # - latency: 62
 # - cpu: 50
@@ -23,7 +24,8 @@ panels = json.loads("""[
     {"panelId": "69", "name": "receive"},
     {"panelId": "55", "name": "transmit"},
     {"panelId": "73", "name": "receive_packets_drop"},
-    {"panelId": "74", "name": "transmit_packets_drop"}
+    {"panelId": "74", "name": "transmit_packets_drop"},
+    {"panelId": "75", "name": "receive_iperf"}
 ]""")
 
 
@@ -72,7 +74,7 @@ class GraphanaGetRenderImage:
             self.latest = str(int(first.replace(subpath, '')) + 1).rjust(4, "0")
             
             basePath = "{}\\{}{}".format(basePath, subpath, self.latest)
-            print(basePath)
+            #print(basePath)
             os.makedirs(basePath)
 
         return basePath
@@ -82,6 +84,8 @@ class GraphanaGetRenderImage:
 
     def getImages(self, start, end,  name, aText, slices = ["1"]):        
         global panels
+        headers = {'Content-Type': 'application/json','accept': 'application/json'}
+
         url = self.getUrl(slices)
         basePath = self.createPath(self.path, name, self.subpath)
         text = "({})".format(aText)
@@ -90,8 +94,13 @@ class GraphanaGetRenderImage:
             finalUrl = "{}&from={}&to={}&panelId={}&var-experience={}".format(url, start, end, p["panelId"], text)
             #print(finalUrl)
             filename = "{}\\{}-{}.png".format(basePath, name, p["name"])
-            print("Create: {}".format(filename))
-            response = requests.get(finalUrl, stream=True)
+            #print("Create: {}".format(filename))
+            try:
+                response = requests.get(finalUrl, stream=True, headers=headers)
+            except ConnectionError as e:
+                print("Can't request.get({})".format(finalUrl))
+                print(e.strerror)
+                
             with open(filename, 'wb') as file:
                 shutil.copyfileobj(response.raw, file)
             with open(txtFilename, 'a+') as f:
@@ -107,9 +116,9 @@ class GraphanaGetRenderImage:
             
         for p in panels:
             finalUrl = "{}&from={}&to={}&panelId={}&var-experience={}".format(url, start, end, p["panelId"], text)
-            print(finalUrl)
+            #print(finalUrl)
             filename = "{}\\{}-{}.png".format(basePath, name, p["name"])
-            print("Create: {}".format(filename))
+            #print("Create: {}".format(filename))
             response = requests.get(finalUrl, stream=True)
             with open(filename, 'wb') as file:
                 shutil.copyfileobj(response.raw, file)

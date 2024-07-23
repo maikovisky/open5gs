@@ -23,13 +23,24 @@ def scale(name, namespace, replicas):
     k8sApi = client.AppsV1Api()
     k8sApi.patch_namespaced_deployment_scale(name, namespace, body={'spec': {'replicas': replicas}})
     
+def bandwith(namespace, deployment_name, value = None):
+    k8sApi = client.AppsV1Api()
+    annotations = [{
+            'op': "remove" if value == None else "add",  # You can try different operations like 'replace', 'add' and 'remove'
+            'path': '/metadata/annotations',
+            'value': {'kubernetes.io/egress-bandwidth': value}
+        }]
+    
+    k8sApi.patch_namespaced_deployment(name=deployment_name, namespace=namespace, body=annotations)
+
+    
     
 def setEnv(namespace, deployment_name, variable, value = None):
     k8sApi = client.AppsV1Api()
     
     deployment = k8sApi.read_namespaced_deployment(deployment_name, namespace)
     envs = deployment.spec.template.spec.containers[0].env
-    print(envs)
+    #print(envs)
     if envs:
         i = 0
         found = False

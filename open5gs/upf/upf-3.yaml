@@ -39,8 +39,6 @@ metadata:
   labels:
     epc-mode: upf3
     promotheus: open5gs-monitor
-  annotations:
-    kubernetes.io/egress-bandwidth: 160M
 spec:
   replicas: 1
   selector:
@@ -129,8 +127,6 @@ spec:
     matchLabels:
       epc-mode: upf3
   endpoints:
-  # - interval: 5s
-  #   port: http-open5gs-upf3-9100
   - interval: 5s
     port: http-open5gs-upf3-9090
 ---

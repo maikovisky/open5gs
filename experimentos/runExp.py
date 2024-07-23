@@ -24,31 +24,35 @@ gUPFPods = ["open5gs-upf-1", "open5gs-upf-2", "open5gs-upf-3", "open5gs-upf-4", 
 gURANSIMPods = ["open5gs-ueransim01", "open5gs-ueransim02", "open5gs-ueransim03", "open5gs-ueransim04", "open5gs-ueransim05"]
 
 gExperiments = json.loads("""[
-    {"experiment": "01", "name": "experiment01", "text": "Baseline only priority UE", "priorityPod": "open5gs-ue01", "pods": [], "slices": ["1"], "cpu": []},                       
-    {"experiment": "02", "name": "experiment02", "text": "Baseline with priority UE and Slice 02", "priorityPod": "open5gs-ue01", "pods": ["open5gs-ue02"], "slices": ["1","2"], "cpu": []},
-    {"experiment": "03", "name": "experiment03", "text": "Baseline with priority UE and Slice 02 and 03", "priorityPod": "open5gs-ue01", "pods": ["open5gs-ue02", "open5gs-ue03"], "slices": ["1","2","3"], "cpu": []},
-    {"experiment": "04", "name": "experiment04", "text": "Baseline with priority UE and Slice 02, 03 and 04", "priorityPod": "open5gs-ue01", "pods": ["open5gs-ue02", "open5gs-ue03", "open5gs-ue04"], "slices": ["1","2","3","4"], "cpu": []},
-    {"experiment": "05", "name": "experiment05", "text": "Baseline with priority UE and Slice 02, 03, 04, 05", "priorityPod": "open5gs-ue01", "pods": ["open5gs-ue02", "open5gs-ue03", "open5gs-ue04", "open5gs-ue05"], "slices": ["1","2","3","4","5"], "cpu": []},
-    {"experiment": "06", "name": "experiment06", "text": "Baseline with priority UE and Slice 02, 03, 04, 05 with nc", "priorityPod": "open5gs-ue01", "pods": ["open5gs-ue02", "open5gs-ue03", "open5gs-ue04", "open5gs-ue05"], "slices": ["1","2","3","4","5"], "cpu": [], "nice": [-5, 0, 2, 5, 10]},
-    {"experiment": "07", "name": "experiment07", "text": "Limit CPU all UPF", "priorityPod": "open5gs-ue01", "pods": ["open5gs-ue02", "open5gs-ue03", "open5gs-ue04", "open5gs-ue05"], "slices": ["1","2","3","4","5"], "cpu": [750, 750, 750, 750, 750]},
-    {"experiment": "08", "name": "experiment08", "text": "Limit CPU all UPF more Slice 01", "priorityPod": "open5gs-ue01", "pods": ["open5gs-ue02", "open5gs-ue03", "open5gs-ue04", "open5gs-ue05"], "slices": ["1","2","3","4","5"], "cpu": [900, 750, 750, 675, 675]},
-    {"experiment": "09", "name": "experiment09", "text": "Limit CPU all UPF more Slice 02", "priorityPod": "open5gs-ue01", "pods": ["open5gs-ue02", "open5gs-ue03", "open5gs-ue04", "open5gs-ue05"], "slices": ["1","2","3","4","5"], "cpu": [900, 900, 750, 600, 600]},
-    {"experiment": "10", "name": "experiment10", "text": "Limit CPU all UPF more Slice 02", "priorityPod": "open5gs-ue01", "pods": ["open5gs-ue02", "open5gs-ue03", "open5gs-ue04", "open5gs-ue05"], "slices": ["1","2","3","4","5"], "cpu": [900, 900, 900, 525, 525]}
+    {"experiment": "01", "name": "experiment01", "text": "Baseline only priority UE", "priorityPod": "open5gs-ue01", "pods": [], "slices": ["1"], "cpu": [], "nice": [0, 0, 0, 0, 0]},                       
+    {"experiment": "02", "name": "experiment02", "text": "Baseline with priority UE and Slice 02", "priorityPod": "open5gs-ue01", "pods": ["open5gs-ue02"], "slices": ["1","2"], "cpu": [0, 0, 0, 0, 0], "nice": [0, 0, 0, 0, 0]},
+    {"experiment": "03", "name": "experiment03", "text": "Baseline with priority UE and Slice 02 and 03", "priorityPod": "open5gs-ue01", "pods": ["open5gs-ue02", "open5gs-ue03"], "slices": ["1","2","3"], "cpu": [0, 0, 0, 0, 0], "nice": [0, 0, 0, 0, 0]},
+    {"experiment": "04", "name": "experiment04", "text": "Baseline with priority UE and Slice 02, 03 and 04", "priorityPod": "open5gs-ue01", "pods": ["open5gs-ue02", "open5gs-ue03", "open5gs-ue04"], "slices": ["1","2","3","4"], "cpu": [], "nice": [0, 0, 0, 0, 0]},
+    {"experiment": "05", "name": "experiment05", "text": "Baseline with priority UE and Slice 02, 03, 04, 05", "priorityPod": "open5gs-ue01", "pods": ["open5gs-ue02", "open5gs-ue03", "open5gs-ue04", "open5gs-ue05"], "slices": ["1","2","3","4","5"], "cpu": [0, 0, 0, 0, 0], "nice": [0, 0, 0, 0, 0]},
+    {"experiment": "06", "name": "experiment06", "text": "Baseline with priority UE and Slice 02, 03, 04, 05 with nc", "priorityPod": "open5gs-ue01", "pods": ["open5gs-ue02", "open5gs-ue03", "open5gs-ue04", "open5gs-ue05"], "slices": ["1","2","3","4","5"], "cpu": [0, 0, 0, 0, 0], "nice": [0, 0, 0, 10, 10]},
+    {"experiment": "07", "name": "experiment07", "text": "Limit CPU all UPF", "priorityPod": "open5gs-ue01", "pods": ["open5gs-ue02", "open5gs-ue03", "open5gs-ue04", "open5gs-ue05"], "slices": ["1","2","3","4","5"], "cpu": [750, 750, 750, 750, 750], "nice": [0, 0, 0, 0, 0]},
+    {"experiment": "08", "name": "experiment08", "text": "Limit CPU all UPF more Slice 01", "priorityPod": "open5gs-ue01", "pods": ["open5gs-ue02", "open5gs-ue03", "open5gs-ue04", "open5gs-ue05"], "slices": ["1","2","3","4","5"], "cpu": [900, 750, 750, 675, 675], "nice": [0, 0, 0, 0, 0]},
+    {"experiment": "09", "name": "experiment09", "text": "Limit CPU all UPF more Slice 02", "priorityPod": "open5gs-ue01", "pods": ["open5gs-ue02", "open5gs-ue03", "open5gs-ue04", "open5gs-ue05"], "slices": ["1","2","3","4","5"], "cpu": [900, 900, 750, 600, 600], "nice": [0, 0, 0, 0, 0]},
+    {"experiment": "10", "name": "experiment10", "text": "Limit CPU all UPF more Slice 03", "priorityPod": "open5gs-ue01", "pods": ["open5gs-ue02", "open5gs-ue03", "open5gs-ue04", "open5gs-ue05"], "slices": ["1","2","3","4","5"], "cpu": [900, 900, 900, 525, 525], "nice": [0, 0, 0, 0, 0]},
+    {"experiment": "11", "name": "experiment11", "text": "Limit CPU all UPF with nice", "priorityPod": "open5gs-ue01", "pods": ["open5gs-ue02", "open5gs-ue03", "open5gs-ue04", "open5gs-ue05"], "slices": ["1","2","3","4","5"], "cpu": [900, 900, 900, 525, 525],  "nice": [0, 0, 0, 10, 10]},
+    {"experiment": "12", "name": "experiment12", "text": "Limit CPU all UPF with limit bandwith", "priorityPod": "open5gs-ue01", "pods": ["open5gs-ue02", "open5gs-ue03", "open5gs-ue04", "open5gs-ue05"], "slices": ["1","2","3","4","5"], "cpu": [900, 900, 900, 525, 525], "nice": [0, 0, 0, 0, 0], "bandwith": ["12M", "80K", "6M", "20M", "20M"]},
+    {"experiment": "13", "name": "experiment13", "text": "Limit CPU all UPF with nice and limit bandwith", "priorityPod": "open5gs-ue01", "pods": ["open5gs-ue02", "open5gs-ue03", "open5gs-ue04", "open5gs-ue05"], "slices": ["1","2","3","4","5"], "cpu": [900, 900, 900, 525, 525], "nice": [0, 0, 0, 10, 10], "bandwith": ["12M", "80K", "6M", "20M", "20M"]},
+    {"experiment": "14", "name": "experiment14", "text": "Baseline with only Slice 04", "priorityPod": "open5gs-ue04", "pods": [], "slices": ["4"], "cpu": [], "nice": [], "bandwith": ["12M", "48K", "3.4M", "21.4M", "21.95M"]}
 ]""")
 
 
 gQueries = json.loads("""[
-    {"name": "receive", "q": "(sum(irate(container_network_receive_bytes_total{job='kubelet', metrics_path='/metrics/cadvisor', namespace='open5gs'}[2m]) * on (namespace,pod) group_left(workload,workload_type) namespace_workload_pod:kube_pod_owner:relabel{namespace='open5gs'}) by (workload, interface))"},
-    {"name": "transmit", "q": "(sum(irate(container_network_transmit_bytes_total{job='kubelet', metrics_path='/metrics/cadvisor', namespace='open5gs'}[2m]) * on (namespace,pod) group_left(workload,workload_type) namespace_workload_pod:kube_pod_owner:relabel{namespace='open5gs'}) by (workload, interface))"},
-    {"name": "latency", "q": "sort_desc(avg(irate(ping_average_response_ms{namespace='open5gs', service=~'open5gs-ue01|open5gs-ue02|open5gs-ue03|open5gs-ue04|open5gs-ue05'}[4h:1m])) by(url, job))"},
-    {"name": "cpu", "q": "sort_desc(sum(irate(node_namespace_pod_container:container_cpu_usage_seconds_total:sum_irate{namespace='open5gs'}[4h:1m]) * on(namespace,pod) group_left(workload, workload_type) namespace_workload_pod:kube_pod_owner:relabel{namespace='open5gs' }) by (workload))"},
+    {"name": "receive", "q": "(sum(irate(container_network_receive_bytes_total{job='kubelet', metrics_path='/metrics/cadvisor', namespace='open5gs'}[30s]) * on (namespace,pod) group_left(workload,workload_type) namespace_workload_pod:kube_pod_owner:relabel{namespace='open5gs'}) by (workload, interface))"},
+    {"name": "transmit", "q": "(sum(irate(container_network_transmit_bytes_total{job='kubelet', metrics_path='/metrics/cadvisor', namespace='open5gs'}[30s]) * on (namespace,pod) group_left(workload,workload_type) namespace_workload_pod:kube_pod_owner:relabel{namespace='open5gs'}) by (workload, interface))"},
+    {"name": "latency", "q": "sort_desc(avg(irate(ping_average_response_ms{namespace='open5gs', service=~'open5gs-ue01|open5gs-ue02|open5gs-ue03|open5gs-ue04|open5gs-ue05'}[20m:30s])) by(url, job))"},
+    {"name": "cpu", "q": "sort_desc(sum(irate(node_namespace_pod_container:container_cpu_usage_seconds_total:sum_irate{namespace='open5gs'}[20m:30s]) * on(namespace,pod) group_left(workload, workload_type) namespace_workload_pod:kube_pod_owner:relabel{namespace='open5gs' }) by (workload))"},
     {"name": "memory", "q": "sum by(service) (process_resident_memory_bytes{namespace='open5gs'})"},
-    {"name": "receive2", "q": "sort_desc(sum(irate(container_network_receive_bytes_total{job='kubelet', metrics_path='/metrics/cadvisor', namespace='open5gs'}[4h:1m]) * on (namespace, pod) group_left(workload, workload_type) namespace_workload_pod:kube_pod_owner:relabel{namespace='open5gs'}) by (workload, interface))"},
-    {"name": "transmit2", "q": "sort_desc(sum(irate(container_network_transmit_bytes_total{job='kubelet', metrics_path='/metrics/cadvisor', namespace='open5gs'}[4h:1m]) * on (namespace, pod) group_left(workload, workload_type) namespace_workload_pod:kube_pod_owner:relabel{namespace='open5gs'}) by (workload, interface))"},
-    {"name": "receive_packets","q": "sort_desc(sum(irate(container_network_receive_packets_total{job='kubelet', metrics_path='/metrics/cadvisor', namespace='open5gs'}[4h:1m]) * on (namespace,pod) group_left(workload,workload_type) namespace_workload_pod:kube_pod_owner:relabel{namespace='open5gs'}) by (pod))"},
-    {"name": "transmit_packets","q": "sort_desc(sum(irate(container_network_transmit_packets_total{job='kubelet', metrics_path='/metrics/cadvisor', namespace='open5gs'}[4h:1m]) * on (namespace,pod) group_left(workload,workload_type) namespace_workload_pod:kube_pod_owner:relabel{namespace='open5gs'}) by (pod))"},
-    {"name": "received_packets_drop", "q": "sort_desc(sum(irate(container_network_receive_packets_dropped_total{job='kubelet', metrics_path='/metrics/cadvisor', namespace='open5gs'}[4h:1m]) * on (namespace,pod) group_left(workload,workload_type) namespace_workload_pod:kube_pod_owner:relabel{namespace='open5gs'}) by (workload, interface))"},
-    {"name": "transmit_packets_drop", "q": "sort_desc(sum(irate(container_network_transmit_packets_dropped_total{job='kubelet', metrics_path='/metrics/cadvisor', namespace='open5gs'}[4h:1m]) * on (namespace,pod) group_left(workload,workload_type) namespace_workload_pod:kube_pod_owner:relabel{namespace='open5gs'}) by (workload, interface))"}
+    {"name": "receive2", "q": "sort_desc(sum(irate(container_network_receive_bytes_total{job='kubelet', metrics_path='/metrics/cadvisor', namespace='open5gs'}[20m:30s]) * on (namespace, pod) group_left(workload, workload_type) namespace_workload_pod:kube_pod_owner:relabel{namespace='open5gs'}) by (workload, interface))"},
+    {"name": "transmit2", "q": "sort_desc(sum(irate(container_network_transmit_bytes_total{job='kubelet', metrics_path='/metrics/cadvisor', namespace='open5gs'}[20m:30s]) * on (namespace, pod) group_left(workload, workload_type) namespace_workload_pod:kube_pod_owner:relabel{namespace='open5gs'}) by (workload, interface))"},
+    {"name": "receive_packets","q": "sort_desc(sum(irate(container_network_receive_packets_total{job='kubelet', metrics_path='/metrics/cadvisor', namespace='open5gs'}[20m:30s]) * on (namespace,pod) group_left(workload,workload_type) namespace_workload_pod:kube_pod_owner:relabel{namespace='open5gs'}) by (pod))"},
+    {"name": "transmit_packets","q": "sort_desc(sum(irate(container_network_transmit_packets_total{job='kubelet', metrics_path='/metrics/cadvisor', namespace='open5gs'}[20m:30s]) * on (namespace,pod) group_left(workload,workload_type) namespace_workload_pod:kube_pod_owner:relabel{namespace='open5gs'}) by (pod))"},
+    {"name": "received_packets_drop", "q": "sort_desc(sum(irate(container_network_receive_packets_dropped_total{job='kubelet', metrics_path='/metrics/cadvisor', namespace='open5gs'}[20m:30s]) * on (namespace,pod) group_left(workload,workload_type) namespace_workload_pod:kube_pod_owner:relabel{namespace='open5gs'}) by (workload, interface))"},
+    {"name": "transmit_packets_drop", "q": "sort_desc(sum(irate(container_network_transmit_packets_dropped_total{job='kubelet', metrics_path='/metrics/cadvisor', namespace='open5gs'}[20m:30s]) * on (namespace,pod) group_left(workload,workload_type) namespace_workload_pod:kube_pod_owner:relabel{namespace='open5gs'}) by (workload, interface))"}
  ]""")
 
 
@@ -117,6 +121,13 @@ for currentArgument, currentValue in arguments:
         
 
 config.load_kube_config()
+
+
+print("********                AVISO                ********")
+print("* Verificar IPs dos testes de latências dos slices. *")
+print("* Verificar IP do ping da UE02.                     *")
+print("*****************************************************")
+
 
 try:
     osEx = Open5gsSliceExperiment(grafanaUrl, prometheusUrl,  mongodbUrl, dashboardUID)

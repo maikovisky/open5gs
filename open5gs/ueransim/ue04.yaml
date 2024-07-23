@@ -36,7 +36,7 @@ metadata:
   labels:
     epc-mode: ue04
 spec:
-  replicas: 1
+  replicas: 0
   selector:
     matchLabels:
       epc-mode: ue04
@@ -120,6 +120,7 @@ spec:
               mountPath: "/dev/net/tun" # Needed for VPN
 
           command: ["nr-ue", "-c", "/etc/ueransim/tmp/open5gs-ue-01.yaml"]
+
         - name: iperf-ue
           image: maikovisky/ueransim:3.2.6  
           imagePullPolicy: "Always" 
@@ -144,7 +145,7 @@ spec:
           securityContext:
             privileged: true
             capabilities:
-              add: ["NET_ADMIN", "SYS_MODULE", "NET_RAW"]
+              add: ["NET_ADMIN", "SYS_MODULE"]
           volumeMounts:
             - name: open5gs-ue4-telegraf-config
               mountPath: /etc/telegraf
@@ -183,13 +184,14 @@ data:
       listen = ":9100"
 
     [[inputs.ping]]
-      urls = ["10.0.13.66"]
+      urls = ["10.0.13.62"]
       #urls = ["10.0.13.167", "143.54.85.1"]
       interface = "uesimtun0"
       method = "native"
       #percentiles = [25, 50, 95, 99]
-      ping_interval = 2.5
+      ping_interval = 2.0
       count = 5
+      timeout = 2.0
 
 
 ---
