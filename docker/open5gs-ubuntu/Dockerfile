@@ -59,11 +59,11 @@ RUN apt install -y python3-pip \
         cd build && \
         ninja install && \ 
         cd / && \ 
-	git clone https://github.com/my5G/my5G-RANTester.git && \
-	cd my5G-RANTester && \
-	go mod download && \
-	cd cmd && \
-	go build app.go 
+	# git clone https://github.com/my5G/my5G-RANTester.git && \
+	# cd my5G-RANTester && \
+	# go mod download && \
+	# cd cmd && \
+	# go build app.go 
 
 WORKDIR /
 
