@@ -77,7 +77,7 @@ spec:
       containers:      
         - name: main-ue
           image: maikovisky/ueransim:3.2.6  
-          imagePullPolicy: "Always" 
+          imagePullPolicy: "IfNotPresent" 
           securityContext:
             privileged: true
             capabilities:
@@ -122,7 +122,7 @@ spec:
           command: ["nr-ue", "-c", "/etc/ueransim/tmp/open5gs-ue-01.yaml"]
         - name: iperf-ue
           image: maikovisky/ueransim:3.2.6  
-          imagePullPolicy: "Always" 
+          imagePullPolicy: "IfNotPresent" 
           securityContext:
             privileged: true
             capabilities:
@@ -185,7 +185,7 @@ data:
 
 
     [[inputs.ping]]
-      urls = ["10.0.33.150"]
+      urls = ["10.0.13.139"]
       interface = "uesimtun0"
       method = "native"
       #percentiles = [25, 50, 95, 99]

@@ -91,7 +91,7 @@ spec:
 
         - name: main-ue
           image: maikovisky/ueransim:3.2.6  
-          imagePullPolicy: "Always" 
+          imagePullPolicy: "IfNotPresent" 
           securityContext:
             privileged: true
             capabilities:
@@ -137,14 +137,14 @@ spec:
 
         # - name: metrics-ue
         #   image: maikovisky/ueransim:3.2.6     
-        #   imagePullPolicy: "Always"
+        #   imagePullPolicy: "IfNotPresent"
         #   command: ["/bin/prometheus-node-exporter", "--collector.disable-defaults", "--collector.textfile", "--collector.arp","--collector.netclass" ,"--collector.netdev" ,"--collector.netstat" ,"--collector.udp_queues","--collector.ipvs","--collector.cpu","--collector.cpufreq","--collector.meminfo"]
         #   volumeMounts:
         #     - name: "dev-net-tun"
         #       mountPath: "/dev/net/tun" # Needed for VPN
         - name: iperf-ue
           image: maikovisky/ueransim:3.2.6  
-          imagePullPolicy: "Always" 
+          imagePullPolicy: "IfNotPresent" 
           securityContext:
             privileged: true
             capabilities:

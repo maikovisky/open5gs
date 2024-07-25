@@ -1,54 +1,41 @@
-apiVersion: v1
-kind: Service
-metadata:
-  name: open5gs-ue04
-  namespace: open5gs
-  labels:
-    epc-mode: ue04
-spec:
-  selector:
-    epc-mode: ue04
-  ports:
-    - name: http2-open5gs-ue04-80
-      protocol: TCP
-      port: 80
-    - name: open5gs-ue04-tcp-3000
-      protocol: TCP
-      port: 3000
-    - name: http2-open5gs-ue04-9100
-      protocol: TCP
-      port: 9100
-    - name: open5gs-ue04-udp-2152
-      protocol: UDP
-      port: 2152
-    - name: open5gs-ue04-udp-36743
-      protocol: UDP
-      port: 36743
-    - name: open5gs-ue04-udp-4997
-      protocol: UDP
-      port: 4997
----    
 apiVersion: apps/v1 # for versions before 1.9.0 use apps/v1beta2
 kind: Deployment
 metadata:
-  name: open5gs-ue04
+  name: open5gs-uegnb02
   namespace: open5gs
   labels:
-    epc-mode: ue04
+    epc-mode: uegnb02
 spec:
   replicas: 0
   selector:
     matchLabels:
-      epc-mode: ue04
+      epc-mode: uegnb02
   template:
     metadata:    
       labels:
-        epc-mode: ue04
-        app: ueransim-ue04
+        epc-mode: uegnb02
+        app: ueransim-uegnb02
     spec:  
       nodeSelector:
-        kubernetes.io/hostname: brix-porvir-05
+        kubernetes.io/hostname: brix-porvir-03
+
       initContainers:
+        - name: init-gnb
+          image: maikovisky/ueransim:3.2.6
+          imagePullPolicy: IfNotPresent
+          command: ["/bin/gnbinit"]
+          volumeMounts:
+            - name: open5gs-ueransim-uegnbinit
+              mountPath: /bin/gnbinit
+              subPath: "gnbinit"
+
+            - name: open5gs-uegnb-config
+              mountPath: /etc/ueransim/open5gs-gnb-base.yaml
+              subPath: "open5gs-gnb-base.yaml"
+
+            - name: etc-tmp
+              mountPath: /etc/ueransim/tmp
+
         - name: init-ue
           image: maikovisky/ueransim:3.2.6
           imagePullPolicy: IfNotPresent
@@ -61,10 +48,10 @@ spec:
             - name: RANDOM_SLICE
               value: "False"
             - name: SLICE
-              value: "4"
+              value: "2"
 
           volumeMounts:
-            - name: open5gs-ue-init
+            - name: open5gs-ueransim-uegnbinit
               mountPath: /bin/ueinit
               subPath: "ueinit"
 
@@ -74,10 +61,31 @@ spec:
 
             - name: etc-ue-tmp
               mountPath: /etc/ueransim/tmp
-      containers:      
+
+      containers:
+        - name: ueransim-gnb
+          image: maikovisky/ueransim:3.2.6  
+          securityContext:
+            privileged: true
+            capabilities:
+              add: ["NET_ADMIN", "SYS_MODULE"]
+                      
+          volumeMounts:
+            - name: "dev-net-tun"
+              mountPath: "/dev/net/tun" # Needed for VPN
+
+            - name: open5gs-uegnb-config
+              mountPath: /etc/ueransim/open5gs-gnb-base.yaml
+              subPath: "open5gs-gnb-base.yaml"
+
+            - name: etc-tmp
+              mountPath: /etc/ueransim/tmp
+
+          command: ["nr-gnb", "-c", "/etc/ueransim/tmp/open5gs-gnb-01.yaml"]
+    
         - name: main-ue
           image: maikovisky/ueransim:3.2.6  
-          imagePullPolicy: "IfNotPresent" 
+          imagePullPolicy: IfNotPresent  
           securityContext:
             privileged: true
             capabilities:
@@ -119,49 +127,58 @@ spec:
             - name: "dev-net-tun"
               mountPath: "/dev/net/tun" # Needed for VPN
 
-          command: ["nr-ue", "-c", "/etc/ueransim/tmp/open5gs-ue-01.yaml"]
+          #command: ["nr-ue", "-c", "/etc/ueransim/tmp/open5gs-ue-01.yaml"]
+          command: ["/bin/sh", "-c", "sleep 5s && nr-ue -c /etc/ueransim/tmp/open5gs-ue-01.yaml"]
+          #command: ["sleep", "1d"]
 
         - name: iperf-ue
           image: maikovisky/ueransim:3.2.6  
-          imagePullPolicy: "IfNotPresent" 
+          imagePullPolicy: IfNotPresent  
           securityContext:
             privileged: true
             capabilities:
               add: ["NET_ADMIN", "SYS_MODULE"]
           env:  
             - name: SLICE
-              value: "4"
+              value: "2"
           command: ["/bin/testing"]
+          #command: ["sleep", "1d"]
           volumeMounts:
             - name: "dev-net-tun"
               mountPath: "/dev/net/tun" # Needed for VPN
 
-            - name: open5gs-ue-testing
+            - name: open5gs-ue-iot
               mountPath: /bin/testing
               subPath: "testing"
 
+        # - name: ping-testing
+        #   image: maikovisky/ueransim:3.2.6 
+        #   imagePullPolicy: "IfNotPresent" 
+        #   securityContext:
+        #     privileged: true
+        #     capabilities:
+        #       add: ["NET_ADMIN", "SYS_MODULE"]
+        #   command: ["/bin/sh", "-c", "sleep 35s && ping -I uesimtun0 -q -i 0.01 10.0.13.64"]
+
         - name: "telegraf"
           image: "telegraf:latest"
+          imagePullPolicy: IfNotPresent  
           securityContext:
             privileged: true
             capabilities:
               add: ["NET_ADMIN", "SYS_MODULE"]
           volumeMounts:
-            - name: open5gs-ue4-telegraf-config
+            - name: open5gs-uegnb02-telegraf-cfg
               mountPath: /etc/telegraf
           
       volumes:
-        - name: open5gs-ue4-telegraf-config
+        - name: open5gs-uegnb-config
           configMap:
-            name: open5gs-ue4-telegraf-config
-        - name: open5gs-ue-testing
-          configMap:
-            name: open5gs-ue-testing
-            defaultMode: 0777
+            name: open5gs-uegnb-config
 
-        - name: open5gs-ue-init
+        - name: open5gs-ueransim-uegnbinit
           configMap:
-            name: open5gs-ue-init
+            name: open5gs-ueransim-uegnbinit
             defaultMode: 0777
 
         - name: dev-net-tun
@@ -171,11 +188,29 @@ spec:
         - name: etc-ue-tmp
           emptyDir: {}
 
+        - name: etc-tmp
+          emptyDir: {}
+
+        - name: open5gs-uegnb02-telegraf-cfg
+          configMap:
+            name: open5gs-uegnb02-telegraf-cfg
+
+        - name: open5gs-ue-init
+          configMap:
+            name: open5gs-ue-init
+            defaultMode: 0777
+
+        - name: open5gs-ue-iot
+          configMap:
+            name: open5gs-ue-iot
+            defaultMode: 0777
+
+
 ---
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: open5gs-ue4-telegraf-config
+  name: open5gs-uegnb02-telegraf-cfg
   namespace: open5gs
 data:
   telegraf.conf: |+
@@ -184,8 +219,7 @@ data:
       listen = ":9100"
 
     [[inputs.ping]]
-      urls = ["10.0.13.187"]
-      #urls = ["10.0.13.167", "143.54.85.1"]
+      urls = ["10.0.13.64"]
       interface = "uesimtun0"
       method = "native"
       #percentiles = [25, 50, 95, 99]
@@ -193,20 +227,53 @@ data:
       count = 5
       timeout = 2.0
 
-
 ---
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
-  name: open5gs-ue04
+  name: open5gs-uegnb02
   namespace: open5gs
   labels:
-    epc-mode: ue04
+    epc-mode: uegnb02
     release: prometheus
 spec:
   selector:
     matchLabels:
-      epc-mode: ue04
+      epc-mode: uegnb02
   endpoints:
-  - interval: 10s
-    port: http2-open5gs-ue04-9100
+  - interval: 15s
+    port: http2-open5gs-uegnb02-9100
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: open5gs-uegnb02
+  namespace: open5gs
+  labels:
+    epc-mode: uegnb02
+spec:
+  selector:
+    epc-mode: uegnb02
+  ports:
+    - name: http2-open5gs-uegnb02-80
+      protocol: TCP
+      port: 80
+    - name: open5gs-uegnb02-tcp-3000
+      protocol: TCP
+      port: 3000
+    - name: open5gs-uegnb02-udp-2152
+      protocol: UDP
+      port: 2152
+    - name: open5gs-uegnb02-udp-36743
+      protocol: UDP
+      port: 36743
+    - name: open5gs-uegnb02-udp-4997
+      protocol: UDP
+      port: 4997
+    - name: http2-open5gs-uegnb02-9100
+      protocol: TCP
+      port: 9100
+    - name: open5gs-uegnb02-udp-5002
+      protocol: UDP
+      port: 5002

@@ -7,7 +7,7 @@ metadata:
     epc-mode: ueransim01
     app: ueransim
 spec:
-  replicas: 1
+  replicas: 0
   selector:
     matchLabels:
       epc-mode: ueransim01
@@ -18,7 +18,7 @@ spec:
         app: ueransim
     spec:  
       nodeSelector:
-        kubernetes.io/hostname: brix-porvir-03
+        kubernetes.io/hostname: brix-porvir-02
       initContainers:
         - name: init-gnb
           image: maikovisky/ueransim:3.2.6

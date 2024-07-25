@@ -1,0 +1,34 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: open5gs-ueransim-uegnbinit
+  namespace: open5gs
+  labels:
+    epc-mode: ueransim
+data:
+  gnbinit: |
+    #!/bin/bash 
+    set -e
+    echo "Config gNB"
+    IPADDRESS=$(hostname -i)
+    #IPADDRESS=127.0.0.1
+    sed "s/HOSTNAME/$IPADDRESS/g" /etc/ueransim/open5gs-gnb-base.yaml > /etc/ueransim/tmp/open5gs-gnb-01.yaml
+    cat /etc/ueransim/tmp/open5gs-gnb-01.yaml
+
+  ueinit: |
+    #!/bin/bash 
+    set -e
+
+    S=$(printf "%02d" $SLICE)
+
+    H=OPEN5GS_UERANSIM$${S}_SERVICE_HOST
+    H=127.0.0.1
+    RESULT=$(python3 /bin/initUE.py)
+
+    echo $RESULT
+
+    export IMSI=$(cut -d , -f 2 <<< $RESULT)
+    export SLICE=$(cut -d , -f 1 <<< $RESULT)
+    #sed "s/HOSTNAME/127.0.0.1/g" /etc/ueransim/open5gs-ue-$SLICE.yaml > /etc/ueransim/tmp/open5gs-ue-01.yaml
+    sed "s/HOSTNAME/127.0.0.1/g" /etc/ueransim/open5gs-ue-$SLICE.yaml > /etc/ueransim/tmp/open5gs-ue-01.yaml
+    sed -i "s/999700000000001/$IMSI/g" /etc/ueransim/tmp/open5gs-ue-01.yaml

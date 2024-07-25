@@ -116,7 +116,7 @@ class Open5gsSliceExperiment:
             lFases = [1, 5]            
         else:
             #lFases = [1, 5, 10, 15, 20]
-            lFases = [5, 10, 15, 20, 20]
+            lFases = [1, 5, 15, 20, 20]
             time.sleep(30)
         
         k8stools.scale(self.priorityPod, self.namespace, 4)
@@ -127,10 +127,10 @@ class Open5gsSliceExperiment:
             text = "{} - Fase {}".format(self.name, fase)
             self.fase.append(self.addAnnotation(text))
             for p  in self.pods:
-                if(p == "open5gs-ue02" or p == "open5gs-ue03"):
+                if(p == "open5gs-uegnb02" or p == "open5gs-uegnb03"):
                     k8stools.scale(p, self.namespace, fase)
                 else:
-                    k8stools.scale(p, self.namespace, 20)
+                    k8stools.scale(p, self.namespace, 1)
                 
             if(self.debug):
                 time.sleep(30)

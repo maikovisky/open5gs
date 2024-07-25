@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: open5gs-ue-testing
+  name: open5gs-ue-iot
   namespace: open5gs
   labels:
     epc-mode: ueransim
@@ -37,6 +37,7 @@ data:
     while :
     do
       t=1800
-      iperf -c open5gs-iperf0$SLICE -f A -i 30 -t $t --trip-times 
+      #iperf -c open5gs-iperf0$SLICE -f A -i 15 -t $t -b 100000 -l 12
+      iperf -c open5gs-iperf02 -t $t -i 15 -b 100K -l 12  
     done
     

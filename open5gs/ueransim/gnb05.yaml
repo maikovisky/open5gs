@@ -7,7 +7,7 @@ metadata:
     epc-mode: ueransim05
     app: ueransim
 spec:
-  replicas: 1
+  replicas: 0
   selector:
     matchLabels:
       epc-mode: ueransim05

@@ -147,7 +147,7 @@ spec:
             - name: open5gs-ue2-ping-config
               mountPath: /config/config.yml
               subPath: "config.yml"
-          command: [ "ping","-I", "uesimtun0", "-q", "-i", "0.01", "10.0.6.26"]
+          command: [ "ping","-I", "uesimtun0", "-q", "-i", "0.01", "10.0.13.64"]
           
       volumes:
         - name: open5gs-ue2-telegraf-config
@@ -192,7 +192,7 @@ data:
     #   files = ["stdout"]
 
     [[inputs.ping]]
-      urls = ["10.0.6.26"]
+      urls = ["10.0.13.64"]
       interface = "uesimtun0"
       method = "native"
       #percentiles = [25, 50, 95, 99]

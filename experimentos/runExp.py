@@ -21,23 +21,40 @@ gCorePods = [
     "open5gs-nrf", "open5gs-scp", "open5gs-amf", "open5gs-ausf","open5gs-bsf", "open5gs-nssf", "open5gs-pcf","open5gs-udm","open5gs-udr", "open5gs-smf"]
 
 gUPFPods = ["open5gs-upf-1", "open5gs-upf-2", "open5gs-upf-3", "open5gs-upf-4", "open5gs-upf-5"]
-gURANSIMPods = ["open5gs-ueransim01", "open5gs-ueransim02", "open5gs-ueransim03", "open5gs-ueransim04", "open5gs-ueransim05"]
+gURANSIMPods = [] # ["open5gs-ueransim01", "open5gs-ueransim02", "open5gs-ueransim03", "open5gs-ueransim04", "open5gs-ueransim05"]
+
+# gExperiments = json.loads("""[
+#     {"experiment": "01", "name": "experiment01", "text": "Baseline only priority UE", "priorityPod": "open5gs-ue01", "pods": [], "slices": ["1"], "cpu": [], "nice": [0, 0, 0, 0, 0]},                       
+#     {"experiment": "02", "name": "experiment02", "text": "Baseline with priority UE and Slice 02", "priorityPod": "open5gs-ue01", "pods": ["open5gs-ue02"], "slices": ["1","2"], "cpu": [0, 0, 0, 0, 0], "nice": [0, 0, 0, 0, 0]},
+#     {"experiment": "03", "name": "experiment03", "text": "Baseline with priority UE and Slice 02 and 03", "priorityPod": "open5gs-ue01", "pods": ["open5gs-ue02", "open5gs-ue03"], "slices": ["1","2","3"], "cpu": [0, 0, 0, 0, 0], "nice": [0, 0, 0, 0, 0]},
+#     {"experiment": "04", "name": "experiment04", "text": "Baseline with priority UE and Slice 02, 03 and 04", "priorityPod": "open5gs-ue01", "pods": ["open5gs-ue02", "open5gs-ue03", "open5gs-ue04"], "slices": ["1","2","3","4"], "cpu": [], "nice": [0, 0, 0, 0, 0]},
+#     {"experiment": "05", "name": "experiment05", "text": "Baseline with priority UE and Slice 02, 03, 04, 05", "priorityPod": "open5gs-ue01", "pods": ["open5gs-ue02", "open5gs-ue03", "open5gs-ue04", "open5gs-ue05"], "slices": ["1","2","3","4","5"], "cpu": [0, 0, 0, 0, 0], "nice": [0, 0, 0, 0, 0]},
+#     {"experiment": "06", "name": "experiment06", "text": "Baseline with priority UE and Slice 02, 03, 04, 05 with nc", "priorityPod": "open5gs-ue01", "pods": ["open5gs-ue02", "open5gs-ue03", "open5gs-ue04", "open5gs-ue05"], "slices": ["1","2","3","4","5"], "cpu": [0, 0, 0, 0, 0], "nice": [0, 0, 0, 10, 10]},
+#     {"experiment": "07", "name": "experiment07", "text": "Limit CPU all UPF", "priorityPod": "open5gs-ue01", "pods": ["open5gs-ue02", "open5gs-ue03", "open5gs-ue04", "open5gs-ue05"], "slices": ["1","2","3","4","5"], "cpu": [750, 750, 750, 750, 750], "nice": [0, 0, 0, 0, 0]},
+#     {"experiment": "08", "name": "experiment08", "text": "Limit CPU all UPF more Slice 01", "priorityPod": "open5gs-ue01", "pods": ["open5gs-ue02", "open5gs-ue03", "open5gs-ue04", "open5gs-ue05"], "slices": ["1","2","3","4","5"], "cpu": [900, 750, 750, 675, 675], "nice": [0, 0, 0, 0, 0]},
+#     {"experiment": "09", "name": "experiment09", "text": "Limit CPU all UPF more Slice 02", "priorityPod": "open5gs-ue01", "pods": ["open5gs-ue02", "open5gs-ue03", "open5gs-ue04", "open5gs-ue05"], "slices": ["1","2","3","4","5"], "cpu": [900, 900, 750, 600, 600], "nice": [0, 0, 0, 0, 0]},
+#     {"experiment": "10", "name": "experiment10", "text": "Limit CPU all UPF more Slice 03", "priorityPod": "open5gs-ue01", "pods": ["open5gs-ue02", "open5gs-ue03", "open5gs-ue04", "open5gs-ue05"], "slices": ["1","2","3","4","5"], "cpu": [900, 900, 900, 525, 525], "nice": [0, 0, 0, 0, 0]},
+#     {"experiment": "11", "name": "experiment11", "text": "Limit CPU all UPF with nice", "priorityPod": "open5gs-ue01", "pods": ["open5gs-ue02", "open5gs-ue03", "open5gs-ue04", "open5gs-ue05"], "slices": ["1","2","3","4","5"], "cpu": [900, 900, 900, 525, 525],  "nice": [0, 0, 0, 10, 10]},
+#     {"experiment": "12", "name": "experiment12", "text": "Limit CPU all UPF with limit bandwith", "priorityPod": "open5gs-ue01", "pods": ["open5gs-ue02", "open5gs-ue03", "open5gs-ue04", "open5gs-ue05"], "slices": ["1","2","3","4","5"], "cpu": [900, 900, 900, 525, 525], "nice": [0, 0, 0, 0, 0], "bandwith": ["12M", "80K", "6M", "20M", "20M"]},
+#     {"experiment": "13", "name": "experiment13", "text": "Limit CPU all UPF with nice and limit bandwith", "priorityPod": "open5gs-ue01", "pods": ["open5gs-ue02", "open5gs-ue03", "open5gs-ue04", "open5gs-ue05"], "slices": ["1","2","3","4","5"], "cpu": [900, 900, 900, 525, 525], "nice": [0, 0, 0, 10, 10], "bandwith": ["12M", "80K", "6M", "20M", "20M"]},
+#     {"experiment": "14", "name": "experiment14", "text": "Baseline with only Slice 04", "priorityPod": "open5gs-ue04", "pods": [], "slices": ["4"], "cpu": [], "nice": [], "bandwith": ["12M", "48K", "3.4M", "21.4M", "21.95M"]}
+# ]""")
 
 gExperiments = json.loads("""[
-    {"experiment": "01", "name": "experiment01", "text": "Baseline only priority UE", "priorityPod": "open5gs-ue01", "pods": [], "slices": ["1"], "cpu": [], "nice": [0, 0, 0, 0, 0]},                       
-    {"experiment": "02", "name": "experiment02", "text": "Baseline with priority UE and Slice 02", "priorityPod": "open5gs-ue01", "pods": ["open5gs-ue02"], "slices": ["1","2"], "cpu": [0, 0, 0, 0, 0], "nice": [0, 0, 0, 0, 0]},
-    {"experiment": "03", "name": "experiment03", "text": "Baseline with priority UE and Slice 02 and 03", "priorityPod": "open5gs-ue01", "pods": ["open5gs-ue02", "open5gs-ue03"], "slices": ["1","2","3"], "cpu": [0, 0, 0, 0, 0], "nice": [0, 0, 0, 0, 0]},
-    {"experiment": "04", "name": "experiment04", "text": "Baseline with priority UE and Slice 02, 03 and 04", "priorityPod": "open5gs-ue01", "pods": ["open5gs-ue02", "open5gs-ue03", "open5gs-ue04"], "slices": ["1","2","3","4"], "cpu": [], "nice": [0, 0, 0, 0, 0]},
-    {"experiment": "05", "name": "experiment05", "text": "Baseline with priority UE and Slice 02, 03, 04, 05", "priorityPod": "open5gs-ue01", "pods": ["open5gs-ue02", "open5gs-ue03", "open5gs-ue04", "open5gs-ue05"], "slices": ["1","2","3","4","5"], "cpu": [0, 0, 0, 0, 0], "nice": [0, 0, 0, 0, 0]},
-    {"experiment": "06", "name": "experiment06", "text": "Baseline with priority UE and Slice 02, 03, 04, 05 with nc", "priorityPod": "open5gs-ue01", "pods": ["open5gs-ue02", "open5gs-ue03", "open5gs-ue04", "open5gs-ue05"], "slices": ["1","2","3","4","5"], "cpu": [0, 0, 0, 0, 0], "nice": [0, 0, 0, 10, 10]},
-    {"experiment": "07", "name": "experiment07", "text": "Limit CPU all UPF", "priorityPod": "open5gs-ue01", "pods": ["open5gs-ue02", "open5gs-ue03", "open5gs-ue04", "open5gs-ue05"], "slices": ["1","2","3","4","5"], "cpu": [750, 750, 750, 750, 750], "nice": [0, 0, 0, 0, 0]},
-    {"experiment": "08", "name": "experiment08", "text": "Limit CPU all UPF more Slice 01", "priorityPod": "open5gs-ue01", "pods": ["open5gs-ue02", "open5gs-ue03", "open5gs-ue04", "open5gs-ue05"], "slices": ["1","2","3","4","5"], "cpu": [900, 750, 750, 675, 675], "nice": [0, 0, 0, 0, 0]},
-    {"experiment": "09", "name": "experiment09", "text": "Limit CPU all UPF more Slice 02", "priorityPod": "open5gs-ue01", "pods": ["open5gs-ue02", "open5gs-ue03", "open5gs-ue04", "open5gs-ue05"], "slices": ["1","2","3","4","5"], "cpu": [900, 900, 750, 600, 600], "nice": [0, 0, 0, 0, 0]},
-    {"experiment": "10", "name": "experiment10", "text": "Limit CPU all UPF more Slice 03", "priorityPod": "open5gs-ue01", "pods": ["open5gs-ue02", "open5gs-ue03", "open5gs-ue04", "open5gs-ue05"], "slices": ["1","2","3","4","5"], "cpu": [900, 900, 900, 525, 525], "nice": [0, 0, 0, 0, 0]},
-    {"experiment": "11", "name": "experiment11", "text": "Limit CPU all UPF with nice", "priorityPod": "open5gs-ue01", "pods": ["open5gs-ue02", "open5gs-ue03", "open5gs-ue04", "open5gs-ue05"], "slices": ["1","2","3","4","5"], "cpu": [900, 900, 900, 525, 525],  "nice": [0, 0, 0, 10, 10]},
-    {"experiment": "12", "name": "experiment12", "text": "Limit CPU all UPF with limit bandwith", "priorityPod": "open5gs-ue01", "pods": ["open5gs-ue02", "open5gs-ue03", "open5gs-ue04", "open5gs-ue05"], "slices": ["1","2","3","4","5"], "cpu": [900, 900, 900, 525, 525], "nice": [0, 0, 0, 0, 0], "bandwith": ["12M", "80K", "6M", "20M", "20M"]},
-    {"experiment": "13", "name": "experiment13", "text": "Limit CPU all UPF with nice and limit bandwith", "priorityPod": "open5gs-ue01", "pods": ["open5gs-ue02", "open5gs-ue03", "open5gs-ue04", "open5gs-ue05"], "slices": ["1","2","3","4","5"], "cpu": [900, 900, 900, 525, 525], "nice": [0, 0, 0, 10, 10], "bandwith": ["12M", "80K", "6M", "20M", "20M"]},
-    {"experiment": "14", "name": "experiment14", "text": "Baseline with only Slice 04", "priorityPod": "open5gs-ue04", "pods": [], "slices": ["4"], "cpu": [], "nice": [], "bandwith": ["12M", "48K", "3.4M", "21.4M", "21.95M"]}
+    {"experiment": "01", "name": "experiment01", "text": "Baseline only priority UE", "priorityPod": "open5gs-uegnb01", "pods": [], "slices": ["1"], "cpu": [], "nice": [0, 0, 0, 0, 0]},                       
+    {"experiment": "02", "name": "experiment02", "text": "Baseline with priority UE and Slice 02", "priorityPod": "open5gs-uegnb01", "pods": ["open5gs-uegnb02"], "slices": ["1","2"], "cpu": [0, 0, 0, 0, 0], "nice": [0, 0, 0, 0, 0]},
+    {"experiment": "03", "name": "experiment03", "text": "Baseline with priority UE and Slice 02 and 03", "priorityPod": "open5gs-uegnb01", "pods": ["open5gs-uegnb02", "open5gs-uegnb03"], "slices": ["1","2","3"], "cpu": [0, 0, 0, 0, 0], "nice": [0, 0, 0, 0, 0]},
+    {"experiment": "04", "name": "experiment04", "text": "Baseline with priority UE and Slice 02, 03 and 04", "priorityPod": "open5gs-uegnb01", "pods": ["open5gs-uegnb02", "open5gs-uegnb03", "open5gs-uegnb04"], "slices": ["1","2","3","4"], "cpu": [], "nice": [0, 0, 0, 0, 0]},
+    {"experiment": "05", "name": "experiment05", "text": "Baseline with priority UE and Slice 02, 03, 04, 05", "priorityPod": "open5gs-uegnb01", "pods": ["open5gs-uegnb02", "open5gs-uegnb03", "open5gs-uegnb04", "open5gs-uegnb05"], "slices": ["1","2","3","4","5"], "cpu": [0, 0, 0, 0, 0], "nice": [0, 0, 0, 0, 0]},
+    {"experiment": "06", "name": "experiment06", "text": "Baseline with priority UE and Slice 02, 03, 04, 05 with nc", "priorityPod": "open5gs-uegnb01", "pods": ["open5gs-uegnb02", "open5gs-uegnb03", "open5gs-uegnb04", "open5gs-uegnb05"], "slices": ["1","2","3","4","5"], "cpu": [0, 0, 0, 0, 0], "nice": [0, 0, 0, 10, 10]},
+    {"experiment": "07", "name": "experiment07", "text": "Limit CPU all UPF", "priorityPod": "open5gs-uegnb01", "pods": ["open5gs-uegnb02", "open5gs-uegnb03", "open5gs-uegnb04", "open5gs-uegnb05"], "slices": ["1","2","3","4","5"], "cpu": [750, 750, 750, 750, 750], "nice": [0, 0, 0, 0, 0]},
+    {"experiment": "08", "name": "experiment08", "text": "Limit CPU all UPF more Slice 01", "priorityPod": "open5gs-uegnb01", "pods": ["open5gs-uegnb02", "open5gs-uegnb03", "open5gs-uegnb04", "open5gs-uegnb05"], "slices": ["1","2","3","4","5"], "cpu": [900, 750, 750, 675, 675], "nice": [0, 0, 0, 0, 0]},
+    {"experiment": "09", "name": "experiment09", "text": "Limit CPU all UPF more Slice 02", "priorityPod": "open5gs-uegnb01", "pods": ["open5gs-uegnb02", "open5gs-uegnb03", "open5gs-uegnb04", "open5gs-uegnb05"], "slices": ["1","2","3","4","5"], "cpu": [900, 900, 750, 600, 600], "nice": [0, 0, 0, 0, 0]},
+    {"experiment": "10", "name": "experiment10", "text": "Limit CPU all UPF more Slice 03", "priorityPod": "open5gs-uegnb01", "pods": ["open5gs-uegnb02", "open5gs-uegnb03", "open5gs-uegnb04", "open5gs-uegnb05"], "slices": ["1","2","3","4","5"], "cpu": [900, 900, 900, 525, 525], "nice": [0, 0, 0, 0, 0]},
+    {"experiment": "11", "name": "experiment11", "text": "Limit CPU all UPF with nice", "priorityPod": "open5gs-uegnb01", "pods": ["open5gs-uegnb02", "open5gs-uegnb03", "open5gs-uegnb04", "open5gs-uegnb05"], "slices": ["1","2","3","4","5"], "cpu": [900, 900, 900, 525, 525],  "nice": [0, 0, 0, 10, 10]},
+    {"experiment": "12", "name": "experiment12", "text": "Limit CPU all UPF with limit bandwith", "priorityPod": "open5gs-uegnb01", "pods": ["open5gs-uegnb02", "open5gs-uegnb03", "open5gs-uegnb04", "open5gs-uegnb05"], "slices": ["1","2","3","4","5"], "cpu": [900, 900, 900, 525, 525], "nice": [0, 0, 0, 0, 0], "bandwith": ["12M", "80K", "6M", "20M", "20M"]},
+    {"experiment": "13", "name": "experiment13", "text": "Limit CPU all UPF with nice and limit bandwith", "priorityPod": "open5gs-uegnb01", "pods": ["open5gs-uegnb02", "open5gs-uegnb03", "open5gs-uegnb04", "open5gs-uegnb05"], "slices": ["1","2","3","4","5"], "cpu": [900, 900, 900, 525, 525], "nice": [0, 0, 0, 10, 10], "bandwith": ["12M", "80K", "6M", "20M", "20M"]},
+    {"experiment": "14", "name": "experiment14", "text": "Baseline with only Slice 04", "priorityPod": "open5gs-uegnb01", "pods": [], "slices": ["4"], "cpu": [], "nice": [], "bandwith": ["12M", "48K", "3.4M", "21.4M", "21.95M"]}
 ]""")
 
 
@@ -62,7 +79,7 @@ long_options = ["Help", "experiment", "repeat", "time"]
 aRepeat = 1
 aExp = None
 aTime = 240
-aTimeBetweenExperience = 120
+aTimeBetweenExperience = 60
 
 def usage():
     print("python runExp.py <options>")
