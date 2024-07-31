@@ -38,6 +38,6 @@ data:
     do
       t=1800
       #iperf -c open5gs-iperf0$SLICE -f A -i 15 -t $t -b 100000 -l 12
-      iperf -c open5gs-iperf02 -t $t -i 15 -b 100K -l 12  
+      iperf -c open5gs-iperf02 -t $t -i 15 -b 500K -l 12  
     done
     

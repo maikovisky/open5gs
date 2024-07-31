@@ -63,13 +63,11 @@ spec:
             privileged: true
             capabilities:
               add: ["NET_ADMIN", "SYS_MODULE"]
-          # resources:
-          #   requests:
-          #     memory: "0Mi"
-          #     cpu: "900m"
-          #   limits:
-          #     memory: "0Mi"
-          #     cpu: "900m"
+          resources:
+            requests:
+              memory: "150Mi"
+            limits:
+              memory: "150Mi"
           volumeMounts:
             - name: open5gs-upf1-config
               mountPath: /open5gs/config-map/upf.yaml
@@ -126,8 +124,8 @@ data:
         path: /var/log/open5gs/upf.log
     global:
       max:
-        ue: 1024  # The number of UE can be increased depending on memory size.
-        peer: 64
+        ue: 2048  # The number of UE can be increased depending on memory size.
+        peer: 128
 
     upf:
       pfcp:

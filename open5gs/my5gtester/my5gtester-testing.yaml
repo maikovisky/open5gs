@@ -1,0 +1,30 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: open5gs-my5gtester-testing
+  namespace: open5gs
+  labels:
+    epc-mode: my5gtester
+data:
+  running: |
+    #!/bin/bash 
+    set -e
+
+    sleep "10s"
+
+    COUNTER=0
+    while [ -z  $(ifconfig | awk  '/uetun/{print $1; exit}') ] 
+    do
+      let COUNTER=COUNTER+1
+      #echo -ne "Waiting create tunnel interface. Attempt $COUNTER"\\r
+      echo "Waiting create tunnel interface. Attempt $COUNTER"
+      sleep "5s"
+    done
+    
+    route add -host open5gs-iperf0$SLICE dev uetun1
+    while :
+    do
+      t=1800
+      iperf -c open5gs-iperf0$SLICE -f A -i 30 -t $t --trip-times 
+    done
+    

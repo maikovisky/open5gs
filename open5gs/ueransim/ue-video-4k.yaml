@@ -11,7 +11,7 @@ data:
     #!/bin/bash 
     set -e
 
-    sleep "15s"
+    sleep "5s"
 
     COUNTER=0
     while [ -z  $(ifconfig | awk  '/uesimtun/{print $1; exit}') ] 
@@ -19,7 +19,7 @@ data:
       let COUNTER=COUNTER+1
       #echo -ne "Waiting create tunnel interface. Attempt $COUNTER"\\r
       echo "Waiting create tunnel interface. Attempt $COUNTER"
-      sleep "5s"
+      sleep "2s"
     done
 
     uesimtun0=$(ifconfig uesimtun0 | awk '/inet / {print $6}')
@@ -37,5 +37,5 @@ data:
     while :
     do
       t=1800
-      /bin/iperf -c open5gs-iperf0$SLICE -u -p 5002 --len 1370 -f A -i 15 -t $t --isochronous=60:32m,5 --trip-times -e -z 
+      /bin/iperf -c open5gs-iperf0$SLICE -u -p 5002 --len 1370 -f A -i 15 -t $t --isochronous=60:64m,2m -e
     done

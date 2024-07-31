@@ -51,7 +51,7 @@ class GraphanaGetRenderImage:
         for s in slices:
             sPad =  s.rjust(2, "0")
             dp.append("var-data_plane=open5gs-upf-{}".format(s))
-            dp.append("var-ues=open5gs-uegnb{}".format(sPad))
+            dp.append("var-ues=open5gs-my5gran{}".format(sPad))
             dp.append("var-workload=open5gs-iperf{}".format(sPad))
             dp.append("var-interface=slice{}".format(sPad))
             

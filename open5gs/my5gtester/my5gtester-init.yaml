@@ -1,0 +1,37 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: open5gs-my5gtester-init
+  namespace: open5gs
+  labels:
+    epc-mode: my5gtester
+data:
+  my5gtester-init: |
+    #!/bin/bash 
+    set -e
+    echo "Config my5grantester"
+
+    S=$(printf "%02d" $SLICE)
+    echo "Slice $S"
+
+    RESULT=$(python3 /bin/initUE.py)
+    echo "From initUE.py: $RESULT"
+    IMSI=$(cut -d , -f 2 <<< $RESULT)
+    IMSI=$${IMSI:5}
+    # SLICE=$(cut -d , -f 1 <<< $RESULT)
+
+    S=$(printf "%02d" $SLICE)
+    SST=$(printf "%02d" $SLICE)
+    UESST=$(printf "%d" $SLICE)
+    SD=$(printf "%06d" $SLICE)
+    DNN=$(printf "slice%02d" $SLICE)
+
+    IPADDRESS=$(hostname -i)
+    ls /my5G-RANTester
+    sed "s/HOSTNAME/$IPADDRESS/g" /my5G-RANTester/base/config.yml > /my5G-RANTester/config/config.yml
+    sed -i "s/DNN/$DNN/g" /my5G-RANTester/config/config.yml 
+    sed -i "s/UESST/$UESST/g" /my5G-RANTester/config/config.yml 
+    sed -i "s/SST/$SST/g" /my5G-RANTester/config/config.yml 
+    sed -i "s/SD/$SD/g" /my5G-RANTester/config/config.yml 
+    sed -i "s/MSIN/$IMSI/g" /my5G-RANTester/config/config.yml 
+    cat /my5G-RANTester/config/config.yml

@@ -58,7 +58,7 @@ RUN apt install -y python3-pip \
         ninja -C  build && \
         cd build && \
         ninja install && \ 
-        cd / && \ 
+        cd /
 	# git clone https://github.com/my5G/my5G-RANTester.git && \
 	# cd my5G-RANTester && \
 	# go mod download && \

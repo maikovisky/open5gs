@@ -14,8 +14,8 @@ data:
     
     global:
       max:
-        ue: 1024
-        peer: 64
+        ue: 2048
+        peer: 128
 
     nrf:
       sbi:

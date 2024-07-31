@@ -127,7 +127,7 @@ class Open5gsSliceExperiment:
             text = "{} - Fase {}".format(self.name, fase)
             self.fase.append(self.addAnnotation(text))
             for p  in self.pods:
-                if(p == "open5gs-uegnb02" or p == "open5gs-uegnb03"):
+                if(p == "open5gs-my5gran02" or p == "open5gs-my5gran03"):
                     k8stools.scale(p, self.namespace, fase)
                 else:
                     k8stools.scale(p, self.namespace, 1)

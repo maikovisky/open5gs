@@ -13,7 +13,7 @@ data:
     IPADDRESS=$(hostname -i)
     #IPADDRESS=127.0.0.1
     sed "s/HOSTNAME/$IPADDRESS/g" /etc/ueransim/open5gs-gnb-base.yaml > /etc/ueransim/tmp/open5gs-gnb-01.yaml
-    cat /etc/ueransim/tmp/open5gs-gnb-01.yaml
+    #cat /etc/ueransim/tmp/open5gs-gnb-01.yaml
 
   ueinit: |
     #!/bin/bash 
@@ -32,3 +32,21 @@ data:
     #sed "s/HOSTNAME/127.0.0.1/g" /etc/ueransim/open5gs-ue-$SLICE.yaml > /etc/ueransim/tmp/open5gs-ue-01.yaml
     sed "s/HOSTNAME/127.0.0.1/g" /etc/ueransim/open5gs-ue-$SLICE.yaml > /etc/ueransim/tmp/open5gs-ue-01.yaml
     sed -i "s/999700000000001/$IMSI/g" /etc/ueransim/tmp/open5gs-ue-01.yaml
+
+  ue-test: |
+    #!/bin/sh
+    nr-cli --dump | xargs -i nr-cli {} -e 'status' | grep -e CM-IDLE
+    if [ $? -eq 0 ]; then
+      exit 1
+    else
+      exit 0
+    fi
+
+  iperf-test: |
+    #!/bin/sh
+    nr-cli --dump | xargs -i nr-cli {} -e 'status' | grep -e "write failed: Network is"
+    if [ $? -eq 0 ]; then
+      exit 1
+    else
+      exit 0
+    fi

@@ -13,8 +13,8 @@ data:
 
     global:
       max:
-        ue: 1024  # The number of UE can be increased depending on memory size.
-        peer: 64
+        ue: 2048  # The number of UE can be increased depending on memory size.
+        peer: 128
 
     nssf:
       sbi:

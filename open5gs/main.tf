@@ -276,6 +276,22 @@ resource "kubectl_manifest" "ueransim" {
     ]
 }
 
+# POD for My5GTester
+data "kubectl_path_documents" "my5gtester_manifests" {
+    pattern = "./my5gtester/*.yaml"
+}
+
+resource "kubectl_manifest" "my5gtester" {
+    count     = length(data.kubectl_path_documents.my5gtester_manifests.documents)
+    yaml_body = element(data.kubectl_path_documents.my5gtester_manifests.documents, count.index)
+
+    depends_on = [
+      data.kubectl_path_documents.nrf_manifests,
+      data.kubectl_path_documents.amf_manifests,
+      data.kubectl_path_documents.smf_manifests
+    ]
+}
+
 # IPERF
 data "kubectl_path_documents" "iperf_manifests" {
     pattern = "./iperf/*.yaml"

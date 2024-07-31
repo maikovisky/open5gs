@@ -50,29 +50,30 @@ spec:
         epc-mode: iperf01
         app: iperf
     spec:  
-      affinity:
-        podAntiAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-          - labelSelector:
-              matchExpressions:
-              - key: prometheus
-                operator: In
-                values:
-                - k8s
-            topologyKey: kubernetes.io/hostname
-            namespaceSelector: {monitoring}
-          - labelSelector:
-              matchExpressions:
-              - key: app
-                operator: In
-                values:
-                - iperf
-            topologyKey: kubernetes.io/hostname
+      # affinity:
+      #   podAntiAffinity:
+      #     requiredDuringSchedulingIgnoredDuringExecution:
+      #     - labelSelector:
+      #         matchExpressions:
+      #         - key: prometheus
+      #           operator: In
+      #           values:
+      #           - k8s
+      #       topologyKey: kubernetes.io/hostname
+      #       namespaceSelector: {monitoring}
+      #     - labelSelector:
+      #         matchExpressions:
+      #         - key: app
+      #           operator: In
+      #           values:
+      #           - iperf
+      #       topologyKey: kubernetes.io/hostname
              
       nodeSelector:
         kubernetes.io/arch: amd64
         nodetype: server
-        kubernetes.io/hostname: blacksabbath
+        #kubernetes.io/hostname: blacksabbath
+        kubernetes.io/hostname: petshopboys
       containers:       
         # - name: iperf3
         #   image: maikovisky/iperf:latest  
@@ -96,7 +97,7 @@ spec:
             privileged: true
             capabilities:
               add: ["NET_ADMIN", "SYS_MODULE"]
-          command: ["/bin/iperf", "-s",  "-i", "15", "--histograms"]
+          command: ["/bin/iperf", "-s",  "-i", "15"]
 
         - name: iperf-udp
           image: maikovisky/iperf:latest  

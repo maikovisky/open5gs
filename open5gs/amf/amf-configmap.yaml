@@ -16,8 +16,8 @@ data:
 
     global:
       max:
-        ue: 1024  # The number of UE can be increased depending on memory size.
-        peer: 64
+        ue: 2048  # The number of UE can be increased depending on memory size.
+        peer: 128
 
     amf:
       sbi:
@@ -106,4 +106,4 @@ data:
         # t3502:
         #   value: 720   # 12 minutes * 60 = 720 seconds
         t3512:
-          value: 540     # 9 mintues * 60 = 540 seconds
+          value: 1500     # 9 mintues * 60 = 540 seconds

@@ -1,0 +1,65 @@
+apiVersion: apps/v1 # for versions before 1.9.0 use apps/v1beta2
+kind: Deployment
+metadata:
+  name: srsrain
+  namespace: open5gs
+  labels:
+    epc-mode: srsrain
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      epc-mode: srsrain
+  template:
+    metadata:  
+      labels:
+        epc-mode: srsrain
+        app: srsrain
+        #version: v2.7.1
+    spec:  
+      nodeSelector:
+        nodetype: server
+        kubernetes.io/arch: amd64
+        kubernetes.io/hostname: blacksabbath
+      containers:
+        - name: srsrain
+          image: maikovisky/open5gs:latest    
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            privileged: true
+            capabilities:
+              add: ["NET_ADMIN", "SYS_MODULE"]
+
+          volumeMounts:
+            - name: open5gs-srsrain-config
+              mountPath: /etc/srsrain.yaml
+              subPath: "srsrain.yaml"
+
+          #command: ["open5gs-udmd", "-c", "/open5gs/config-map/srsrain.yaml"]
+          command: ["sleep", "1d"]
+      volumes:
+        - name: open5gs-srsrain-config
+          configMap:
+            name: open5gs-srsrain-config
+
+# ---
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: open5gs-udm
+#   namespace: open5gs
+#   labels:
+#     epc-mode: udm
+#     prometheus: open5gs-monitor
+# spec:
+#   selector:
+#     epc-mode: udm
+#   ports:
+#     - name: http2-open5gs-udm-80
+#       protocol: TCP
+#       port: 80
+#       targetPort: 80
+#     # - name: http-open5gs-udm-9100
+#     #   protocol: TCP
+#     #   port: 9100
+#     #   targetPort: 9100

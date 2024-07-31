@@ -94,6 +94,12 @@ spec:
             preStop:
               exec:
                 command: ["/bin/sh", "-c", "nr-cli --dump | xargs -i nr-cli {} -e 'deregister remove-sim'"]
+          livenessProbe:
+            initialDelaySeconds: 25
+            periodSeconds: 5
+            failureThreshold: 1
+            exec:
+              command: ["/bin/sh", "-c", "/bin/ue-test"]
           env:            
             - name: MY_NODE_NAME
               valueFrom:
@@ -120,6 +126,10 @@ spec:
             - name: open5gs-ue-init
               mountPath: "/bin/initUE.py"
               subPath: "initUE.py"
+
+            - name: open5gs-ueransim-uegnbinit
+              mountPath: /bin/ue-test
+              subPath: "ue-test"
 
             - name: etc-ue-tmp
               mountPath: /etc/ueransim/tmp
@@ -239,7 +249,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: open5gs-uegnb01-service
+  name: open5gs-uegnb01
   namespace: open5gs
   labels:
     epc-mode: uegnb01

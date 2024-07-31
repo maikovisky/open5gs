@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: open5gs-my5gtester-video-hd
+  namespace: open5gs
+  labels:
+    epc-mode: my5gtester
+data:
+  running: |
+    #!/bin/bash 
+    set -e
+
+    sleep "10s"
+
+    COUNTER=0
+    while [ -z  $(ifconfig | awk  '/uetun/{print $1; exit}') ] 
+    do
+      let COUNTER=COUNTER+1
+      #echo -ne "Waiting create tunnel interface. Attempt $COUNTER"\\r
+      echo "Waiting create tunnel interface. Attempt $COUNTER"
+      sleep "5s"
+    done
+
+    route add -host open5gs-iperf0$SLICE dev uetun1
+    while :
+    do
+      t=1800
+      /bin/iperf -c open5gs-iperf0$SLICE -u -p 5002 --len 1370 -f A -i 15 -t $t --isochronous=60:6m,1m --trip-times -e -z
+    done

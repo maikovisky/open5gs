@@ -138,6 +138,12 @@ spec:
             privileged: true
             capabilities:
               add: ["NET_ADMIN", "SYS_MODULE"]
+          livenessProbe:
+            initialDelaySeconds: 25
+            periodSeconds: 5
+            failureThreshold: 1
+            exec:
+              command: ["/bin/sh", "-c", "/bin/ue-test"]
           env:  
             - name: SLICE
               value: "2"
@@ -146,6 +152,10 @@ spec:
           volumeMounts:
             - name: "dev-net-tun"
               mountPath: "/dev/net/tun" # Needed for VPN
+
+            - name: open5gs-ueransim-uegnbinit
+              mountPath: /bin/ue-test
+              subPath: "ue-test"
 
             - name: open5gs-ue-iot
               mountPath: /bin/testing
