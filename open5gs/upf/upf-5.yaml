@@ -63,13 +63,6 @@ spec:
             privileged: true
             capabilities:
               add: ["NET_ADMIN", "SYS_MODULE"]
-          # resources:
-          #   requests:
-          #     memory: "0Mi"
-          #     cpu: "0m"
-          #   limits:
-          #     memory: "0Mi"
-          #     cpu: "0m"
           volumeMounts:
             - name: open5gs-upf5-config
               mountPath: /open5gs/config-map/upf.yaml
