@@ -53,10 +53,10 @@ data:
               s_nssai:
                 sst: 6
                 sd: 000006
-          #   - uri: http://open5gs-nrf
-          #     s_nssai:
-          #       sst: 7
-          #       sd: 000007
+            - uri: http://open5gs-nrf
+              s_nssai:
+                sst: 7
+                sd: 000007
           #  - uri: http://open5gs-nrf
           #     s_nssai:
           #       sst: 8

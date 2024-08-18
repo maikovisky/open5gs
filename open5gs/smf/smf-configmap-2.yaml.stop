@@ -1,10 +1,10 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: open5gs-smf-config
+  name: open5gs-smf2-config
   namespace: open5gs
   labels:
-    epc-mode: smf
+    epc-mode: smf2
 data:
   smf.yaml: |
     logger:
@@ -20,7 +20,7 @@ data:
       sbi:
         server:
           - address: 0.0.0.0
-            advertise: open5gs-smf
+            advertise: open5gs-smf2
         client:
           nrf:
             - uri: http://open5gs-nrf
@@ -31,23 +31,11 @@ data:
       pfcp:
         server:
           - address: 0.0.0.0
-            advertise: open5gs-smf
+            advertise: open5gs-smf2
         client:
           upf:
-            # - address: open5gs-upf
-            #   dnn: [internet]
-            - address: open5gs-upf-1
-              dnn: [internet, slice01]
-            - address: open5gs-upf-2
-              dnn: [internet, slice02]
-            - address: open5gs-upf-3
-              dnn: [internet, slice03]
-            - address: open5gs-upf-4
-              dnn: [internet, slice04]
-            - address: open5gs-upf-5
-              dnn: [internet, slice05]
-            - address: open5gs-upf-6
-              dnn: [internet, slice06]
+            - address: open5gs-upf
+              dnn: [internet]
             - address: open5gs-upf-7
               dnn: [internet, slice07]
             # - address: open5gs-upf-8
@@ -64,33 +52,15 @@ data:
       gtpc:
         server:
           - address: 0.0.0.0
-            advertise: open5gs-smf
+            advertise: open5gs-smf2
       gtpu:
         server:
           - address: 0.0.0.0
-            advertise: open5gs-smf
+            advertise: open5gs-smf2
       session:
-        # - subnet: 192.168.0.0/16
-        #   gateway: 192.168.0.1
-        #   dnn: internet
-        - subnet: 10.41.0.1/16
-          gateway: 10.41.0.1
-          dnn: slice01
-        - subnet: 10.42.0.0/16
-          gateway: 10.42.0.1
-          dnn: slice02
-        - subnet: 10.43.0.0/16
-          gateway: 10.43.0.1
-          dnn: slice03
-        - subnet: 10.44.0.0/16
-          gateway: 10.44.0.1
-          dnn: slice04
-        - subnet: 10.45.0.0/16
-          gateway: 10.45.0.1
-          dnn: slice05
-        - subnet: 10.46.0.0/16
-          gateway: 10.46.0.1
-          dnn: slice06
+        - subnet: 192.168.0.0/16
+          gateway: 192.168.0.1
+          dnn: internet
         - subnet: 10.47.0.0/16
           gateway: 10.47.0.1
           dnn: slice07
@@ -120,33 +90,9 @@ data:
       freeDiameter: /etc/freeDiameter/smf.conf
       info:
         - s_nssai:
-          # - sst: 1
-          #   dnn:
-          #     - internet
           - sst: 1
-            sd: 000001
             dnn:
-              - slice01
-          - sst: 2
-            sd: 000002
-            dnn:
-              - slice02
-          - sst: 3
-            sd: 000003
-            dnn:
-              - slice03
-          - sst: 4
-            sd: 000004
-            dnn:
-              - slice04
-          - sst: 5
-            sd: 000005
-            dnn:
-              - slice05
-          - sst: 6
-            sd: 000006
-            dnn:
-              - slice06
+              - internet
           - sst: 7
             sd: 000007
             dnn:

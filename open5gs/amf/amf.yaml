@@ -6,8 +6,8 @@ metadata:
   labels:
     epc-mode: amf
     promotheus: open5gs-monitor
-    version:  2.6.4
-    app.kubernetes.io/version: 2.6.4-25-g93012c4
+    version:  2.7.1
+    app.kubernetes.io/version: 2.7.1-27-g4f7f4ec
     app.kubernetes.io/part-of: open5gs
 spec:
   replicas: 1
@@ -16,8 +16,8 @@ spec:
       epc-mode: amf
   template:
     metadata:
-      annotations:
-        readiness.status.sidecar.istio.io/applicationPorts: "80"
+      #annotations:
+      #  readiness.status.sidecar.istio.io/applicationPorts: "80"
       labels:
         epc-mode: amf
         app: open5gs-amf
@@ -58,11 +58,11 @@ spec:
               add: ["NET_ADMIN", "SYS_MODULE"]
           resources:
             requests:
-              memory: "150Mi"
-              cpu: "100m"
+              memory: "500Mi"
+              cpu: "500m"
             limits:
-              memory: "250Mi"
-              cpu: "200m"
+              memory: "750Mi"
+              cpu: "500m"
 
           volumeMounts:
             - name: open5gs-amf-config

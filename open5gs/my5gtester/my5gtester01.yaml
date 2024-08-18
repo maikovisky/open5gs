@@ -49,8 +49,7 @@ spec:
       containers:
         - name: my5grantester
           image:   maikovisky/mygranttester:1.0.1-3-ubuntu
-          #command: ["sleep", "20d"]
-          command: ["./app", "load-test", "-n", "1"]
+          command: ["./app", "load-test", "-n", "1", "|" , "tee", "/tmp/stdout.log"]
           volumeMounts:
             - name: config-tmp
               mountPath:  /my5G-RANTester/config
@@ -61,6 +60,14 @@ spec:
                 - NET_ADMIN
                 - SYS_MODULE
             privileged: true
+          # livenessProbe:
+          #   exec:
+          #     command: ["sh", "-c", "grep -q 'Err' /tmp/stdout.log || exit 1"]
+          #   initialDelaySeconds: 5
+          #   periodSeconds: 5
+          #   timeoutSeconds: 5
+          #   successThreshold: 1
+          #   failureThreshold: 3
 
         - name: iperf-ue
           image: maikovisky/mygranttester:1.0.1-3-ubuntu
@@ -135,7 +142,7 @@ data:
       listen = ":9100"
 
     [[inputs.ping]]
-      urls = ["10.0.13.188"]
+      urls = ["10.0.13.232"]
       interface = "uetun1"
       method = "native"
       #percentiles = [25, 50, 95, 99]

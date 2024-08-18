@@ -25,5 +25,6 @@ data:
     while :
     do
       t=1800
-      /bin/iperf -c open5gs-iperf0$SLICE -u -p 5002 --len 1370 -f A -i 15 -t $t --isochronous=60:64m,2m -e
+      # /bin/iperf -c open5gs-iperf0$SLICE -u -p 5002 --len 1370 -f A -i 15 -t $t --isochronous=60:64m,2m -e
+      /bin/iperf -c open5gs-iperf0$SLICE --len 1370 -f A -i 15 -t $t --isochronous=60:64m,2m -e
     done

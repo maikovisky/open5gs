@@ -62,8 +62,8 @@ spec:
 
              
       nodeSelector:
-          kubernetes.io/arch: amd64
-          nodetype: server     
+          # kubernetes.io/arch: amd64
+          # nodetype: server     
           kubernetes.io/hostname: petshopboys
       containers:       
         # - name: iperf3

@@ -58,18 +58,20 @@ data:
               sd: 000002
             - sst: 3
               sd: 000003
-            - sst: 4
-              sd: 000004
-            - sst: 5
-              sd: 000005
+            # - sst: 4
+            #   sd: 000004
+            # - sst: 5
+            #   sd: 000005
             # - sst: 6
             #   sd: 000006
+            # - sst: 7
+            #   sd: 000007
         # - plmn_id:
         #     mcc: 999
         #     mnc: 70
         #   s_nssai:
-        #     - sst: 5
-        #       sd: 000005
+        #     - sst: 7
+        #       sd: 000007
         #     - sst: 6
         #       sd: 000006
         #     - sst: 7

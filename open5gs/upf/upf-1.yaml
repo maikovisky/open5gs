@@ -36,8 +36,11 @@ kind: Deployment
 metadata:
   name: open5gs-upf-1
   namespace: open5gs
+  annotations:
+    kubernetes.io/egress-bandwidth: "10M"
   labels:
     epc-mode: upf1
+    app: open5gs-upf-1
     promotheus: open5gs-monitor
 spec:
   replicas: 1
@@ -48,7 +51,7 @@ spec:
     metadata:  
       labels:
         epc-mode: upf1
-        app: open5gs-upf
+        app: open5gs-upf-1
     spec:  
       nodeSelector:
         #kubernetes.io/arch: amd64

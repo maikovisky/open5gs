@@ -41,7 +41,7 @@ import k8stools
 # print(UEAddr)
 
 config.load_kube_config()
-
+apps_v1_api = client.CoreV1Api()
 # def bandwith(namespace, deployment_name, value = None):
 #     apps_v1_api = client.AppsV1Api()
 #     annotations = [{
@@ -52,15 +52,11 @@ config.load_kube_config()
     
 #     apps_v1_api.patch_namespaced_deployment(name=deployment_name, namespace=namespace, body=annotations)
 
-    
-# bandwith("open5gs", "open5gs-upf-1", "10M")
 
-k8stools.scale( "open5gs-ue04", "open5gs", 0)    
-k8stools.scale( "open5gs-upf-4", "open5gs", 0)
+k8stools.bandwith("open5gs", "open5gs-upf-1", "15M")
 
-k8stools.update_resource("open5gs", "open5gs-upf-4", 0, 0)
-k8stools.scale( "open5gs-upf-4", "open5gs", 1)
-k8stools.scale( "open5gs-ue04", "open5gs", 1)   
+#r = apps_v1_api.list_namespaced_pod(namespace="open5gs", label_selector="app=open5gs-upf-1")
+#print(r.items[0].metadata.name)
 
 
 

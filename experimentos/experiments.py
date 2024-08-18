@@ -65,7 +65,7 @@ class Open5gsSliceExperiment:
         header = {'Accept': 'application/json', 'Content-Type': 'application/json'}
         body = { "dashboardUID": self.dashboardUID, "time": timeStart, "text": text, "tags": self.tags }
 
-        print(self.grafanaUrl + "/api/annotations")
+        # print(self.grafanaUrl + "/api/annotations")
         print("Annotation {}".format(text))
         try:
             r = requests.post(self.grafanaUrl + "/api/annotations", headers=header, data=json.dumps(body))
@@ -97,6 +97,8 @@ class Open5gsSliceExperiment:
         self.priorityPod = r["priorityPod"]
         self.pods = r["pods"]
         self.slices = r["slices"]
+        self.bandwith = r["bandwith"]
+        print(r["bandwith"])
         
         for i, v in enumerate(r["cpu"]):        
             self.cpu[i] = v
@@ -116,8 +118,8 @@ class Open5gsSliceExperiment:
             lFases = [1, 5]            
         else:
             #lFases = [1, 5, 10, 15, 20]
-            lFases = [1, 5, 15, 20, 20]
-            time.sleep(30)
+            lFases = [5, 10, 15, 20, 20]
+            time.sleep(15)
         
         k8stools.scale(self.priorityPod, self.namespace, 4)
 
@@ -127,10 +129,12 @@ class Open5gsSliceExperiment:
             text = "{} - Fase {}".format(self.name, fase)
             self.fase.append(self.addAnnotation(text))
             for p  in self.pods:
-                if(p == "open5gs-my5gran02" or p == "open5gs-my5gran03"):
+                if( p == "open5gs-my5gran03"):
                     k8stools.scale(p, self.namespace, fase)
+                elif(p == "open5gs-my5gran02"):
+                    k8stools.scale(p, self.namespace, 10)
                 else:
-                    k8stools.scale(p, self.namespace, 1)
+                    k8stools.scale(p, self.namespace, 5)
                 
             if(self.debug):
                 time.sleep(30)
@@ -161,7 +165,7 @@ class Open5gsSliceExperiment:
             base[metric] = {"status": data["status"], "result": data["data"]["result"]}
 
                 
-        db = self.getDatabase("open5gsunique")
+        db = self.getDatabase("open5gs5slices")
         db["experiments"].insert_one(base)
         
     
@@ -198,13 +202,12 @@ class Open5gsSliceExperiment:
         for i, p in enumerate(self.UPFPods):
             k8stools.setEnv(self.namespace, p, "NICE_VALUE", self.nice[i])
             k8stools.update_resource(self.namespace, p, self.cpu[i], self.cpu[i])
-            k8stools.bandwith(self.namespace, p, self.bandwith[i])
-
-            
-        
+  
         self.startOpen5gsCore()
         print("Esperando core subir")
         self.verifyCoreRunnig()
+        for i, p in enumerate(self.UPFPods):
+            k8stools.bandwith(self.namespace, p, self.bandwith[i])
         
     def stopPods(self):
         k8stools.scale(self.priorityPod, self.namespace, 0)

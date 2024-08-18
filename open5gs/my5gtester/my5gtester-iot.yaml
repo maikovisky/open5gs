@@ -10,7 +10,7 @@ data:
     #!/bin/bash 
     set -e
 
-    sleep "10s"
+    sleep "15s"
 
     COUNTER=0
     while [ -z  $(ifconfig | awk  '/uetun/{print $1; exit}') ] 
@@ -18,7 +18,11 @@ data:
       let COUNTER=COUNTER+1
       #echo -ne "Waiting create tunnel interface. Attempt $COUNTER"\\r
       echo "Waiting create tunnel interface. Attempt $COUNTER"
-      sleep "5s"
+      sleep "2s"
+      if [ $COUNTER -eq 5 ]; then
+        echo "Tunnel interface not created"
+        exit 1
+      fi
     done
 
     
@@ -26,6 +30,6 @@ data:
     while :
     do
       t=1800
-      iperf -c open5gs-iperf02 -t $t -i 15 -b 500K -l 12  
+      iperf -c open5gs-iperf0$SLICE -t $t -i 15 -b 500K -l 48  
     done
     

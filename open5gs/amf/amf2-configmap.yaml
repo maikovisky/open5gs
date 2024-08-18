@@ -6,86 +6,106 @@ metadata:
   labels:
     epc-mode: amf2
     app.kubernetes.io/name: open5gs
-    app.kubernetes.io/component: amf2
+    app.kubernetes.io/component: amf
 data:
   amf.yaml: |
     logger:
         # level: debug
-        file: /var/log/open5gs/amf.log
+        file: 
+            path: /var/log/open5gs/amf.log
 
-    sbi:
-      server:
-        no_tls: true
-        cacert: /etc/open5gs/tls/ca.crt
-        key: /etc/open5gs/tls/amf.key
-        cert: /etc/open5gs/tls/amf.crt
-      client:
-        no_tls: true
-        cacert: /etc/open5gs/tls/ca.crt
-        key: /etc/open5gs/tls/amf.key
-        cert: /etc/open5gs/tls/amf.crt
+    global:
+      max:
+        ue: 2048  # The number of UE can be increased depending on memory size.
+        peer: 128
 
     amf:
-        sbi:
+      sbi:
+        server:
           - dev: eth0
             advertise: open5gs-amf2
+        client:
+          nrf:
+            - uri: http://open5gs-nrf:80
 
-        ngap: 
-          - dev: eth0
+      ngap: 
+        server:
+          - address: 0.0.0.0
+            port: 38412
 
-        guami:
-          - plmn_id:
-              mcc: 999
-              mnc: 70
-            amf_id:
-              region: 2
-              set: 2
-        tai:
-          - plmn_id:
-              mcc: 999
-              mnc: 70
-            tac: 1
+      guami:
+        - plmn_id:
+            mcc: 999
+            mnc: 70
+          amf_id:
+            region: 2
+            set: 1
+      tai:
+        - plmn_id:
+            mcc: 999
+            mnc: 70
+          tac: 1
 
-        plmn_support:
-          - plmn_id:
-              mcc: 999
-              mnc: 70
-            s_nssai:
-              - sst: 1
-              - sst: 5
-                sd: 000005
-              - sst: 6
-                sd: 000006
-              - sst: 7
-                sd: 000007
-              - sst: 8
-                sd: 000008
-        security:
-            integrity_order : [ NIA2, NIA1, NIA0 ]
-            ciphering_order : [ NEA0, NEA1, NEA2 ]
-        network_name:
-            full: Open5GS
-        amf_name: open5gs-amf2
+      plmn_support:
+        - plmn_id:
+            mcc: 999
+            mnc: 70
+          s_nssai:
+            - sst: 1
+            # - sst: 1
+            #   sd: 000001
+            # - sst: 2
+            #   sd: 000002
+            # - sst: 3
+            #   sd: 000003
+            - sst: 4
+              sd: 000004
+            - sst: 5
+              sd: 000005
+            - sst: 6
+              sd: 000006
+            - sst: 7
+              sd: 000007
+        # - plmn_id:
+        #     mcc: 999
+        #     mnc: 70
+        #   s_nssai:
+        #     - sst: 7
+        #       sd: 000007
+        #     - sst: 6
+        #       sd: 000006
+        #     - sst: 7
+        #       sd: 000007
+        #     - sst: 8
+        #       sd: 000008
 
-        metrics:
-          addr: 0.0.0.0
-          port: 9090
+        # - plmn_id:
+        #     mcc: 999
+        #     mnc: 70
+        #   s_nssai:
+        #     - sst: 9
+        #       sd: 000009
+        #     - sst: 10
+        #       sd: 000010
+        #     - sst: 11
+        #       sd: 000011
+        #     - sst: 12
+        #       sd: 000012
 
-    nrf:
-      sbi:
-        - name: open5gs-nrf
+      security:
+          integrity_order : [ NIA2, NIA1, NIA0 ]
+          ciphering_order : [ NEA0, NEA1, NEA2 ]
+      network_name:
+          full: Open5GS
+      amf_name: open5gs-amf
 
-    # scp:
-    #   sbi:
-    #     - name: open5gs-scp
-        
-    usrsctp:
-    time:
-      t3512:
-        value: 540     # 9 mintues * 60 = 540 seconds
-      nf_instance:
-        heartbeat: 20
-      message:
-        duration: 3000
-      handover:
-        duration: 500
+      metrics:
+        server:
+          - address: 0.0.0.0
+            port: 9090
+
+      time:
+        # t3502:
+        #   value: 720   # 12 minutes * 60 = 720 seconds
+        t3512:
+          value: 1500     # 9 mintues * 60 = 540 seconds

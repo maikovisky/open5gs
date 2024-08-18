@@ -40,7 +40,7 @@ metadata:
     epc-mode: upf7
     promotheus: open5gs-monitor
 spec:
-  replicas: 0
+  replicas: 1
   selector:
     matchLabels:
       epc-mode: upf7
@@ -54,31 +54,15 @@ spec:
       nodeSelector:
         #kubernetes.io/arch: amd64
         #kubernetes.io/hostname: erasure
-        kubernetes.io/hostname: mac-porvir-01
+        kubernetes.io/hostname: brix-porvir-01
       containers:
-        # - name: tcpdump-upf7
-        #   image: maikovisky/open5gs:ubuntu-latest   
-        #   imagePullPolicy: IfNotPresent
-        #   command: ["/bin/tcpdump", "-i", "eth0", "-s", "65535", "-G", "3600", "-w", "/var/tcpdump/upf7-%F_%H%M.pcap"]
-        #   volumeMounts:
-        #     - name: "dev-net-tun"
-        #       mountPath: "/dev/net/tun" # Needed for VPN
-        #     - name: tcpdump-persistent-storage
-        #       mountPath: /var/tcpdump
         - name: upf7
-          image: maikovisky/open5gs:ubuntu-latest  
+          image: maikovisky/open5gs:latest  
           imagePullPolicy: IfNotPresent  
           securityContext:
             privileged: true
             capabilities:
               add: ["NET_ADMIN", "SYS_MODULE"]
-          # resources:
-          #   requests:
-          #     memory: "250Mi"
-          #     cpu: "500m"
-          #   limits:
-          #     memory: "250Mi"
-          #     cpu: "500m"
           volumeMounts:
             - name: open5gs-upf7-config
               mountPath: /open5gs/config-map/upf.yaml
@@ -95,13 +79,6 @@ spec:
           #command: ["open5gs-upfd", "-c", "/open5gs/config-map/upf.yaml"]
           command: ["/bin/entrypoint.sh"]
 
-        # - name: metrics-upf7
-        #   image: maikovisky/open5gs:ubuntu-latest    
-        #   command: ["/bin/prometheus-node-exporter", "--collector.disable-defaults","--collector.arp","--collector.netclass" ,"--collector.netdev" ,"--collector.netstat" ,"--collector.udp_queues","--collector.ipvs","--collector.cpu","--collector.cpufreq","--collector.meminfo"]
-        #   volumeMounts:
-        #     - name: "dev-net-tun"
-        #       mountPath: "/dev/net/tun" # Needed for VPN
-
       volumes:
         - name: open5gs-upf7-config
           configMap:
@@ -110,9 +87,6 @@ spec:
         - name: dev-net-tun
           hostPath:
             path: /dev/net/tun
-        - name: tcpdump-persistent-storage
-          persistentVolumeClaim:
-            claimName: open5gs-tcpdump-pv-claim
 
 ---
 apiVersion: monitoring.coreos.com/v1
@@ -127,8 +101,6 @@ spec:
     matchLabels:
       epc-mode: upf7
   endpoints:
-  # - interval: 5s
-  #   port: http-open5gs-upf7-9100
   - interval: 5s
     port: http-open5gs-upf7-9090
 ---
@@ -139,60 +111,42 @@ metadata:
   namespace: open5gs
   labels:
     epc-mode: upf7
+    release: prometheus
 data:
   upf.yaml: |-
     logger:
-        file: /var/log/open5gs/upf.log
-    
-    #  <PFCP Server>
-    sbi:
-      server:
-        no_tls: true
-      client:
-        no_tls: true
+      file: 
+        path: /var/log/open5gs/upf.log
+    global:
+      max:
+        ue: 2048  # The number of UE can be increased depending on memory size.
+        peer: 128
+
     upf:
       pfcp:
-        - dev eth0
+        server:
+          - address: 0.0.0.0
+            advertise: open5gs-upf-7
+        client:
+          # smf:     #  UPF PFCP Client try to associate SMF PFCP Server
+          #   - address: open5gs-smf2
       gtpu:
-        - dev eth0
+        server:
+          - address: 0.0.0.0
+            advertise: open5gs-upf-7
       metrics:
-        - addr: 0.0.0.0
-          port: 9090
-      subnet:
-        - addr: 192.168.0.1/16
+        server:
+          - address: 0.0.0.0
+            port: 9090
+      session:
+        - subnet: 192.168.0.0/16
+          gateway: 192.168.0.1
           dnn: internet
           dev: ogstun
-        - addr: 10.47.0.1/16
+        - subnet: 10.47.0.0/16
+          gateway: 10.47.0.1
           dnn: slice07
-          dev: slice07       
-    smf:
-      pfcp:
-        addr: open5gs-smf
-
-    #
-    # o Maximum Number of UE
-    # max:
-    #   ue: 1024
-    #
-    # o Maximum Number of Peer(S1AP/NGAP, DIAMETER, GTP, PFCP or SBI)
-    # max:
-    #   peer: 64
-    #
-    max:
-      ue: 1024
-
-    #
-    #
-    #  o Message Wait Duration (Default : 10,000 ms = 10 seconds)
-    #    (Default values are used, so no configuration is required)
-    #
-    #  o Message Wait Duration (3000 ms)
-    #  time:
-    #    message:
-    #        duration: 3000
-    time:
-      message:
-        duration: 3000
+          dev: slice07
 
   entrypoint.sh: |-
     #!/bin/bash
@@ -231,4 +185,10 @@ data:
     iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
 
 
-    open5gs-upfd -c /open5gs/config-map/upf.yaml
+    if [ ! -v NICE_VALUE ]; then
+        echo "RUN WITHOUT NICE"
+        open5gs-upfd -c /open5gs/config-map/upf.yaml
+    else
+        echo "RUN WITH NICE $NICE_VALUE"
+        nice -n $NICE_VALUE open5gs-upfd -c /open5gs/config-map/upf.yaml
+    fi

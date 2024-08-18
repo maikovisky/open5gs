@@ -1,25 +1,25 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: open5gs-my5gran04
+  name: open5gs-my5gran07
   namespace: open5gs
   labels:
-    epc-mode: my5gran04
+    epc-mode: my5gran07
     prometheus: open5gs-monitor
 spec:
   replicas: 0
   selector:
     matchLabels:
-      epc-mode: my5gran04
+      epc-mode: my5gran07
   template:
     metadata:
       labels:
-        epc-mode: my5gran04
+        epc-mode: my5gran07
         version: 1.0.1
         app: open5gs-my5grantester
     spec:
       nodeSelector:
-        kubernetes.io/hostname: brix-porvir-05
+        kubernetes.io/hostname: brix-porvir-06
       initContainers:
         - name: init-my5gtester
           image:  maikovisky/mygranttester:1.0.1-3-ubuntu
@@ -33,7 +33,7 @@ spec:
             - name: RANDOM_SLICE
               value: "False"
             - name: SLICE
-              value: "4"
+              value: "7"
             - name: AMF
               value: "2"
           volumeMounts:
@@ -52,11 +52,18 @@ spec:
         - name: my5grantester
           image:   maikovisky/mygranttester:1.0.1-3-ubuntu
           #command: ["sleep", "20d"]
-          command: ["./app", "load-test", "-n", "1"]
+          command: ["./app", "load-test", "-n", "1", "|" , "tee", "/tmp/stdout.log"]
           volumeMounts:
             - name: config-tmp
               mountPath:  /my5G-RANTester/config
-
+          # livenessProbe:
+          #     exec:
+          #       command: ["sh", "-c", "grep -q 'Err' /tmp/stdout.log || exit 1"]
+          #     initialDelaySeconds: 5
+          #     periodSeconds: 5
+          #     timeoutSeconds: 5
+          #     successThreshold: 1
+          #     failureThreshold: 3
           securityContext:
             capabilities:
               add:
@@ -73,7 +80,7 @@ spec:
               add: ["NET_ADMIN", "SYS_MODULE"]
           env:  
             - name: SLICE
-              value: "4"
+              value: "7"
           command: ["/bin/running"]
           #command: ["sleep", "1d"]
           volumeMounts:
@@ -90,12 +97,12 @@ spec:
               add: ["NET_ADMIN", "SYS_MODULE"]
 
           volumeMounts:
-            - name: open5gs-my5gran04-telegraf-cfg
+            - name: open5gs-my5gran07-telegraf-cfg
               mountPath: /etc/telegraf
 
 
       volumes:
-        - name: open5gs-mygtester-config2
+        - name: open5gs-mygtester-config
           configMap:
             name: open5gs-mygtester-config2
 
@@ -109,9 +116,9 @@ spec:
             name: open5gs-my5gtester-testing
             defaultMode: 0777
 
-        - name: open5gs-my5gran04-telegraf-cfg
+        - name: open5gs-my5gran07-telegraf-cfg
           configMap:
-            name: open5gs-my5gran04-telegraf-cfg
+            name: open5gs-my5gran07-telegraf-cfg
             defaultMode: 0777
 
         - name: open5gs-ue-init
@@ -128,7 +135,7 @@ spec:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: open5gs-my5gran04-telegraf-cfg
+  name: open5gs-my5gran07-telegraf-cfg
   namespace: open5gs
 data:
   telegraf.conf: |+
@@ -137,7 +144,7 @@ data:
       listen = ":9100"
 
     [[inputs.ping]]
-      urls = ["10.0.13.52"]
+      urls = ["10.0.13.165"]
       interface = "uetun1"
       method = "native"
       #percentiles = [25, 50, 95, 99]
@@ -149,15 +156,15 @@ data:
 apiVersion: v1
 kind: Service
 metadata:
-  name: open5gs-my5gran04
+  name: open5gs-my5gran07
   namespace: open5gs
   labels:
-    epc-mode: my5gran04
+    epc-mode: my5gran07
 spec:
   selector:
-    epc-mode: my5gran04
+    epc-mode: my5gran07
   ports:
-    - name: http2-open5gs-my5gran04-9100
+    - name: http2-open5gs-my5gran07-9100
       protocol: TCP
       port: 9100
 
@@ -166,15 +173,15 @@ spec:
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
-  name: open5gs-my5gran04
+  name: open5gs-my5gran07
   namespace: open5gs
   labels:
-    epc-mode: my5gran04
+    epc-mode: my5gran07
     release: prometheus
 spec:
   selector:
     matchLabels:
-      epc-mode: my5gran04
+      epc-mode: my5gran07
   endpoints:
   - interval: 10s
-    port: http2-open5gs-my5gran04-9100
+    port: http2-open5gs-my5gran07-9100

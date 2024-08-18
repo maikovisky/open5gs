@@ -34,4 +34,7 @@ data:
     sed -i "s/SST/$SST/g" /my5G-RANTester/config/config.yml 
     sed -i "s/SD/$SD/g" /my5G-RANTester/config/config.yml 
     sed -i "s/MSIN/$IMSI/g" /my5G-RANTester/config/config.yml 
+    if [ $AMF == 2  ]; then
+        sed -i "s/open5gs-amf-sctp/open5gs-amf2-sctp/g" /my5G-RANTester/config/config.yml
+    fi
     cat /my5G-RANTester/config/config.yml
