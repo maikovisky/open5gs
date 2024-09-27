@@ -25,7 +25,8 @@ panels = json.loads("""[
     {"panelId": "55", "name": "transmit"},
     {"panelId": "73", "name": "receive_packets_drop"},
     {"panelId": "74", "name": "transmit_packets_drop"},
-    {"panelId": "75", "name": "receive_iperf"}
+    {"panelId": "75", "name": "receive_iperf"},
+    {"panelId": "76", "name": "cpu_irq"}
 ]""")
 
 
@@ -90,6 +91,11 @@ class GraphanaGetRenderImage:
         basePath = self.createPath(self.path, name, self.subpath)
         text = "({})".format(aText)
         txtFilename = "{}\\{}-grafana.txt".format(basePath, name)
+        
+        
+        with open(txtFilename, 'a+') as f:
+                f.write("&from={}&to={}".format(start, end))
+                f.write("\n")
         for p in panels:
             finalUrl = "{}&from={}&to={}&panelId={}&var-experience={}".format(url, start, end, p["panelId"], text)
             #print(finalUrl)

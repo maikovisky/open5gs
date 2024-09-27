@@ -34,8 +34,9 @@ class Open5gsSliceExperiment:
         self.UPFPods = UPFPods
         self.URANSIMPods = URANSIMPods
         self.cpu = [0] * len(self.UPFPods)
-        self.nice = [None] * len(self.UPFPods)
-        self.bandwith = [None] * len(self.UPFPods)
+        self.limit = [0] * len(self.UPFPods)
+        self.nice = [0] * len(self.UPFPods)
+        self.bandwith = [-1] * len(self.UPFPods)
         
   
     def setDebug(self, debug=True):
@@ -103,6 +104,10 @@ class Open5gsSliceExperiment:
         for i, v in enumerate(r["cpu"]):        
             self.cpu[i] = v
             
+        if "limit" in r:
+            for i, v in enumerate(r["limit"]):        
+                self.limit[i] = v
+            
         if "nice" in r:
             for i, v in enumerate(r["nice"]):        
                 self.nice[i] = v
@@ -118,23 +123,32 @@ class Open5gsSliceExperiment:
             lFases = [1, 5]            
         else:
             #lFases = [1, 5, 10, 15, 20]
-            lFases = [5, 10, 15, 20, 20]
+            lFases = [1, 2, 3, 4, 5]
             time.sleep(15)
         
         k8stools.scale(self.priorityPod, self.namespace, 4)
 
         self.startScale = datetime.now(timezone.utc)
         self.tStart = int( self.startScale.timestamp() * 1000)
+        first = True
         for fase in lFases:
             text = "{} - Fase {}".format(self.name, fase)
-            self.fase.append(self.addAnnotation(text))
+            if not first:
+                self.fase.append(self.addAnnotation(text))
             for p  in self.pods:
-                if( p == "open5gs-my5gran03"):
-                    k8stools.scale(p, self.namespace, fase)
-                elif(p == "open5gs-my5gran02"):
-                    k8stools.scale(p, self.namespace, 10)
-                else:
-                    k8stools.scale(p, self.namespace, 5)
+                k8stools.scale(p, self.namespace, fase)
+                # if( p == "open5gs-my5gran03"):
+                #     k8stools.scale(p, self.namespace, fase)
+                # elif(p == "open5gs-my5gran02"):
+                #     k8stools.scale(p, self.namespace, fase)
+                # else:
+                #     k8stools.scale(p, self.namespace, fase)
+            if first:
+                time.sleep(100)
+                tStart = self.addAnnotation(text)
+                self.fase.append(tStart)
+                self.tStart = int( tStart * 1000)
+                first = False
                 
             if(self.debug):
                 time.sleep(30)
@@ -201,7 +215,7 @@ class Open5gsSliceExperiment:
         print(self.cpu)
         for i, p in enumerate(self.UPFPods):
             k8stools.setEnv(self.namespace, p, "NICE_VALUE", self.nice[i])
-            k8stools.update_resource(self.namespace, p, self.cpu[i], self.cpu[i])
+            k8stools.update_resource(self.namespace, p, self.limit[i], self.cpu[i])
   
         self.startOpen5gsCore()
         print("Esperando core subir")
@@ -213,6 +227,9 @@ class Open5gsSliceExperiment:
         k8stools.scale(self.priorityPod, self.namespace, 0)
         for p  in self.pods:
             k8stools.scale(p, self.namespace, 0)
+            
+        for i, p in enumerate(self.UPFPods):
+            k8stools.bandwith(self.namespace, p, "-1")
                 
     def verifyCoreRunnig(self):
         v1 = client.CoreV1Api()

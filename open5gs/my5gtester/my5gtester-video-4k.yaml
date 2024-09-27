@@ -13,7 +13,7 @@ data:
     sleep "5s"
 
     COUNTER=0
-    while [ -z  $(ifconfig | awk  '/uetun/{print $1; exit}') ] 
+    while [ -z  $(ifconfig | awk  '/uetun/{print $1; exit}') ]
     do
       let COUNTER=COUNTER+1
       #echo -ne "Waiting create tunnel interface. Attempt $COUNTER"\\r
@@ -21,10 +21,11 @@ data:
       sleep "2s"
     done
 
+    tunnel=$(ifconfig uetun1 | awk '/inet / {print $6}')
     route add -host open5gs-iperf0$SLICE dev uetun1
     while :
     do
       t=1800
-      # /bin/iperf -c open5gs-iperf0$SLICE -u -p 5002 --len 1370 -f A -i 15 -t $t --isochronous=60:64m,2m -e
-      /bin/iperf -c open5gs-iperf0$SLICE --len 1370 -f A -i 15 -t $t --isochronous=60:64m,2m -e
+      /bin/iperf -c open5gs-iperf0$SLICE -B $tunnel -u -p 5002 --len 1000 -f A -i 15 -t $t --isochronous=60:45m,0 -e
+      #/bin/iperf -c open5gs-iperf0$SLICE -B $tunnel --len 1370 -f A -i 15 -t $t --isochronous=60:64m,2m -e
     done

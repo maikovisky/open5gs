@@ -16,7 +16,7 @@ def update_resource(namespace, deployment_name, limit=0, request=0, claim="cpu",
     limits  ={claim: "{}m".format(limit) }
     resource = client.V1ResourceRequirements(limits=limits, requests=requests)
     deployment.spec.template.spec.containers[0].resources = resource
-    
+    print("Deployment: {} with CPU limit: {} and request: {}".format(deployment_name, limit, request))
     update_deployment(namespace, deployment_name, deployment)
 
 def scale(name, namespace, replicas):
@@ -26,12 +26,17 @@ def scale(name, namespace, replicas):
 def bandwith(namespace, deployment_name, value = None):
     k8core = client.CoreV1Api()
     annotations = [{
-            'op': "remove" if value == None else "add",  # You can try different operations like 'replace', 'add' and 'remove'
+            'op': "remove" if value == None or value == "-1" else "add",  # You can try different operations like 'replace', 'add' and 'remove'
             'path': '/metadata/annotations',
             'value': {'kubernetes.io/egress-bandwidth': value}
         }]
     r = k8core.list_namespaced_pod(namespace=namespace, label_selector="app={}".format(deployment_name))
     name = r.items[0].metadata.name
+    annot = r.items[0].metadata.annotations
+    if(annot  == None and value == '-1'):
+        print("Pod: {} with bandwith {}".format(name, "None"))
+        return 
+
     print("Pod: {} with bandwith {}".format(name, value))
     k8core.patch_namespaced_pod(name=name, namespace=namespace, body=annotations)
 

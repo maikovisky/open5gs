@@ -112,7 +112,7 @@ spec:
 
         - name: open5gs-my5gtester-running
           configMap:
-            name: open5gs-my5gtester-iot
+            name: open5gs-my5gtester-video-hd
             defaultMode: 0777
 
         - name: open5gs-my5gran02-telegraf-cfg
@@ -143,7 +143,7 @@ data:
       listen = ":9100"
 
     [[inputs.ping]]
-      urls = ["10.0.13.216"]
+      urls = ["10.0.13.115"]
       interface = "uetun1"
       method = "native"
       #percentiles = [25, 50, 95, 99]

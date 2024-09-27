@@ -4,3 +4,10 @@
 
 
 [Laboratório para Migração](https://isovalent.com/labs/migrating-to-cilium/)
+
+
+## Disable Hubble
+helm upgrade cilium cilium/cilium --version 1.16.1 --namespace=kube-system   --reuse-values --set hubble.enabled=false --set hubble.relay.enabled=false --set hubble.ui.enabled=false
+
+## Enable routingMode=native
+helm upgrade cilium cilium/cilium --version 1.16.1 --namespace=kube-system   --reuse-values --set routingMode=native

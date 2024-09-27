@@ -53,7 +53,7 @@ apps_v1_api = client.CoreV1Api()
 #     apps_v1_api.patch_namespaced_deployment(name=deployment_name, namespace=namespace, body=annotations)
 
 
-k8stools.bandwith("open5gs", "open5gs-upf-1", "15M")
+k8stools.bandwith("open5gs", "open5gs-upf-1", "-1")
 
 #r = apps_v1_api.list_namespaced_pod(namespace="open5gs", label_selector="app=open5gs-upf-1")
 #print(r.items[0].metadata.name)

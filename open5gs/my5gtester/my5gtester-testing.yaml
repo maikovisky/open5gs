@@ -24,11 +24,11 @@ data:
         exit 1
       fi
     done
-    
+    tunnel=$(ifconfig uetun1 | awk '/inet / {print $6}')
     route add -host open5gs-iperf0$SLICE dev uetun1
     while :
     do
       t=1800
-      iperf -c open5gs-iperf0$SLICE -f A -i 30 -t $t 
+      iperf -c open5gs-iperf0$SLICE -B $tunnel -f A -i 30 -t $t 
     done
     

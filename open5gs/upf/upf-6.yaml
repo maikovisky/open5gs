@@ -40,7 +40,7 @@ metadata:
     epc-mode: upf6
     promotheus: open5gs-monitor
 spec:
-  replicas: 1
+  replicas: 0
   selector:
     matchLabels:
       epc-mode: upf6
