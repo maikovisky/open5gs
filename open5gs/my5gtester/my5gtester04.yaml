@@ -137,7 +137,7 @@ data:
       listen = ":9100"
 
     [[inputs.ping]]
-      urls = ["10.0.13.189"]
+      urls = ["10.0.13.79"]
       interface = "uetun1"
       method = "native"
       #percentiles = [25, 50, 95, 99]
